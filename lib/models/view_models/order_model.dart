@@ -1,0 +1,83 @@
+import 'package:food_app/models/objects/payment_method.dart';
+import 'package:food_app/models/objects/sales_master.dart';
+
+class OrderModel {
+
+  List<String> _orderTypeList;
+  List<SalesMaster> _itemHoldList;
+  List<SalesMaster> _dineInList;
+  List<SalesMaster> _takeawayList;
+  List<SalesMaster> _deliveryList;
+  List<String> _dineInColumns;
+  List<String> _takeawayAndDeliveryColumns;
+  List<PaymentMethod> _paymentMethodList;
+  int orderType;
+  String _leadingText, _titleText, _trailingText;
+
+
+  List<PaymentMethod> get paymentMethodList => _paymentMethodList;
+
+  set paymentMethodList(List<PaymentMethod> value) {
+    _paymentMethodList = value;
+  }
+
+  List<String> get dineInColumns => _dineInColumns;
+
+  set dineInColumns(List<String> value) {
+    _dineInColumns = value;
+  }
+
+  get getOrderTypeList => _orderTypeList;
+
+  void setOrderTypeList(List<String> value) => _orderTypeList = value;
+
+  get getItemHoldList => _itemHoldList;
+
+  void setItemHoldList(List<SalesMaster> value) => _itemHoldList = value;
+
+  void onOrderCancelled(SalesMaster salesMaster) {
+    _itemHoldList.remove(salesMaster);
+  }
+
+  List<SalesMaster> get dineInList => _dineInList;
+
+  List<SalesMaster> get takeawayList => _takeawayList;
+
+  List<SalesMaster> get deliveryList => _deliveryList;
+
+  set deliveryList(List<SalesMaster> value) {
+    _deliveryList = value;
+  }
+
+  set takeawayList(List<SalesMaster> value) {
+    _takeawayList = value;
+  }
+
+  set dineInList(List<SalesMaster> value) {
+    _dineInList = value;
+  }
+
+  List<String> get takeawayAndDeliveryColumns => _takeawayAndDeliveryColumns;
+
+  set takeawayAndDeliveryColumns(List<String> value) {
+    _takeawayAndDeliveryColumns = value;
+  }
+
+  get trailingText => _trailingText;
+
+  set trailingText(value) {
+    _trailingText = value;
+  }
+
+  get titleText => _titleText;
+
+  set titleText(value) {
+    _titleText = value;
+  }
+
+  String get leadingText => _leadingText;
+
+  set leadingText(String value) {
+    _leadingText = value;
+  }
+}

@@ -1,0 +1,127 @@
+import 'package:flutter/material.dart';
+import 'package:food_app/models/objects/device.dart';
+import 'package:food_app/models/objects/setting_detail.dart';
+import 'package:food_app/models/objects/shift.dart';
+import 'package:food_app/models/objects/user.dart';
+import 'package:intl/intl.dart';
+import 'package:logger/logger.dart';
+import 'package:sqflite/sqflite.dart';
+
+class Config {
+  static const String appTitle = 'Cloud Kitchen';
+  static const DATABASE databaseVersion = DATABASE.CREATE;
+  static const String databaseName = 'CloudKitchen.db';
+  static const String serverIP = '72.52.142.19';
+  //1626065997
+  static String _authToken;
+  static set authToken(String value) => _authToken = value;
+  static String get authToken => _authToken;
+  static String activeStatus = 'Online';
+  static bool isSwitched = true;
+  static bool isLogin = true;
+  static String _installApi;
+
+  static String get installApi => _installApi;
+
+  static set installApi(String value) {
+    _installApi =
+        'http://$serverIP/cloud-kitchen/api/install?auth=$value&sale_limit=20&expense_limit=20';
+  }
+
+  static final String addUpdateOrderApi =
+      'http://$serverIP/cloud-kitchen/api/order?auth=$authToken';
+  static final customerUploadApi =
+      'http://$serverIP/cloud-kitchen/api/customer?auth=$authToken';
+  static final String openRegisterApi =
+      'http://$serverIP/cloud-kitchen/api/openRegister?auth=$authToken';
+  static final String closeRegisterApi =
+      'http://$serverIP/cloud-kitchen/api/closeRegister?auth=$authToken';
+  static const int screenStartTime = 3;
+
+  static const int serviceCycleDelay = 5; //SECONDS
+
+  static User _currentUser;
+  static set currentUser(user) => _currentUser = user;
+  static User get currentUser => _currentUser;
+
+  static Shift _currentShift;
+  static set currentShift(shift) => _currentShift = shift;
+  static Shift get currentShift => _currentShift;
+
+  static Device _currentDevice;
+  static set currentDevice(device) => _currentDevice = device;
+  static Device get currentDevice => _currentDevice;
+
+  static SettingDetail _settingDetail;
+  static set settingDetail(detail) => _settingDetail = detail;
+  static SettingDetail get settingDetail => _settingDetail;
+
+  static double getDeviceWidth(BuildContext context) =>
+      MediaQuery.of(context).size.width;
+
+  static double getDeviceHeight(BuildContext context) =>
+      MediaQuery.of(context).size.height;
+
+  static final Logger log = new Logger(
+    printer: PrettyPrinter(
+        colors: true,
+        errorMethodCount: 1,
+        printEmojis: true,
+        printTime: false,
+        lineLength: 80,
+        methodCount: 0),
+  );
+
+  static Database _database;
+  static set database(Database database) => _database = database;
+  static Database get database => _database;
+
+  static String getCurrentDateTime() {
+    DateTime dateTime = DateTime.now();
+    DateFormat formatDateTime = DateFormat.yMd().add_jm();
+    String currentDateTime = formatDateTime.format(dateTime);
+    return currentDateTime;
+  }
+
+  static String getCurrentDateTimeDBFormat() {
+    DateTime dateTime = DateTime.now();
+    DateFormat formatDateTime = DateFormat("yyyy-MM-dd HH:mm:ss");
+    String currentDateTime = formatDateTime.format(dateTime);
+    return currentDateTime;
+  }
+
+  static String getCurrentTime() {
+    DateTime dateTime = DateTime.now();
+    DateFormat formatDateTime = DateFormat("HH:mm:ss");
+    String currentDateTime = formatDateTime.format(dateTime);
+    return currentDateTime;
+  }
+
+  static String getCurrentShiftDate(String date) {
+    DateFormat formatDateTime = DateFormat("yyyy-MM-dd");
+    String currentDateTime = formatDateTime.format(DateTime.parse(date));
+    return currentDateTime;
+  }
+
+  static String convertDateTimeToDate(DateTime date) {
+    DateFormat formatDateTime = DateFormat("yyyy-MM-dd");
+    String currentDateTime = formatDateTime.format(date);
+    return currentDateTime;
+  }
+
+  static String getCurrentDate() {
+    DateTime dateTime = DateTime.now();
+    DateFormat formatDateTime = DateFormat("yyyy-MM-dd");
+    String currentDate = formatDateTime.format(dateTime);
+    return currentDate;
+  }
+
+  static String getCurrentTime24Format() {
+    DateTime dateTime = DateTime.now();
+    DateFormat formatDateTime = DateFormat("HH:mm:ss");
+    String currentTime = formatDateTime.format(dateTime);
+    return currentTime;
+  }
+}
+
+enum DATABASE { STABLE, CREATE, UPGRADE, DOWNGRADE }
