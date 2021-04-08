@@ -1,60 +1,30 @@
 import 'package:flutter/material.dart';
-import 'package:food_app/models/objects/device.dart';
-import 'package:food_app/models/objects/setting_detail.dart';
-import 'package:food_app/models/objects/shift.dart';
-import 'package:food_app/models/objects/user.dart';
 import 'package:intl/intl.dart';
 import 'package:logger/logger.dart';
-import 'package:sqflite/sqflite.dart';
+import 'package:pos_app/models/objects/user.dart';
 
 class Config {
-  static const String appTitle = 'Cloud Kitchen';
-  static const DATABASE databaseVersion = DATABASE.CREATE;
-  static const String databaseName = 'CloudKitchen.db';
-  static const String serverIP = '72.52.142.19';
-  //1626065997
+  static const String appTitle = 'POS';
+  static String serverIp;
+  static User user;
+  static String _apiCommon = 'http://$serverIp/api';
+
+  static String get getLoginApi => '$_apiCommon/Login';
+  static String get getCategoryApi => '$_apiCommon/Category';
+  static String get getItemsApi => '$_apiCommon/Item';
+  static String get getTablesApi => '$_apiCommon/Table';
+  static String get getWaitersApi => '$_apiCommon/Waiters';
+  static String get getOrdersApi => '$_apiCommon/Orders';
+
   static String _authToken;
   static set authToken(String value) => _authToken = value;
   static String get authToken => _authToken;
   static String activeStatus = 'Online';
-  static bool isSwitched = true;
-  static bool isLogin = true;
-  static String _installApi;
-
-  static String get installApi => _installApi;
-
-  static set installApi(String value) {
-    _installApi =
-        'http://$serverIP/cloud-kitchen/api/install?auth=$value&sale_limit=20&expense_limit=20';
-  }
-
-  static final String addUpdateOrderApi =
-      'http://$serverIP/cloud-kitchen/api/order?auth=$authToken';
-  static final customerUploadApi =
-      'http://$serverIP/cloud-kitchen/api/customer?auth=$authToken';
-  static final String openRegisterApi =
-      'http://$serverIP/cloud-kitchen/api/openRegister?auth=$authToken';
-  static final String closeRegisterApi =
-      'http://$serverIP/cloud-kitchen/api/closeRegister?auth=$authToken';
-  static const int screenStartTime = 3;
+  static const int SCREEN_START_TIME = 3;
+  static const int SNACKBAR_TIMEOUT = 1;
+  static const int SERVER_TIMEOUT = 30;
 
   static const int serviceCycleDelay = 5; //SECONDS
-
-  static User _currentUser;
-  static set currentUser(user) => _currentUser = user;
-  static User get currentUser => _currentUser;
-
-  static Shift _currentShift;
-  static set currentShift(shift) => _currentShift = shift;
-  static Shift get currentShift => _currentShift;
-
-  static Device _currentDevice;
-  static set currentDevice(device) => _currentDevice = device;
-  static Device get currentDevice => _currentDevice;
-
-  static SettingDetail _settingDetail;
-  static set settingDetail(detail) => _settingDetail = detail;
-  static SettingDetail get settingDetail => _settingDetail;
 
   static double getDeviceWidth(BuildContext context) =>
       MediaQuery.of(context).size.width;
@@ -71,10 +41,6 @@ class Config {
         lineLength: 80,
         methodCount: 0),
   );
-
-  static Database _database;
-  static set database(Database database) => _database = database;
-  static Database get database => _database;
 
   static String getCurrentDateTime() {
     DateTime dateTime = DateTime.now();
@@ -123,5 +89,3 @@ class Config {
     return currentTime;
   }
 }
-
-enum DATABASE { STABLE, CREATE, UPGRADE, DOWNGRADE }

@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.devaj.cloud_kitchen">
+    package="com.devaj.pos_app">
 
 
 
     <application
-        android:icon="@drawable/logo2"
-        android:label="Cloud Kitchen"
+        android:icon="@drawable/logo"
+        android:label="POS"
         android:usesCleartextTraffic="true"
         android:allowBackup="true">
         <service
-            android:name=".RegisterService"
+            android:name="com.devaj.pos_app.RegisterService"
             android:enabled="true"
             android:exported="false"/>
         <service
-            android:name=".OrdersService"
+            android:name="com.devaj.pos_app.OrdersService"
             android:enabled="true"
             android:exported="false" />
 
         <activity
-            android:name=".MainActivity"
+            android:name="com.devaj.pos_app.MainActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:hardwareAccelerated="true"
             android:launchMode="singleTop"

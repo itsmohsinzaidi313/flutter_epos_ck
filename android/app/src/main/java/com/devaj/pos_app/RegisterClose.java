@@ -1,4 +1,4 @@
-package com.devaj.cloud_kitchen;
+package com.devaj.pos_app;
 
 import com.google.gson.annotations.SerializedName;
 

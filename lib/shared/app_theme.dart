@@ -1,10 +1,8 @@
 import 'dart:async';
-
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
 import 'package:progress_dialog/progress_dialog.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:toast/toast.dart';
 
 class AppTheme {
   static final Color appBarColor = Colors.red;
@@ -220,9 +218,5 @@ class AppTheme {
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8)),
             ));
-  }
-
-  static void showToast(String msg, BuildContext context){
-    Toast.show(msg, context, backgroundColor: Colors.redAccent, textColor: Colors.white, duration: 2);
   }
 }

@@ -1,4 +1,4 @@
-package com.devaj.cloud_kitchen;
+package com.devaj.pos_app;
 
 import android.app.Service;
 import android.content.Intent;
@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Build;
-import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
 

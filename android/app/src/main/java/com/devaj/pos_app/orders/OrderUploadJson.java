@@ -1,4 +1,4 @@
-package com.devaj.cloud_kitchen.orders;
+package com.devaj.pos_app.orders;
 
 public class OrderUploadJson {
 

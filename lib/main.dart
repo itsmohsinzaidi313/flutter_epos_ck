@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:food_app/pages/splash_screen.dart';
-import 'package:food_app/shared/config.dart';
+import './pages/splash_screen.dart';
+import './shared/config.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();

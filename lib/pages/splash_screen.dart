@@ -1,14 +1,10 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:food_app/controller/dashboard_controller.dart';
-import 'package:food_app/controller/login_controller.dart';
-import 'package:food_app/controller/shift_controller.dart';
-import 'package:food_app/database/project_database.dart';
-import 'package:food_app/database/table_object/user_table.dart';
-import 'package:food_app/models/objects/setting_detail.dart';
-import 'package:food_app/models/objects/shift.dart';
-import 'package:food_app/models/objects/user.dart';
-import 'package:food_app/shared/config.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pos_app/bloc/login_bloc/login_bloc.dart';
+import '../pages/login_screen.dart';
+import '../shared/config.dart';
+import 'login_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   @override
@@ -21,43 +17,17 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    ProjectDatabase().database.then((db) => Config.database = db);
-    Timer(
-          Duration(seconds: 3),
-          () => _whichScreenToGo());
+    Timer(Duration(seconds: 3), () => _whichScreenToGo());
   }
 
-  void _whichScreenToGo() async{
-      SettingDetail settingDetail = await SettingDetail()
-          .getUserSettingByDesc();
-      if (settingDetail != null) {
-        Config.settingDetail = settingDetail;
-        User user = await User().getSpecificUser(settingDetail.userId); 
-        if(user != null){
-          Config.currentUser = user;
-          if(settingDetail.registerStatus == 1){
-            ShiftController(1).launch(context);
-          } else if (settingDetail.registerStatus == 0){
-            Shift shift = await Shift().getSpecificShift(settingDetail.shiftId);
-            if(shift != null){
-              Config.currentShift = shift;
-              DashboardController(context).pushAndRemoveUntil(context);
-            }
-            else{
-              print('Shift Found NaN');
-              LoginController().launch(context);
-            }
-          } else{
-            ShiftController(1).launch(context);
-          }
-        } else{
-          print('User Found NaN');
-          LoginController().launch(context);
-        }
-      } else{
-        print('Setting Found NaN');
-        LoginController().launch(context);
-      }
+  void _whichScreenToGo() async {
+    Navigator.of(context).pushAndRemoveUntil(
+        new MaterialPageRoute(
+            builder: (context) => BlocProvider(
+                  create: (_) => LoginBloc(),
+                  child: LoginScreen(),
+                )),
+        (route) => false);
   }
 
   @override

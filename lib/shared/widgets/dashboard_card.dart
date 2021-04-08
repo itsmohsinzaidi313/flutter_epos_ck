@@ -1,33 +1,34 @@
 import 'package:flutter/material.dart';
-import 'package:food_app/models/generic_models/dashboard_item.dart';
+import '../config.dart';
 
 class DashboardCard extends StatelessWidget {
-  final DashboardItem _dashboardItem;
-  final VoidCallback _onTap;
-  final double _height, _width;
-
-  const DashboardCard(
-      this._dashboardItem, this._height, this._width, this._onTap);
-
+  DashboardCard({
+    @required this.title,
+    @required this.onTap,
+    @required this.asset
+  });
+  final String asset;
+  final String title;
+  final Function onTap;
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: _height,
-      width: _width,
+      height: Config.getDeviceHeight(context),
+      width: Config.getDeviceWidth(context),
       child: Card(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10.0),
         ),
         elevation: 10.0,
         child: InkWell(
-          onTap: _onTap,
+          onTap: onTap,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Image(
-                  image: AssetImage(_dashboardItem.img),
+                  image: AssetImage('assets/$asset'),
                   fit: BoxFit.contain,
                   width: 80,
                   height: 80,
@@ -36,7 +37,7 @@ class DashboardCard extends StatelessWidget {
                   height: 20,
                 ),
                 Text(
-                  _dashboardItem.name,
+                  title,
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 25,
@@ -49,7 +50,7 @@ class DashboardCard extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.all(3.0),
                   child: Text(
-                    _dashboardItem.subtitle,
+                    '',
                     maxLines: 2,
                     textAlign: TextAlign.center,
                     overflow: TextOverflow.ellipsis,

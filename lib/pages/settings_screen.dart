@@ -2,7 +2,7 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:food_app/shared/config.dart';
+import '../shared/config.dart';
 
 class SettingsScreen extends StatefulWidget {
   @override
@@ -11,11 +11,10 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   final MethodChannel ordersChannel =
-      MethodChannel("com.devaj.cloudKitchen/orderService");
+      MethodChannel("com.devaj.pos_app/orderService");
   final MethodChannel registerChannel =
-      MethodChannel("com.devaj.cloudKitchen/registerService");
-  final MethodChannel configChannel =
-      MethodChannel("com.devaj.cloudKitchen/config");
+      MethodChannel("com.devaj.pos_app/registerService");
+  final MethodChannel configChannel = MethodChannel("com.devaj.pos_app/config");
 
   @override
   Widget build(BuildContext context) {
@@ -26,13 +25,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
               child: Text('Ok'),
               onPressed: () {
                 if (Platform.isAndroid) {
-                  Map<String, String> map = {
-                    'installApi': Config.installApi,
-                    'addUpdateOrderApi': Config.addUpdateOrderApi,
-                    'openRegisterApi': Config.openRegisterApi,
-                    'closeRegisterApi': Config.closeRegisterApi
-                  };
-                  
+                  Map<String, String> map = {};
+
                   configChannel
                       .invokeMethod("init", [map])
                       .then((value) => print(value))

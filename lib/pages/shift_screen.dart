@@ -1,31 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:food_app/controller/dashboard_controller.dart';
-import 'package:food_app/controller/login_controller.dart';
-import 'package:food_app/database/table_object/device_table.dart';
-import 'package:food_app/database/table_object/setting_detail_table.dart';
-import 'package:food_app/database/table_object/shift_table.dart';
-import 'package:food_app/models/objects/device.dart';
-import 'package:food_app/models/objects/shift.dart';
-import 'package:food_app/models/view_models/shift_model.dart';
-import 'package:food_app/shared/app_theme.dart';
-import 'package:food_app/shared/config.dart';
-import 'package:food_app/shared/data_lists.dart';
-import 'package:food_app/shared/lib.dart';
+import '../shared/config.dart';
 
 class ShiftScreen extends StatefulWidget {
-  final ShiftModel model;
-
-  ShiftScreen(this.model);
-
   @override
-  _ShiftScreen createState() => _ShiftScreen(this.model);
+  _ShiftScreen createState() => _ShiftScreen();
 }
 
 class _ShiftScreen extends State<ShiftScreen> {
-  final ShiftModel model;
-
-  _ShiftScreen(this.model);
-
   String _dropdown = 'Morning';
   bool _autoValidate = false;
   TextEditingController closingAmount = TextEditingController();
@@ -62,12 +43,12 @@ class _ShiftScreen extends State<ShiftScreen> {
                     ),
                   ),
                 ),
-                bodyLayoutController(model.layoutType)
+                bodyLayoutController(1)
               ]),
             ),
           ),
         ),
-        floatingActionButton: floatingButtonLayoutController(model.layoutType));
+        floatingActionButton: floatingButtonLayoutController(1));// CHANGES FOATING ACTION BUTTON ICON
   }
 
   Widget bodyLayoutController(int layoutType) {
@@ -121,7 +102,7 @@ class _ShiftScreen extends State<ShiftScreen> {
                                   _dropdown = newValue;
                                 });
                               },
-                              items: this.model.shiftList,
+                              items: <DropdownMenuItem<String>>[],
                             ),
                           ],
                         ),
@@ -222,71 +203,7 @@ class _ShiftScreen extends State<ShiftScreen> {
             setState(() {
               if (_formKey.currentState.validate()) {
                 _formKey.currentState.save();
-                // DataLists.instance.listDevices.forEach((d) {
-                //   Config.currentDevice = d;
-                Config.database.rawQuery('SELECT * FROM ${DeviceTable.tableName} WHERE ${DeviceTable.outletId} = ${Config.currentUser.outletId}').then((value) {
-                  if(value != null){
-                    Config.currentDevice = Device.fromJson(value[0]);
-                    // deviceId = Config.currentDevice.serverId;
-                  }
-                }).whenComplete(() {
-                  Config.currentShift = Shift(
-                      shift: _dropdown,
-                      deviceKey: Config.authToken ?? Config.currentDevice.deviceKey,
-                      openingBalance: openingAmount.text.trim(),
-                      userId: Config.currentUser.serverId,
-                      openingBalanceDateTime:
-                          Config.getCurrentDateTimeDBFormat(),
-                      outletId: Config.currentUser.outletId,
-                      companyId: Config.currentUser.companyId,
-                      registerStatus: '1',
-                      closingBalance: '0',
-                      closingBalanceDateTime: '0',
-                      isUpload: '0');
-
-                  Shift().getNextShiftRemoteId(Config.database).then((value) {
-                    if (value > 0) {
-                      Config.currentShift.remoteId = value.toString();
-                      Config.currentShift.registerNo =
-                           Lib.codeGenerator('REG', int.parse(value.toString()));
-                      Config.database
-                          .insert(ShiftTable.tableName,
-                              Config.currentShift.toMap(Config.currentShift))
-                          .then((value) {
-                        if (value > 0) {
-                          Config.database.update(SettingDetailTable.tableName, {
-                            SettingDetailTable.shiftId : value,
-                            SettingDetailTable.registerStatus : 0
-                          }, where: '${SettingDetailTable.userId} = ?', whereArgs: [Config.currentUser.serverId]).then((value) {
-                            if(value > 0){
-                              AppTheme.showAlertDialogOK(context,
-                                  title: 'Success',
-                                  message:
-                                  'Shift# ${Config.currentShift.registerNo} opened successfully.',
-                                  onOK: () => DashboardController(context)
-                                      .pushAndRemoveUntil(context));
-                            } else{
-                              print('SettingDetail did not updated');
-                              AppTheme.showAlertDialogOK(context,
-                                  title: 'Error',
-                                  message:
-                                  'Shift does not open. Try again!',
-                                  onOK: () => Navigator.of(context).pop());
-                            }
-                          });
-                        } else {
-                          print('Shift did not inserted');
-                          AppTheme.showAlertDialogOK(context,
-                              title: 'Error',
-                              message:
-                                  'Your request is not accepted by Server. Please Try Again!',
-                              onOK: () => Navigator.of(context).pop());
-                        }
-                      });
-                    }
-                  });
-                });
-                // });
+                
               } else {
                 _autoValidate = true;
               }
@@ -300,78 +217,7 @@ class _ShiftScreen extends State<ShiftScreen> {
         return FloatingActionButton(
           onPressed: () async {
             try {
-              setState(() {
-                checkField = closingAmount.text == '' ? true : false;
-                errorMessage = 'Required.';
-              });
-
-              if (!checkField) {
-                double amount = double.parse(closingAmount.text);
-                if (amount > 0) {
-                  ///UPDATING THE SHIFT OBJECT IN CONFIG
-                  Config.currentShift.closingBalance = closingAmount.text;
-                  Config.currentShift.closingBalanceDateTime =
-                      Config.getCurrentDateTimeDBFormat();
-                  Config.currentShift.registerStatus = '2';
-
-                  ///UPDATING SHIFT IN THE DATABASE
-                  await Config.database
-                      .update(
-                          ShiftTable.tableName,
-                          {
-                            ShiftTable.closingBalance:
-                                Config.currentShift.closingBalance,
-                            ShiftTable.closingBalanceDateTime:
-                                Config.currentShift.closingBalanceDateTime,
-                            ShiftTable.registerStatus:
-                                Config.currentShift.registerStatus
-                          },
-                          where:
-                              '${ShiftTable.localId} = ${Config.currentShift.remoteId}')
-                      .then((value) {
-                    if (value > 0) {
-                      Config.database.update(SettingDetailTable.tableName, {
-                        SettingDetailTable.shiftId : value,
-                        SettingDetailTable.registerStatus : 1,
-                        SettingDetailTable.loginStatus : 1
-                      }, where: '${SettingDetailTable.userId} = ?', whereArgs: [Config.currentUser.serverId]).then((value) {
-                        if(value > 0){
-                          Lib.closeRegister(Config.currentShift);
-                          AppTheme.showAlertDialogOK(context,
-                              title: 'Success',
-                              message:
-                              'Shift# ${Config.currentShift.registerNo} closed successfully.',
-                              onOK: () {
-                                setState(() {
-                                  Config.isLogin = false;
-                                });
-                                LoginController().pushAndRemoveUntil(context);
-                              });
-                        } else{
-                          print('SettingDetail did not updated');
-                          AppTheme.showAlertDialogOK(context,
-                              title: 'Error',
-                              message:
-                              'Shift does not close. Try again!',
-                              onOK: () => Navigator.of(context).pop());
-                        }
-                      });
-                    } else {
-                      print('Shift did not inserted');
-
-                      AppTheme.showAlertDialogOK(context,
-                          title: 'Error',
-                          message: 'Something went wrong. Please Try Again!',
-                          onOK: () => Navigator.of(context).pop());
-                    }
-                  });
-                  // LoginController().pushAndRemoveUntil(context);
-
-                } else {
-                  checkField = true;
-                  errorMessage = 'Invalid Amount.';
-                }
-              }
+             
             } catch (e) {
               Config.log.e(e);
             }
