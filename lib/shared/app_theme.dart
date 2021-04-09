@@ -219,4 +219,6 @@ class AppTheme {
                   borderRadius: BorderRadius.circular(8)),
             ));
   }
+  static void snackbar(BuildContext context, String text) =>
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
 }

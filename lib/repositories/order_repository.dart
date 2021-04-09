@@ -1,3 +1,7 @@
+import 'package:http/http.dart';
+import 'package:meta/meta.dart';
+import 'package:pos_app/models/objects/customer_order.dart';
+import 'package:pos_app/models/objects/server_response.dart';
 import 'package:pos_app/shared/config.dart';
 
 class OrderRepo {
@@ -6,4 +10,14 @@ class OrderRepo {
     _url = Config.getOrdersApi;
   }
   String _url;
+
+  Future<ServerResponse> order(
+          {@required String userId, @required String type}) async =>
+      ServerResponse(response: await get('$_url?userid=$userId&type=$type'));
+
+  Future<ServerResponse> postOrder({@required Order customerOrder}) async =>
+      ServerResponse(
+          response: await post(_url,
+              headers: {'Content-type': 'application/json'},
+              body: '"${customerOrder.toJson.replaceAll('"', '\\"')}"'));
 }

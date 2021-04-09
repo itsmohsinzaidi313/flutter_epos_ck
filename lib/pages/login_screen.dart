@@ -192,45 +192,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                                 onChanged: (value) =>
                                                     ipAddress = value,
                                               ),
-                                              // child: FutureBuilder(
-                                              //   future: SharedPreferences
-                                              //       .getInstance(),
-                                              //   builder: (context, snapshot) {
-                                              //     TextEditingController
-                                              //         ipController =
-                                              //         TextEditingController();
-                                              //     if (snapshot.hasData) {
-                                              //       final perf = snapshot.data
-                                              //           as SharedPreferences;
-                                              //       ipAddress = perf
-                                              //           .getString('ipAddress');
-                                              //       Config.serverIp = ipAddress;
-                                              //     }
-                                              //     return TextField(
-                                              //       controller: ipController,
-                                              //       enabled: true,
-                                              //       decoration: InputDecoration(
-                                              //         icon:
-                                              //             Icon(Icons.computer),
-                                              //         border: InputBorder.none,
-                                              //         labelText: 'Ip Address',
-                                              //         labelStyle: TextStyle(
-                                              //           color: Colors.grey[400],
-                                              //         ),
-                                              //         errorText: state
-                                              //                 is InvalidIpAddress
-                                              //             ? 'Required'
-                                              //             : null,
-                                              //       ),
-                                              //       textInputAction:
-                                              //           TextInputAction.next,
-                                              //       keyboardType:
-                                              //           TextInputType.number,
-                                              //       onChanged: (value) =>
-                                              //           ipAddress = value,
-                                              //     );
-                                              //   },
-                                              // ),
                                             ),
                                           ),
                                           TextButton(

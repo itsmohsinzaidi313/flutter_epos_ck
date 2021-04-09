@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
 import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:pos_app/models/objects/customer_order.dart';
 import 'package:pos_app/models/objects/items_category.dart';
@@ -13,23 +12,32 @@ part 'pos_state.dart';
 
 class POSBloc extends Bloc<POSEvents, POSState> {
   final Order customerOrder;
-  final List<Category> listCategories;
-  final List<MenuItem> listItems;
-  POSBloc({this.customerOrder, this.listCategories, this.listItems})
-      : super(PosInitial());
+  List<Category> listCategories = [];
+  List<MenuItem> listItems = [];
+  POSBloc({@required this.customerOrder}) : super(PosInitial());
 
   @override
   Stream<POSState> mapEventToState(
     POSEvents event,
   ) async* {
     try {
-      if (state is PosInitial) {
+      if (event is Build) {
+        final cateResponse = await CategoryRepo.repo.rawCategories;
+        final itemResponse = await MenuItemRepo.repo.allItems;
+        listCategories = (cateResponse.data as List<dynamic>)
+            .map((e) => Category.fromJson(e))
+            .toList();
+        listItems = (itemResponse.data as List<dynamic>)
+            .map((e) => MenuItem.fromJson(e))
+            .toList();
         yield CategoriesLoaded(list: listCategories);
         yield ItemsLoaded(
             list: listItems
                 .where((e) => e.categoryId == listCategories.first.id)
                 .toList());
-        yield CartItems(list: customerOrder.cartItems);
+        yield CartItems(
+            list: customerOrder.cartItems,
+            totalAmount: customerOrder.totalAmount);
       } else if (event is LoadCategories) {
         yield CategoriesLoaded(list: listCategories);
       } else if (event is LoadItems) {

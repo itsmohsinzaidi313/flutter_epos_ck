@@ -1,13 +1,13 @@
 part of 'order_info_bloc.dart';
 
-abstract class OrderInfoEvent extends Equatable {
+enum ORDERTYPE { DINE_IN, TAKE_AWAY, DELIVERY }
+
+abstract class OrderInfoEvent {
   const OrderInfoEvent({this.orderType});
   final ORDERTYPE orderType;
-  @override
-  List<Object> get props => [];
 }
 
-enum ORDERTYPE { DINE_IN, TAKE_AWAY, DELIVERY }
+class Build extends OrderInfoEvent {}
 
 class OrderTypeChanged extends OrderInfoEvent {
   OrderTypeChanged({@required ORDERTYPE type}) : super(orderType: type);
@@ -53,11 +53,12 @@ class AddressChanged extends OrderInfoEvent {
 }
 
 class Submit extends OrderInfoEvent {
-  final String contact;
-  final String address;
-  final String customerName;
-  final String covers;
-  final Waiter waiter;
-  final Tables table;
-  Submit({@required ORDERTYPE type, this.covers, this.waiter, this.table, this.contact, this.address, this.customerName}) : super(orderType: type);
+  Submit(
+      {@required ORDERTYPE type})
+      : super(orderType: type);
+}
+
+class SearchCustomer extends OrderInfoEvent {
+  SearchCustomer({@required ORDERTYPE type})
+      : super(orderType: type);
 }

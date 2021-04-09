@@ -46,7 +46,7 @@ class Order {
         orderType = map[OrderTypeKey],
         userId = map[UserIdKey];
 
-  String toJson() => {
+  String get toJson => {
         jsonEncode(ItemsKey): jsonEncode(_items),
         jsonEncode(WaiterKey): jsonEncode(waiter),
         jsonEncode(TableKey): jsonEncode(table),

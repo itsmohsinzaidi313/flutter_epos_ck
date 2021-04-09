@@ -1,7 +1,7 @@
 class User {
-  static const String IdKey = 'id';
-  static const String NameKey = 'name';
-  static const String TiltIdKey = 'tiltid';
+  static const String IdKey = 'Id';
+  static const String NameKey = 'Name';
+  static const String TiltIdKey = 'TiltId';
   final String id;
   final String name;
   final String tiltId;

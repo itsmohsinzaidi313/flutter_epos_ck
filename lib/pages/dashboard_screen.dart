@@ -44,28 +44,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
             DashboardCard(
                 title: 'New Order',
                 asset: 'cutlery.png',
-                onTap: () async {
-                  ServerResponse response1 = await WaiterRepo.repo.waiters;
-                  ServerResponse response2 = await TablesRepo.repo.tables;
-                  if (response1.status && response2.status) {
-                    final List<Waiter> waiters =
-                        (response1.data as List<dynamic>)
-                            .map((e) => Waiter.fromJson(e))
-                            .toList();
-                    final List<Tables> tables =
-                        (response2.data as List<dynamic>)
-                            .map((e) => Tables.fromJson(e))
-                            .toList();
-                    return Navigator.of(context).push(new MaterialPageRoute(
-                      builder: (context) => BlocProvider(
-                        create: (_) => OrderInfoBloc(),
-                        child: NewOrderInfoScreen(
-                          waiters: waiters,
-                          tables: tables,
-                        ),
-                      ),
-                    ));
-                  }
+                onTap: () {
+                  return Navigator.of(context).push(new MaterialPageRoute(
+                    builder: (context) => BlocProvider(
+                      create: (_) => OrderInfoBloc(),
+                      child: NewOrderInfoScreen(),
+                    ),
+                  ));
                 }),
           ],
         ));

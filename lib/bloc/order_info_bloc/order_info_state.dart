@@ -1,13 +1,13 @@
 part of 'order_info_bloc.dart';
 
-abstract class OrderInfoState extends Equatable {
+abstract class OrderInfoState {
   const OrderInfoState({@required this.orderType});
   final ORDERTYPE orderType;
-  @override
-  List<Object> get props => [];
 }
 
-class OrderInfoInitial extends OrderInfoState {}
+class OrderInfoInitial extends OrderInfoState {
+  OrderInfoInitial({@required ORDERTYPE type}) : super(orderType: type);
+}
 
 class OrderTypeState extends OrderInfoState {
   OrderTypeState({@required ORDERTYPE type}) : super(orderType: type);
@@ -88,4 +88,21 @@ class InvalidSubmission extends OrderInfoState {
   final String message;
   InvalidSubmission({this.message, @required ORDERTYPE type})
       : super(orderType: type);
+}
+
+class CustomerFound extends OrderInfoState {
+  final Customer customer;
+  final String message;
+  CustomerFound({this.customer, @required ORDERTYPE type, this.message})
+      : super(orderType: type);
+}
+
+class CustomerNotFound extends OrderInfoState {
+  final String message;
+  CustomerNotFound({this.message, @required ORDERTYPE type})
+      : super(orderType: type);
+}
+
+class Nod extends OrderInfoState {
+  Nod({@required ORDERTYPE type}) : super(orderType: type);
 }

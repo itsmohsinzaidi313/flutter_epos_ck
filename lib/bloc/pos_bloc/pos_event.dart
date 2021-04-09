@@ -13,6 +13,7 @@ class LoadItems extends POSEvents {
   // @override
   // List<Object> get props => [categoryId];
 }
+class Build extends POSEvents {}
 
 class LoadCategories extends POSEvents {}
 

@@ -7,7 +7,7 @@ class Config {
   static const String appTitle = 'POS';
   static String serverIp;
   static User user;
-  static String _apiCommon = 'http://$serverIp/api';
+  static String _apiCommon = 'http://$serverIp/api/pos';
 
   static String get getLoginApi => '$_apiCommon/Login';
   static String get getCategoryApi => '$_apiCommon/Category';
@@ -15,6 +15,8 @@ class Config {
   static String get getTablesApi => '$_apiCommon/Table';
   static String get getWaitersApi => '$_apiCommon/Waiters';
   static String get getOrdersApi => '$_apiCommon/Orders';
+  static String get getCustomerApi => '$_apiCommon/Customer';
+  static String get getUsersApi => '$_apiCommon/User';
 
   static String _authToken;
   static set authToken(String value) => _authToken = value;

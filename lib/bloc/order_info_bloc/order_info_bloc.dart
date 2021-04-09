@@ -1,11 +1,12 @@
 import 'dart:async';
 import 'package:bloc/bloc.dart';
-import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pos_app/models/objects/customer_order.dart';
 import 'package:pos_app/models/objects/customer_table.dart';
 import 'package:pos_app/models/objects/waiter.dart';
+import 'package:pos_app/repositories/customer_repository.dart';
+import 'package:pos_app/models/objects/customer.dart';
 import 'package:pos_app/repositories/tables_repository.dart';
 import 'package:pos_app/repositories/waiters_repository.dart';
 
@@ -13,90 +14,179 @@ part 'order_info_event.dart';
 part 'order_info_state.dart';
 
 class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
-  OrderInfoBloc() : super(OrderInfoInitial());
+  OrderInfoBloc() : super(OrderInfoInitial(type: null));
   Order customerOrder = Order();
+  List<Waiter> listWaiters = [];
+  List<Tables> listTables = [];
   @override
   Stream<OrderInfoState> mapEventToState(
     OrderInfoEvent event,
   ) async* {
-    yield OrderInfoInitial();
+    try {
+      if (event is Build) {
+        final waiterResponse = await WaiterRepo.repo.waiters;
+        final tablesResponse = await TablesRepo.repo.tables;
+        listWaiters = (waiterResponse.data as List<dynamic>)
+            .map((e) => Waiter.fromJson(e))
+            .toList();
+        listTables = (tablesResponse.data as List<dynamic>)
+            .map((e) => Tables.fromJson(e))
+            .toList();
+        yield OrderTypeState(type: ORDERTYPE.DINE_IN);
+        yield WaitersState(waiters: listWaiters, type: ORDERTYPE.DINE_IN);
+      }
 
-    switch (event.orderType) {
-      case ORDERTYPE.DINE_IN:
-        final dineIn = ORDERTYPE.DINE_IN;
-        if (event is OrderTypeChanged) {
-          yield OrderTypeState(type: event.orderType);
-        } else if (event is WaiterChanged) {
-          customerOrder.waiter = event.waiter.id;
-          yield TablesState(tables: [], type: dineIn);
-        } else if (event is TableChanged) {
-          customerOrder.table = event.table.id;
-          yield WaitersState(waiters: [], type: dineIn);
-        } else if (event is CoversChanged) {
-          customerOrder.covers = event.covers.toString();
-        } else if (event is Submit) {
-          customerOrder.covers = event.covers.toString();
-          if (customerOrder.waiter == null || customerOrder.waiter.isEmpty) {
-            yield InvalidWaiter(message: 'Please select waiter.', type: dineIn);
-          } else if (customerOrder.covers == null ||
-              customerOrder.covers.isEmpty) {
-            yield InvalidCovers(message: 'Please enter covers.', type: dineIn);
-          } else if (customerOrder.table == null ||
-              customerOrder.table.isEmpty) {
-            yield InvalidTables(message: 'Please select table.', type: dineIn);
+      switch (event.orderType) {
+        case ORDERTYPE.DINE_IN:
+          final dineIn = ORDERTYPE.DINE_IN;
+          if (event is OrderTypeChanged) {
+            yield OrderTypeState(type: dineIn);
+            yield WaitersState(waiters: listWaiters, type: dineIn);
+          } else if (event is WaiterChanged) {
+            customerOrder.waiter = event.waiter.id;
+            yield TablesState(tables: listTables, type: dineIn);
+          } else if (event is TableChanged) {
+            customerOrder.table = event.table.id;
+            yield WaitersState(waiters: listWaiters, type: dineIn);
+          } else if (event is CoversChanged) {
+            customerOrder.covers = event.covers.toString();
+            yield Nod(type: dineIn);
+          } else if (event is Submit) {
+            if (customerOrder.waiter == null || customerOrder.waiter.isEmpty) {
+              yield InvalidWaiter(
+                  message: 'Please select waiter.', type: dineIn);
+            } else if (customerOrder.covers == null ||
+                customerOrder.covers.isEmpty) {
+              yield InvalidCovers(
+                  message: 'Please enter covers.', type: dineIn);
+            } else if (customerOrder.table == null ||
+                customerOrder.table.isEmpty) {
+              yield InvalidTables(
+                  message: 'Please select table.', type: dineIn);
+            } else {
+              yield ValidSubmission(customerOrder: customerOrder, type: dineIn);
+            }
           } else {
-            yield ValidSubmission(customerOrder: customerOrder, type: dineIn);
+            yield Nod(type: dineIn);
           }
-        }
-        break;
-      case ORDERTYPE.TAKE_AWAY:
-        final takeAway = ORDERTYPE.TAKE_AWAY;
-        if (event is CustomerChanged) {
-          customerOrder.customer = event.customerName;
-        } else if (event is ContactChanged) {
-          customerOrder.contact = event.contact;
-        } else if (event is Submit) {
-          if (customerOrder.customer == null ||
-              customerOrder.customer.isEmpty) {
-            yield InvalidCustomer(
-                message: 'Please enter customer name.', type: takeAway);
-          } else if (customerOrder.contact == null ||
-              customerOrder.contact.isEmpty) {
-            yield InvalidContact(
-                message: 'Please enter contact number.', type: takeAway);
+          break;
+        case ORDERTYPE.TAKE_AWAY:
+          final takeAway = ORDERTYPE.TAKE_AWAY;
+          if (event is OrderTypeChanged) {
+            yield OrderTypeState(type: takeAway);
+          } else if (event is CustomerChanged) {
+            customerOrder.customer = event.customerName;
+            yield Nod(type: takeAway);
+          } else if (event is ContactChanged) {
+            customerOrder.contact = event.contact;
+            yield Nod(type: takeAway);
+          } else if (event is Submit) {
+            if (customerOrder.customer == null ||
+                customerOrder.customer.isEmpty) {
+              yield InvalidCustomer(
+                  message: 'Please enter customer name.', type: takeAway);
+            } else if (customerOrder.contact == null ||
+                customerOrder.contact.isEmpty) {
+              yield InvalidContact(
+                  message: 'Please enter contact number.', type: takeAway);
+            } else {
+              yield ValidSubmission(
+                  customerOrder: customerOrder, type: takeAway);
+            }
+          } else if (event is SearchCustomer) {
+            if (customerOrder.contact == null &&
+                customerOrder.contact.isEmpty) {
+              yield InvalidContact(
+                  type: takeAway, message: 'Please enter contact number');
+            } else {
+              final response = await CustomerRepo.repo
+                  .customer(contact: customerOrder.contact);
+              if (response.status) {
+                List<Customer> list = (response.data as List<dynamic>)
+                    .map((e) => Customer.fromJson(e))
+                    .toList();
+                Customer customer = list.first;
+                customerOrder.customer = customer.name;
+                customerOrder.contact = customer.contact;
+                if (list.isNotEmpty) {
+                  yield CustomerFound(
+                      type: takeAway,
+                      customer: customer,
+                      message: 'Customer found.');
+                } else {
+                  yield CustomerNotFound(
+                      type: takeAway, message: 'Customer not found');
+                }
+              } else {}
+            }
           } else {
-            yield ValidSubmission(customerOrder: customerOrder, type: takeAway);
+            yield Nod(type: takeAway);
           }
-        }
-        break;
-      case ORDERTYPE.DELIVERY:
-        final delivery = ORDERTYPE.DELIVERY;
-        if (event is CustomerChanged) {
-          customerOrder.customer = event.customerName;
-        } else if (event is ContactChanged) {
-          customerOrder.contact = event.contact;
-        } else if (event is AddressChanged) {
-          customerOrder.address = event.address;
-        } else if (event is Submit) {
-          if (customerOrder.customer == null ||
-              customerOrder.customer.isEmpty) {
-            yield InvalidCustomer(
-                message: 'Please enter customer name.', type: delivery);
-          } else if (customerOrder.contact == null ||
-              customerOrder.contact.isEmpty) {
-            yield InvalidContact(
-                message: 'Please enter contact number.', type: delivery);
-          } else if (customerOrder.address == null ||
-              customerOrder.address.isEmpty) {
-            yield InvalidAddress(
-                message: 'Please enter address', type: delivery);
+          break;
+        case ORDERTYPE.DELIVERY:
+          final delivery = ORDERTYPE.DELIVERY;
+          if (event is OrderTypeChanged) {
+            yield OrderTypeState(type: delivery);
+          } else if (event is CustomerChanged) {
+            customerOrder.customer = event.customerName;
+            yield Nod(type: delivery);
+          } else if (event is ContactChanged) {
+            customerOrder.contact = event.contact;
+            yield Nod(type: delivery);
+          } else if (event is AddressChanged) {
+            customerOrder.address = event.address;
+            yield Nod(type: delivery);
+          } else if (event is SearchCustomer) {
+            if (customerOrder.contact == null &&
+                customerOrder.contact.isEmpty) {
+              yield InvalidContact(
+                  type: delivery, message: 'Please enter contact number');
+            } else {
+              final response = await CustomerRepo.repo
+                  .customer(contact: customerOrder.contact);
+              if (response.status) {
+                List<Customer> list = (response.data as List<dynamic>)
+                    .map((e) => Customer.fromJson(e))
+                    .toList();
+                if (list.isNotEmpty) {
+                  Customer customer = list.first;
+                  customerOrder.customer = customer.name;
+                  customerOrder.contact = customer.contact;
+                  customerOrder.address = customer.address;
+                  yield CustomerFound(
+                      type: delivery,
+                      customer: customer,
+                      message: 'Customer found.');
+                } else {
+                  yield CustomerNotFound(
+                      type: delivery, message: 'Customer not found');
+                }
+              } else {}
+            }
+          } else if (event is Submit) {
+            if (customerOrder.customer == null ||
+                customerOrder.customer.isEmpty) {
+              yield InvalidCustomer(
+                  message: 'Please enter customer name.', type: delivery);
+            } else if (customerOrder.contact == null ||
+                customerOrder.contact.isEmpty) {
+              yield InvalidContact(
+                  message: 'Please enter contact number.', type: delivery);
+            } else if (customerOrder.address == null ||
+                customerOrder.address.isEmpty) {
+              yield InvalidAddress(
+                  message: 'Please enter address', type: delivery);
+            } else {
+              yield ValidSubmission(
+                  customerOrder: customerOrder, type: delivery);
+            }
           } else {
-            yield ValidSubmission(customerOrder: customerOrder, type: delivery);
+            yield Nod(type: delivery);
           }
-        }
-        break;
-      default:
-        break;
-    }
+          break;
+        default:
+          break;
+      }
+    } catch (e) {}
   }
 }
