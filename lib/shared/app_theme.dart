@@ -10,16 +10,24 @@ class AppTheme {
   static final Color listTextColor = Colors.amber[400];
   static final Color appThemeColor = Colors.amber;
 
+  static Widget get progIndicator => Center(
+      child:
+          SizedBox(height: 40, width: 40, child: CircularProgressIndicator()));
+
   static Widget appBarNormal(
       {BuildContext context,
       String appBarTitle,
       Color appBarBgColor,
-      double appBarElevation}) {
+      double appBarElevation,
+      PreferredSizeWidget bottom,
+      List<Widget> actions = const []}) {
     final appBar = AppBar(
       backgroundColor: appBarBgColor,
       elevation: appBarElevation == null ? 0.0 : appBarElevation,
       title: Text(appBarTitle),
       centerTitle: true,
+      bottom: bottom,
+      actions: actions,
     );
     return appBar;
   }
@@ -86,7 +94,7 @@ class AppTheme {
           bool barrier = true,
           Widget content,
           Widget widget,
-          List<FlatButton> buttons}) =>
+          List<TextButton> buttons}) =>
       showDialog(
           context: context,
           barrierDismissible: barrier,
@@ -103,13 +111,12 @@ class AppTheme {
               ));
 
   static ProgressDialog showProgressDialog(BuildContext context,
-      {Widget widget,bool isDismissible = true}) {
+      {@required Widget widget, bool isDismissible = true}) {
     final spinKit = new SpinKitCircle(
       itemBuilder: (context, index) => DecoratedBox(
         decoration: BoxDecoration(
-            color: appThemeColor,
+          color: appThemeColor,
           shape: BoxShape.circle,
-
         ),
       ),
     );
@@ -142,43 +149,41 @@ class AppTheme {
     );
   }
 
-  static void showAlertDialogYN(BuildContext context,
-      {String title, String message, Function onYes, Function onNo}) {
-    showDialog(
+  static Future<bool> showAlertDialogYN(BuildContext context,
+      {String title, String message, Function onYes, Function onNo}) async {
+    return await showDialog(
         context: context,
         builder: (value) => AlertDialog(
             title: text(text: title, fontWeight: FontWeight.bold, fontSize: 20),
             content: text(text: message),
             actions: [
-              FlatButton(
+              TextButton(
                   child: text(text: 'Yes', color: Colors.blue),
                   onPressed: onYes),
-              FlatButton(
+              TextButton(
                   child: text(text: 'No', color: Colors.blue), onPressed: onNo)
             ],
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8))));
   }
 
-  static Future<bool> showAlertDialogYNFutureReturn(
-      BuildContext context,
-      {String title, String message, Function onYes, Function onNo}
-      ) async {
+  static Future<bool> showAlertDialogYNFutureReturn(BuildContext context,
+      {String title, String message, Function onYes, Function onNo}) async {
     await showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (value) => AlertDialog(
-          title: text(text: title, fontWeight: FontWeight.bold, fontSize: 20),
-          content: text(text: message),
-          actions: [
-            FlatButton(
-                child: text(text: 'Yes', color: Colors.blue),
-                onPressed: onYes),
-            FlatButton(
-                child: text(text: 'No', color: Colors.blue), onPressed: onNo)
-          ],
-          shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8))));
+        context: context,
+        barrierDismissible: false,
+        builder: (value) => AlertDialog(
+            title: text(text: title, fontWeight: FontWeight.bold, fontSize: 20),
+            content: text(text: message),
+            actions: [
+              TextButton(
+                  child: text(text: 'Yes', color: Colors.blue),
+                  onPressed: onYes),
+              TextButton(
+                  child: text(text: 'No', color: Colors.blue), onPressed: onNo)
+            ],
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8))));
     return true;
   }
 
@@ -201,9 +206,9 @@ class AppTheme {
     return TextStyle(fontSize: fontSize, fontWeight: fontWeight, color: color);
   }
 
-  static void showAlertDialogOK(BuildContext context,
+  static Future<dynamic> showAlertDialogOK(BuildContext context,
       {String title, String message, Function onOK}) {
-    showDialog(
+    return showDialog(
         context: context,
         barrierDismissible: false,
         builder: (value) => AlertDialog(
@@ -211,7 +216,7 @@ class AppTheme {
                   text(text: title, fontWeight: FontWeight.bold, fontSize: 20),
               content: text(text: message),
               actions: [
-                FlatButton(
+                TextButton(
                     child: text(text: 'OK', color: Colors.blue),
                     onPressed: onOK),
               ],
@@ -219,6 +224,13 @@ class AppTheme {
                   borderRadius: BorderRadius.circular(8)),
             ));
   }
-  static void snackbar(BuildContext context, String text) =>
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(text)));
+
+  static void snackbar(BuildContext context, String text,
+          {int duration = 2, Color textColor = Colors.white}) =>
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text(
+            text,
+            style: TextStyle(color: textColor),
+          ),
+          duration: Duration(seconds: duration)));
 }

@@ -13,9 +13,15 @@ class LoadItems extends POSEvents {
   // @override
   // List<Object> get props => [categoryId];
 }
-class Build extends POSEvents {}
+
+class POSBuild extends POSEvents {}
 
 class LoadCategories extends POSEvents {}
+
+class CategoryChanged extends POSEvents {
+  final String categoryId;
+  CategoryChanged({@required this.categoryId});
+}
 
 class AddItem extends POSEvents {
   final int itemId;
@@ -46,6 +52,11 @@ class AddComment extends POSEvents {
   // List<Object> get props => [item];
 }
 
-class PostOrder extends POSEvents {
-  
+class PostOrder extends POSEvents {}
+
+class ResetPOSOrder extends POSEvents {}
+
+class LoadPOSOrder extends POSEvents {
+  final Order customerOrder;
+  LoadPOSOrder({@required this.customerOrder});
 }

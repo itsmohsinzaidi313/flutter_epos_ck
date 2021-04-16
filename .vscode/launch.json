@@ -5,9 +5,9 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "pos",
+            "name": "flutter_epos_ck",
             "request": "launch",
-            "type": "dart"
+            "type": "dart",
         }
     ]
 }

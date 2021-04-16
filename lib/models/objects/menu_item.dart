@@ -1,17 +1,13 @@
-import 'dart:convert';
-
-import 'package:equatable/equatable.dart';
-
 class MenuItem {
   static const String IdKey = 'Id';
   static const String CatIdKey = 'CategoryId';
   static const String NameKey = 'Name';
   static const String PriceKey = 'Price';
-  static const String TaxPriceKey = 'TaxPrice';
+  static const String TaxAmountKey = 'TaxAmount';
   static const String QuantityKey = 'Quantity';
   static const String ImageKey = 'image';
 
-  final String id, categoryId, name, price, taxPrice, image;
+  final String id, categoryId, name, price, taxAmount, image;
   double quantity;
 
   String comment;
@@ -21,7 +17,7 @@ class MenuItem {
       this.categoryId,
       this.name,
       this.price,
-      this.taxPrice,
+      this.taxAmount,
       this.quantity,
       this.image});
 
@@ -30,7 +26,7 @@ class MenuItem {
         categoryId = map[CatIdKey],
         name = map[NameKey],
         price = map[PriceKey],
-        taxPrice = map[TaxPriceKey],
+        taxAmount = map[TaxAmountKey],
         quantity = double.parse(map[QuantityKey]),
         image = map[ImageKey];
 
@@ -39,16 +35,16 @@ class MenuItem {
         categoryId = item.categoryId,
         name = item.name,
         price = item.price,
-        taxPrice = item.taxPrice,
+        taxAmount = item.taxAmount,
         quantity = 1,
         image = item.image,
         comment = item.comment;
 
-  String toJson() => {
-        jsonEncode(IdKey): jsonEncode(id),
-        jsonEncode(CatIdKey): jsonEncode(categoryId),
-        jsonEncode(NameKey): jsonEncode(name),
-        jsonEncode(PriceKey): jsonEncode(price),
-        jsonEncode(QuantityKey): jsonEncode(quantity)
-      }.toString();
+  Map<String, dynamic> toJson() => {
+        IdKey: id,
+        CatIdKey: categoryId,
+        NameKey: name,
+        PriceKey: price,
+        QuantityKey: quantity
+      };
 }

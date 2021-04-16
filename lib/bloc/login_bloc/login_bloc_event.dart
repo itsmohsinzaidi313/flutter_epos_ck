@@ -1,46 +1,32 @@
 part of 'login_bloc.dart';
 
 @immutable
-abstract class LoginBlocEvent extends Equatable {}
+abstract class LoginEvent{}
 
-class IpAddressChanged extends LoginBlocEvent {
+class IpAddressChanged extends LoginEvent {
   final String ipaddress;
   IpAddressChanged({@required this.ipaddress});
-
-  @override
-  List<Object> get props => [this.ipaddress];
 }
 
-class UsernameChanged extends LoginBlocEvent {
+class UsernameChanged extends LoginEvent {
   final String username;
   UsernameChanged({@required this.username});
-
-  @override
-  List<Object> get props => [this.username];
 }
 
-class LoginInit extends LoginBlocEvent {
-  @override
-  List<Object> get props => [];
+class LoginInit extends LoginEvent {
 }
 
-class PasswordChanged extends LoginBlocEvent {
+class PasswordChanged extends LoginEvent {
   final String password;
   PasswordChanged({@required this.password});
-
-  @override
-  List<Object> get props => [this.password];
 }
 
-class SubmitPressed extends LoginBlocEvent {
+class SubmitPressed extends LoginEvent {
   final String ipaddress;
   SubmitPressed({@required this.ipaddress});
-
-  @override
-  List<Object> get props => throw UnimplementedError();
 }
 
-class LoginPressed extends LoginBlocEvent {
+class LoginPressed extends LoginEvent {
   final String ipaddress;
   final String username;
   final String password;
@@ -48,17 +34,10 @@ class LoginPressed extends LoginBlocEvent {
       {@required this.ipaddress,
       @required this.username,
       @required this.password});
-
-  @override
-  List<Object> get props => [this.ipaddress, this.username, this.password];
 }
 
-class SwitchChanged extends LoginBlocEvent {
+class SwitchChanged extends LoginEvent {
   final bool online;
   SwitchChanged({@required this.online});
-
-  @override
-  List<Object> get props => [
-        this.online,
-      ];
 }
+

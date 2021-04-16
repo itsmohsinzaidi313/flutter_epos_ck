@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:pos_app/shared/config.dart';
 import 'package:http/http.dart';
 import 'package:pos_app/models/objects/server_response.dart';

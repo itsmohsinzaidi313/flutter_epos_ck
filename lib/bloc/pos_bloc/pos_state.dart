@@ -34,10 +34,33 @@ class CartItems extends POSState {
 
 class SubmissionValid extends POSState {
   final Order customerOrder;
-  SubmissionValid({this.customerOrder});
+  final List<MenuItem> listItems;
+  SubmissionValid({@required this.customerOrder, @required this.listItems});
 }
 
 class SubmissionInvalid extends POSState {
   final String message;
   SubmissionInvalid({this.message});
 }
+
+class OrderPosted extends POSState {
+  final String message;
+  OrderPosted({this.message});
+}
+
+class OrderUpdated extends POSState {
+  final String message;
+  OrderUpdated({this.message});
+}
+
+class OrderPostFailed extends POSState {
+  final String message;
+  OrderPostFailed({this.message});
+}
+
+class POSError extends POSState {
+  final String message;
+  POSError({this.message});
+}
+
+class POSLoading extends POSState {}

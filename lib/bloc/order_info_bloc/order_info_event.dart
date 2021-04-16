@@ -7,7 +7,7 @@ abstract class OrderInfoEvent {
   final ORDERTYPE orderType;
 }
 
-class Build extends OrderInfoEvent {}
+class OrderInfoBuild extends OrderInfoEvent {}
 
 class OrderTypeChanged extends OrderInfoEvent {
   OrderTypeChanged({@required ORDERTYPE type}) : super(orderType: type);
@@ -53,12 +53,11 @@ class AddressChanged extends OrderInfoEvent {
 }
 
 class Submit extends OrderInfoEvent {
-  Submit(
-      {@required ORDERTYPE type})
-      : super(orderType: type);
+  Submit({@required ORDERTYPE type}) : super(orderType: type);
 }
 
 class SearchCustomer extends OrderInfoEvent {
-  SearchCustomer({@required ORDERTYPE type})
-      : super(orderType: type);
+  SearchCustomer({@required ORDERTYPE type}) : super(orderType: type);
 }
+
+class ResetOrderInfoOrder extends OrderInfoEvent {}

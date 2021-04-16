@@ -1,78 +1,60 @@
 part of 'login_bloc.dart';
 
 @immutable
-abstract class LoginBlocState extends Equatable {}
+abstract class LoginState {}
 
-class LoginBlocInitial extends LoginBlocState {
+class LoginBlocInitial extends LoginState {
   final String ipAddress;
-  LoginBlocInitial({this.ipAddress});
-  @override
-  List<Object> get props => [];
+  final String message;
+  LoginBlocInitial({this.ipAddress, this.message});
 }
 
-class ValidIpAddress extends LoginBlocState {
+class ValidIpAddress extends LoginState {
   final String message;
   ValidIpAddress({@required this.message});
-  @override
-  List<Object> get props => [this.message];
 }
 
-class InvalidIpAddress extends LoginBlocState {
+class InvalidIpAddress extends LoginState {
   final String message;
   InvalidIpAddress({@required this.message});
-
-  @override
-  List<Object> get props => [this.message];
 }
 
-class ValidUsername extends LoginBlocState {
-  @override
-  List<Object> get props => [];
-}
+class ValidUsername extends LoginState {}
 
-class InvalidUsername extends LoginBlocState {
+class InvalidUsername extends LoginState {
   final String message;
   InvalidUsername({@required this.message});
-
-  @override
-  List<Object> get props => [this.message];
 }
 
-class ValidPassword extends LoginBlocState {
-  @override
-  List<Object> get props => [];
-}
+class ValidPassword extends LoginState {}
 
-class InvalidPassword extends LoginBlocState {
+class InvalidPassword extends LoginState {
   final String message;
   InvalidPassword({@required this.message});
-
-  @override
-  List<Object> get props => [this.message];
 }
 
-class ValidSubmission extends LoginBlocState {
-  @override
-  List<Object> get props => [];
+class ValidSubmission extends LoginState {
+  final String message;
+  ValidSubmission({this.message});
 }
 
-class InvalidSubmission extends LoginBlocState {
+class InvalidSubmission extends LoginState {
   final String message;
   InvalidSubmission({@required this.message});
-
-  @override
-  List<Object> get props => [this.message];
 }
 
-class Successful extends LoginBlocState {
-  @override
-  List<Object> get props => [];
+class Successful extends LoginState {
+  final String message;
+  Successful({this.message});
 }
 
-class Failed extends LoginBlocState {
+class Failed extends LoginState {
   final String message;
   Failed({@required this.message});
+}
 
-  @override
-  List<Object> get props => [message];
+
+class UsersLoaded extends LoginState {
+  final List<User> list;
+  UsersLoaded({this.list});
 }

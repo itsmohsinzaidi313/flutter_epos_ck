@@ -1,8 +1,8 @@
-import 'dart:convert';
-
+import 'package:pos_app/bloc/payment_bloc/payment_bloc.dart';
 import 'package:pos_app/models/objects/menu_item.dart';
 
 class Order {
+  static const OrderIdKey = 'id';
   static const ItemsKey = 'items';
   static const WaiterKey = 'waiter';
   static const TableKey = 'table';
@@ -12,75 +12,98 @@ class Order {
   static const ContactKey = 'contact';
   static const AddressKey = 'address';
   static const UserIdKey = 'userId';
+  static const OrderNoKey = 'orderNo';
+  static const OrderTimeKey = 'time';
+  static const OrderDateKey = 'date';
+  static const TaxKey = 'tax';
 
-  List<MenuItem> _items = [];
-  String waiter;
-  String table;
-  String userId;
-  String orderType;
-  String covers;
-  String customer;
-  String contact;
-  String address;
+  List<MenuItem> items = [];
+  String id,
+      waiter,
+      table,
+      userId,
+      orderType,
+      orderNo,
+      covers,
+      customer,
+      contact,
+      address,
+      time,
+      date,
+      tax,
+      discountedAmount,
+      payment,
+      cardNumber;
+  PAYMENTMODE paymentmode;
+  bool editOrder = false;
 
   Order(
-      {this.waiter,
+      {this.id,
+      this.waiter,
       this.table,
       this.address,
       this.contact,
       this.covers,
       this.customer,
       this.orderType,
-      this.userId});
+      this.orderNo});
 
   Order.fromJson(Map<String, dynamic> map)
-      : _items = (map[ItemsKey] as List<dynamic>)
-            .map((e) => MenuItem.fromJson(e))
-            .toList(),
+      : id = map[OrderIdKey].toString(),
         waiter = map[WaiterKey],
         table = map[TableKey],
         address = map[AddressKey],
         contact = map[ContactKey],
-        covers = map[CoversKey],
+        covers = map[CoversKey].toString(),
         customer = map[CustomerKey],
         orderType = map[OrderTypeKey],
-        userId = map[UserIdKey];
+        userId = map[UserIdKey],
+        orderNo = map[OrderNoKey].toString(),
+        time = map[OrderTimeKey],
+        date = map[OrderDateKey],
+        tax = map[TaxKey],
+        items = (map[ItemsKey] as List<dynamic>)
+            .map((e) => MenuItem.fromJson(e))
+            .toList();
 
-  String get toJson => {
-        jsonEncode(ItemsKey): jsonEncode(_items),
-        jsonEncode(WaiterKey): jsonEncode(waiter),
-        jsonEncode(TableKey): jsonEncode(table),
-        jsonEncode(AddressKey): jsonEncode(address),
-        jsonEncode(ContactKey): jsonEncode(contact),
-        jsonEncode(CoversKey): jsonEncode(covers),
-        jsonEncode(CustomerKey): jsonEncode(customer),
-        jsonEncode(OrderTypeKey): jsonEncode(orderType),
-        jsonEncode(UserIdKey): jsonEncode(userId)
-      }.toString();
+  Map<String, dynamic> get toJson => {
+        ItemsKey: items.map((e) => e.toJson()).toList(),
+        OrderIdKey: id,
+        WaiterKey: waiter,
+        TableKey: table,
+        AddressKey: address,
+        ContactKey: contact,
+        CoversKey: covers,
+        CustomerKey: customer,
+        OrderTypeKey: orderType,
+        UserIdKey: userId
+      };
 
-  List<MenuItem> get cartItems => _items ?? [];
+  List<MenuItem> get cartItems => items ?? [];
 
   void addCartItem(MenuItem item) {
-    if (_items == null) _items = [];
+    if (items == null) items = [];
     bool itemExists = false;
-    for (var i = 0; i < _items.length; i++) {
-      if (_items[i].id == item.id) {
-        _items[i].quantity++;
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].id == item.id) {
+        items[i].quantity++;
         itemExists = true;
         break;
       }
     }
     if (!itemExists) {
-      _items.add(MenuItem.fromItem(item));
+      items.add(MenuItem.fromItem(item));
     }
   }
 
-  void reduceCartItem(int itemId) {
-    if (_items == null) _items = [];
-    for (var i = 0; i < _items.length; i++) {
-      if (_items[i].id == '$itemId') {
-        _items[i].quantity--;
-        if (_items[i].quantity < 1) {
+  void reduceCartItem(int itemId, {bool removeZeroQuantity = true}) {
+    if (items == null) items = [];
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].id == '$itemId') {
+        if (items[i].quantity > 0) {
+          items[i].quantity--;
+        }
+        if (items[i].quantity < 1 && removeZeroQuantity) {
           removeCartItem(itemId);
         }
         break;
@@ -89,15 +112,15 @@ class Order {
   }
 
   void removeCartItem(int itemId) =>
-      _items.removeAt(_items.indexWhere((element) => element.id == '$itemId'));
+      items.removeAt(items.indexWhere((element) => element.id == '$itemId'));
 
   void addItemComment(int itemId, String comment) =>
-      _items.where((element) => element.id == itemId.toString()).first.comment =
+      items.where((element) => element.id == itemId.toString()).first.comment =
           comment;
 
   String get totalAmount {
     double total = 0;
-    _items.forEach((e) {
+    items.forEach((e) {
       total += double.parse(e.price) * e.quantity;
     });
     return total.toStringAsFixed(2);
@@ -105,9 +128,45 @@ class Order {
 
   String get totalTaxAmount {
     double totalTax = 0;
-    _items.forEach((e) {
-      totalTax += double.parse(e.taxPrice) * e.quantity;
+    items.forEach((e) {
+      totalTax += double.parse(e.taxAmount);
     });
     return totalTax.toStringAsFixed(2);
+  }
+
+  void reset() {
+    items = [];
+    id = '';
+    waiter = '';
+    table = '';
+    address = '';
+    contact = '';
+    covers = '';
+    cardNumber = '';
+    customer = '';
+    orderType = '';
+    userId = '';
+    orderNo = '';
+    time = '';
+    date = '';
+    discountedAmount = '';
+  }
+
+  void copyOrder(Order order) {
+    items = order.items;
+    id = order.id;
+    waiter = order.waiter;
+    table = order.table;
+    address = order.address;
+    contact = order.contact;
+    covers = order.covers;
+    cardNumber = order.cardNumber;
+    customer = order.customer;
+    orderType = order.orderType;
+    userId = order.userId;
+    orderNo = order.orderNo;
+    time = order.time;
+    date = order.date;
+    discountedAmount = order.discountedAmount;
   }
 }

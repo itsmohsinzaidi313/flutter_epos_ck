@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pos_app/bloc/order_info_bloc/order_info_bloc.dart';
-import 'package:pos_app/bloc/pos_bloc/pos_bloc.dart' as pos;
 import 'package:pos_app/models/objects/waiter.dart';
-import 'package:pos_app/pages/pos_screen.dart';
 import '../shared/app_theme.dart';
 import '../shared/config.dart';
 import '../models/objects/customer_table.dart' as t;
 import 'package:google_fonts/google_fonts.dart';
 
-class NewOrderInfoScreen extends StatelessWidget {
+class OrderInfoScreen extends StatelessWidget {
   final ImageProvider dineIn = AssetImage('assets/dine_in.jpg'),
       takeAway = AssetImage('assets/takeaway.jpg'),
       delivery = AssetImage('assets/delivery.jpg');
@@ -17,19 +15,18 @@ class NewOrderInfoScreen extends StatelessWidget {
   final dineInOrdertype = ORDERTYPE.DINE_IN;
   final takeAwayOrderType = ORDERTYPE.TAKE_AWAY;
   final deliveryOrderType = ORDERTYPE.DELIVERY;
+  @override
+  StatelessElement createElement() {
+    return super.createElement();
+  }
 
   @override
   Widget build(BuildContext context) {
-    context.read<OrderInfoBloc>().add(Build());
     return BlocListener<OrderInfoBloc, OrderInfoState>(
         listener: (context, state) async {
           if (state is ValidSubmission) {
-            Navigator.of(context).push(new MaterialPageRoute(
-              builder: (context) => BlocProvider(
-                create: (_) => pos.POSBloc(customerOrder: state.customerOrder),
-                child: PosScreen(),
-              ),
-            ));
+            Navigator.of(context)
+                .pushNamed('/pos', arguments: state.customerOrder);
           }
         },
         child: Scaffold(
@@ -224,7 +221,7 @@ class DineInLayout extends StatelessWidget {
                               backgroundColor:
                                   MaterialStateProperty.all(Colors.redAccent)),
                           child:
-                              Text('OK', style: TextStyle(color: Colors.black)),
+                              Text('OK', style: TextStyle(color: Colors.white)),
                           onPressed: () =>
                               passEvent(context, Submit(type: orderType)),
                         ),
@@ -274,7 +271,9 @@ class DineInLayout extends StatelessWidget {
         ),
         itemBuilder: (context, index) => Container(
           child: Card(
-            color: true ? Colors.redAccent[200] : Colors.white,
+            color: listWaiters[index].selected
+                ? Colors.redAccent[200]
+                : Colors.white,
             child: InkWell(
               child: Stack(
                 children: [
@@ -284,7 +283,9 @@ class DineInLayout extends StatelessWidget {
                     child: Text(
                       listWaiters[index].name.toUpperCase(),
                       style: GoogleFonts.ubuntuCondensed(
-                        color: true ? Colors.black : Colors.grey[800],
+                        color: listWaiters[index].selected
+                            ? Colors.black
+                            : Colors.grey[800],
                         fontSize: 14,
                         letterSpacing: 1.0,
                         wordSpacing: 1.0,
@@ -326,7 +327,9 @@ class DineInLayout extends StatelessWidget {
             SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4),
         itemBuilder: (context, index) => Card(
           elevation: 10,
-          color: Colors.grey.shade100,
+          color: listTables[index].selected
+              ? Colors.redAccent[200]
+              : Colors.grey.shade100,
           child: InkWell(
             child: Stack(
               children: [
@@ -380,7 +383,12 @@ class DineInLayout extends StatelessWidget {
                         ),
                       ],
                     ),
-                    child: Icon(Icons.check),
+                    child: listTables[index].reserved
+                        ? Icon(Icons.lock, color: Colors.black)
+                        : Icon(Icons.check,
+                            color: listTables[index].selected
+                                ? Colors.green
+                                : Colors.white),
                   ),
                 ),
               ],

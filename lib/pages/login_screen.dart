@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import '../pages/dashboard_screen.dart';
+import 'package:pos_app/shared/app_theme.dart';
 import 'package:pos_app/bloc/login_bloc/login_bloc.dart';
 import '../shared/config.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'dashboard_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   @override
@@ -43,38 +40,29 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: BlocListener<LoginBloc, LoginBlocState>(
+      body: BlocListener<LoginBloc, LoginState>(
         listener: (context, state) {
           if (state is LoginBlocInitial) {
             Config.serverIp = state.ipAddress;
             ipController.text = Config.serverIp;
-            ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-              content: Text('Please Wait...'),
-              duration: Duration(microseconds: 1000),
-            ));
+            AppTheme.snackbar(context, state.message);
+          } else if (state is ValidSubmission) {
+            AppTheme.snackbar(context, state.message);
           } else if (state is Successful) {
-            Navigator.of(context).push(new MaterialPageRoute(
-              builder: (context) => DashboardScreen(),
-            ));
-            // Navigator.of(context)
-            //     .pushAndRemoveUntil(new MaterialPageRoute(
-            //   builder: (context) => DashboardScreen(),
-            // ), (route) => false);
+            AppTheme.snackbar(context, state.message);
+            Navigator.of(context)
+                .pushNamedAndRemoveUntil('/menu', (route) => false);
           } else if (state is Failed) {
-            ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(content: Text(state.message)));
+            AppTheme.snackbar(context, state.message, textColor: Colors.red);
           } else if (state is InvalidSubmission) {
-            ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(content: Text(state.message)));
+            AppTheme.snackbar(context, state.message);
           } else if (state is ValidIpAddress) {
-            ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(content: Text(state.message)));
+            AppTheme.snackbar(context, state.message);
           } else if (state is InvalidIpAddress) {
-            ScaffoldMessenger.of(context)
-                .showSnackBar(SnackBar(content: Text(state.message)));
+            AppTheme.snackbar(context, state.message);
           }
         },
-        child: BlocBuilder<LoginBloc, LoginBlocState>(
+        child: BlocBuilder<LoginBloc, LoginState>(
           builder: (context, state) {
             return SingleChildScrollView(
               child: SafeArea(
@@ -135,30 +123,30 @@ class _LoginScreenState extends State<LoginScreen> {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: <Widget>[
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.end,
-                                        children: [
-                                          Text(
-                                            Config.activeStatus,
-                                            style: GoogleFonts.ubuntuCondensed(
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 13,
-                                                letterSpacing: 1.0,
-                                                color: activeColor),
-                                          ),
-                                          Switch(
-                                            value: true,
-                                            onChanged: _onSwitchTap,
-                                            activeTrackColor:
-                                                Colors.yellowAccent[600],
-                                            activeColor: Colors.yellow[700],
-                                            inactiveTrackColor:
-                                                Colors.grey[200],
-                                            inactiveThumbColor: Colors.grey,
-                                          ),
-                                        ],
-                                      ),
+                                      // Row(
+                                      //   mainAxisAlignment:
+                                      //       MainAxisAlignment.end,
+                                      //   children: [
+                                      //     Text(
+                                      //       Config.activeStatus,
+                                      //       style: GoogleFonts.ubuntuCondensed(
+                                      //           fontWeight: FontWeight.w600,
+                                      //           fontSize: 13,
+                                      //           letterSpacing: 1.0,
+                                      //           color: activeColor),
+                                      //     ),
+                                      //     Switch(
+                                      //       value: true,
+                                      //       onChanged: _onSwitchTap,
+                                      //       activeTrackColor:
+                                      //           Colors.yellowAccent[600],
+                                      //       activeColor: Colors.yellow[700],
+                                      //       inactiveTrackColor:
+                                      //           Colors.grey[200],
+                                      //       inactiveThumbColor: Colors.grey,
+                                      //     ),
+                                      //   ],
+                                      // ),
                                       Row(
                                         children: [
                                           Expanded(
@@ -187,8 +175,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                                 ),
                                                 textInputAction:
                                                     TextInputAction.next,
-                                                keyboardType:
-                                                    TextInputType.number,
+                                                keyboardType: TextInputType.url,
                                                 onChanged: (value) =>
                                                     ipAddress = value,
                                               ),
@@ -229,6 +216,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                               username = value,
                                         ),
                                       ),
+
                                       Container(
                                         padding: EdgeInsets.all(5),
                                         child: Stack(

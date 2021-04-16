@@ -1,51 +1,62 @@
-import 'dart:developer';
-
 import 'package:draggable_floating_button/draggable_floating_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:pos_app/bloc/payment_bloc/payment_bloc.dart';
 import 'package:pos_app/bloc/pos_bloc/pos_bloc.dart';
 import 'package:pos_app/models/objects/items_category.dart';
 import 'package:pos_app/models/objects/menu_item.dart';
-import 'package:pos_app/pages/payment_screen.dart';
 import '../shared/app_theme.dart';
 import '../shared/config.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class PosScreen extends StatelessWidget {
-  String categoryName = '';
-  List<Category> listCategories = [];
-  List<MenuItem> listItems = [];
-  List<MenuItem> listCartItems = [];
   final totalAmount = TextEditingController();
-  String totalTaxAmount;
-
   @override
   Widget build(BuildContext context) {
-    context.read<POSBloc>().add(Build());
+    context.read<POSBloc>().add(POSBuild());
     return BlocListener<POSBloc, POSState>(
-        listener: (context, state) {
-          if (state is CategoriesLoaded) {
-            listCategories.clear();
-            listCategories.addAll(state.list);
-          } else if (state is ItemsLoaded) {
-            listItems.clear();
-            listItems.addAll(state.list);
-          } else if (state is CartItems) {
-            listCartItems.clear();
-            listCartItems.addAll(state.list);
-            totalAmount.text = state.totalAmount;
-          } else if (state is SubmissionInvalid) {
+        listener: (context, state) async {
+          final prog = AppTheme.showProgressDialog(context,
+              widget: Text('Please wait...'), isDismissible: true);
+          if (state is SubmissionInvalid) {
             AppTheme.snackbar(context, state.message);
           } else if (state is SubmissionValid) {
-            Navigator.of(context).push(new MaterialPageRoute(
-                builder: (context) => BlocProvider(
-                      create: (_) =>
-                          PaymentBloc(customerOrder: state.customerOrder),
-                      child: PaymentScreen(),
-                    )));
+          } else if (state is CartItems) {
+            totalAmount.text = state.totalAmount;
+          } else if (state is POSLoading) {
+            if (!prog.isShowing()) {
+              await prog.show();
+            }
+          } else if (state is POSError) {
+            await AppTheme.showAlertDialogOK(context,
+                message: state.message,
+                title: 'Error',
+                onOK: () => Navigator.of(context).pop());
+            if (prog.isShowing()) {
+              await prog.hide();
+            }
+          } else if (state is OrderPostFailed) {
+            await AppTheme.showAlertDialogOK(context,
+                message: state.message,
+                title: 'Failed',
+                onOK: () => Navigator.of(context).pop());
+            if (prog.isShowing()) {
+              await prog.hide();
+            }
+          } else if (state is OrderPosted) {
+            AppTheme.snackbar(context, state.message);
+            if (prog.isShowing()) {
+              await prog.hide();
+            }
+            Navigator.of(context)
+                .pushNamedAndRemoveUntil('/menu', (route) => false);
+          } else if (state is OrderUpdated) {
+            AppTheme.snackbar(context, state.message);
+            Navigator.of(context).pop();
+          }
+          if (prog.isShowing()) {
+            await prog.hide();
           }
         },
         child: Scaffold(
@@ -61,58 +72,59 @@ class PosScreen extends StatelessWidget {
               Container(
                 child: Column(
                   children: [
-                    Container(
-                      color: Colors.red,
-                      child: Row(
-                        children: [
-                          Flexible(
-                            flex: 1,
-                            child: ListTile(
-                              leading: Container(
-                                padding: EdgeInsets.all(5),
-                                decoration: BoxDecoration(
-                                  color: Colors.red,
-                                  shape: BoxShape.rectangle,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Text(
-                                  '',
-                                  style: TextStyle(
-                                      color: Colors.grey[600],
-                                      fontWeight: FontWeight.bold),
-                                ),
-                              ),
-                              title: Container(
-                                padding: EdgeInsets.all(5),
-                                decoration: BoxDecoration(
-                                  color: Colors.red,
-                                  shape: BoxShape.rectangle,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Center(
-                                  child: Text('',
-                                      style: TextStyle(
-                                          color: Colors.grey[600],
-                                          fontWeight: FontWeight.bold)),
-                                ),
-                              ),
-                              trailing: Container(
-                                padding: EdgeInsets.all(5),
-                                decoration: BoxDecoration(
-                                  color: Colors.red,
-                                  shape: BoxShape.rectangle,
-                                  borderRadius: BorderRadius.circular(10),
-                                ),
-                                child: Text('',
-                                    style: TextStyle(
-                                        color: Colors.grey[600],
-                                        fontWeight: FontWeight.bold)),
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    // Top bar for table and waiters
+                    // Container(
+                    //   color: Colors.red,
+                    //   child: Row(
+                    //     children: [
+                    //       Flexible(
+                    //         flex: 1,
+                    //         child: ListTile(
+                    //           leading: Container(
+                    //             padding: EdgeInsets.all(5),
+                    //             decoration: BoxDecoration(
+                    //               color: Colors.red,
+                    //               shape: BoxShape.rectangle,
+                    //               borderRadius: BorderRadius.circular(10),
+                    //             ),
+                    //             child: Text(
+                    //               '',
+                    //               style: TextStyle(
+                    //                   color: Colors.grey[600],
+                    //                   fontWeight: FontWeight.bold),
+                    //             ),
+                    //           ),
+                    //           title: Container(
+                    //             padding: EdgeInsets.all(5),
+                    //             decoration: BoxDecoration(
+                    //               color: Colors.red,
+                    //               shape: BoxShape.rectangle,
+                    //               borderRadius: BorderRadius.circular(10),
+                    //             ),
+                    //             child: Center(
+                    //               child: Text('',
+                    //                   style: TextStyle(
+                    //                       color: Colors.grey[600],
+                    //                       fontWeight: FontWeight.bold)),
+                    //             ),
+                    //           ),
+                    //           trailing: Container(
+                    //             padding: EdgeInsets.all(5),
+                    //             decoration: BoxDecoration(
+                    //               color: Colors.red,
+                    //               shape: BoxShape.rectangle,
+                    //               borderRadius: BorderRadius.circular(10),
+                    //             ),
+                    //             child: Text('',
+                    //                 style: TextStyle(
+                    //                     color: Colors.grey[600],
+                    //                     fontWeight: FontWeight.bold)),
+                    //           ),
+                    //         ),
+                    //       ),
+                    //     ],
+                    //   ),
+                    // ),
                     Expanded(
                       child: Row(
                         children: [
@@ -126,6 +138,7 @@ class PosScreen extends StatelessWidget {
                                     'Categories'.toUpperCase(),
                                     style: GoogleFonts.staatliches(
                                       color: Colors.grey[500],
+                                      fontSize: 18,
                                       fontWeight: FontWeight.bold,
                                       letterSpacing: 5.0,
                                     ),
@@ -145,11 +158,15 @@ class PosScreen extends StatelessWidget {
                                         }
                                       },
                                       builder: (context, state) {
-                                        return ListView(
-                                          scrollDirection: Axis.horizontal,
-                                          children: getCategoryWidgets(
-                                              context, listCategories),
-                                        );
+                                        if (state is CategoriesLoaded) {
+                                          return ListView(
+                                            scrollDirection: Axis.horizontal,
+                                            children: getCategoryWidgets(
+                                                context, state.list),
+                                          );
+                                        } else {
+                                          return AppTheme.progIndicator;
+                                        }
                                       },
                                     )),
                                 Container(
@@ -159,6 +176,7 @@ class PosScreen extends StatelessWidget {
                                     style: GoogleFonts.staatliches(
                                       color: Colors.grey[500],
                                       fontWeight: FontWeight.bold,
+                                      fontSize: 16,
                                       letterSpacing: 5.0,
                                     ),
                                   ),
@@ -177,11 +195,15 @@ class PosScreen extends StatelessWidget {
                                           }
                                         },
                                         builder: (context, state) {
-                                          return GridView.count(
-                                            crossAxisCount: 4,
-                                            children: getItemsWidgets(
-                                                context, listItems),
-                                          );
+                                          if (state is ItemsLoaded) {
+                                            return GridView.count(
+                                              crossAxisCount: 4,
+                                              children: getItemsWidgets(
+                                                  context, state.list),
+                                            );
+                                          } else {
+                                            return AppTheme.progIndicator;
+                                          }
                                         },
                                       )),
                                 ),
@@ -216,100 +238,101 @@ class PosScreen extends StatelessWidget {
                                   ),
                                 ),
                                 child: BlocBuilder<POSBloc, POSState>(
-                                  builder: (context, state) {
-                                    if (listCartItems.length == 0) {
-                                      return Container(
-                                        alignment: Alignment.bottomCenter,
-                                        decoration: BoxDecoration(
-                                          image: DecorationImage(
-                                            fit: BoxFit.cover,
-                                            // scale: 10,
-                                            image: AssetImage(
-                                              'assets/empty_cart.png',
-                                            ),
-                                          ),
-                                        ),
-                                      );
+                                  buildWhen: (previous, current) {
+                                    if (current is CartItems) {
+                                      return true;
                                     } else {
-                                      return Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Row(
-                                              children: [
-                                                Expanded(
-                                                  child: TextField(
-                                                    controller:
-                                                        TextEditingController(
-                                                            text: 'Amount: '),
-                                                    style: TextStyle(
-                                                      color: Colors.grey,
-                                                      letterSpacing: 0,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                ),
-                                                Expanded(
-                                                  flex: 4,
-                                                  child: TextField(
-                                                    controller: totalAmount,
-                                                    style: TextStyle(
-                                                      color: Colors.black,
-                                                      letterSpacing: 1,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ),
-                                                ),
-                                              ],
+                                      return false;
+                                    }
+                                  },
+                                  builder: (context, state) {
+                                    if (state is CartItems) {
+                                      if (state.list.length < 1) {
+                                        return Container(
+                                          alignment: Alignment.bottomCenter,
+                                          decoration: BoxDecoration(
+                                            image: DecorationImage(
+                                              fit: BoxFit.cover,
+                                              // scale: 10,
+                                              image: AssetImage(
+                                                'assets/empty_cart.png',
+                                              ),
                                             ),
                                           ),
+                                        );
+                                      } else {
+                                        return Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Row(
+                                                children: [
+                                                  Expanded(
+                                                    child: TextField(
+                                                      controller:
+                                                          TextEditingController(
+                                                              text: 'Amount: '),
+                                                      style: TextStyle(
+                                                        color: Colors.grey,
+                                                        letterSpacing: 0,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Expanded(
+                                                    flex: 4,
+                                                    child: TextField(
+                                                      controller: totalAmount,
+                                                      style: TextStyle(
+                                                        color: Colors.black,
+                                                        letterSpacing: 1,
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
 
-                                          // RichText(
-                                          //   text: TextSpan(
-                                          //     text: 'Tax Amount: ',
-                                          //     style: TextStyle(
-                                          //       color: Colors.grey,
-                                          //       fontSize: 16,
-                                          //       letterSpacing: 0,
-                                          //       fontWeight: FontWeight.bold,
-                                          //     ),
-                                          //     children: <TextSpan>[
-                                          //       TextSpan(
-                                          //         text: '${states.totalCartTaxAmount.toString()}',
-                                          //         style: TextStyle(
-                                          //           color: Colors.black,
-                                          //           fontSize: 18,
-                                          //           letterSpacing: 1,
-                                          //           fontWeight: FontWeight.bold,
-                                          //         ),
-                                          //       ),
-                                          //     ],
-                                          //   ),
-                                          // ),
-                                          Expanded(
-                                              child: BlocBuilder<POSBloc,
-                                                  POSState>(
-                                            buildWhen: (previous, current) {
-                                              if (current is CartItems) {
-                                                return true;
-                                              } else {
-                                                return false;
-                                              }
-                                            },
-                                            builder: (context, state) {
-                                              return ListView(
+                                            // RichText(
+                                            //   text: TextSpan(
+                                            //     text: 'Tax Amount: ',
+                                            //     style: TextStyle(
+                                            //       color: Colors.grey,
+                                            //       fontSize: 16,
+                                            //       letterSpacing: 0,
+                                            //       fontWeight: FontWeight.bold,
+                                            //     ),
+                                            //     children: <TextSpan>[
+                                            //       TextSpan(
+                                            //         text: '${states.totalCartTaxAmount.toString()}',
+                                            //         style: TextStyle(
+                                            //           color: Colors.black,
+                                            //           fontSize: 18,
+                                            //           letterSpacing: 1,
+                                            //           fontWeight: FontWeight.bold,
+                                            //         ),
+                                            //       ),
+                                            //     ],
+                                            //   ),
+                                            // ),
+                                            Expanded(
+                                              child: ListView(
                                                 children:
                                                     getCartItemsNewWidgets(
-                                                        context, listCartItems),
-                                              );
-                                            },
-                                          )),
-                                        ],
-                                      );
+                                                        context, state.list),
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      }
+                                    } else {
+                                      return AppTheme.progIndicator;
                                     }
                                   },
                                 )),
@@ -338,7 +361,7 @@ class PosScreen extends StatelessWidget {
                 child: Icon(
                   Icons.done_rounded,
                   size: 35,
-                  color: Colors.red.shade100,
+                  color: Colors.white,
                 ),
                 onPressed: () => context.read<POSBloc>().add(PostOrder()),
               ),
@@ -378,13 +401,13 @@ class PosScreen extends StatelessWidget {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(40),
                 ),
-                color: Colors.white,
+                color: category.selected ? Colors.redAccent[200] : Colors.white,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: InkWell(
                     onTap: () => context
                         .read<POSBloc>()
-                        .add(LoadItems(categoryId: category.id)),
+                        .add(CategoryChanged(categoryId: category.id)),
                     child: Row(
                       children: [
                         CircleAvatar(
@@ -394,7 +417,9 @@ class PosScreen extends StatelessWidget {
                             backgroundColor: Colors.white,
                             radius: 13,
                             child: CircleAvatar(
-                              backgroundColor: Colors.grey.shade700,
+                              backgroundColor: category.selected
+                                  ? Colors.grey.shade700
+                                  : Colors.white,
                               radius: 9,
                             ),
                           ),
@@ -402,13 +427,18 @@ class PosScreen extends StatelessWidget {
                         Container(
                           height: Config.getDeviceHeight(context) * 0.1,
                           width: Config.getDeviceHeight(context) * 0.18,
+                          color: category.selected
+                              ? Colors.redAccent[200]
+                              : Colors.white,
                           child: Center(
                             child: Text(
                               category.name.toUpperCase(),
                               textAlign: TextAlign.center,
                               style: GoogleFonts.ubuntuCondensed(
-                                color: Colors.red.shade700,
-                                fontSize: 11,
+                                color: category.selected
+                                    ? Colors.white
+                                    : Colors.red.shade700,
+                                fontSize: 14,
                                 fontWeight: FontWeight.w700,
                                 letterSpacing: 1.2,
                                 wordSpacing: 1.0,
@@ -422,7 +452,7 @@ class PosScreen extends StatelessWidget {
                 ),
               ))
           .toList() ??
-      [CircularProgressIndicator()];
+      [AppTheme.progIndicator];
 
   // CREATE ITEMS WIDGETS
   List<Widget> getItemsWidgets(BuildContext context, List<MenuItem> lstItem) =>
@@ -478,7 +508,8 @@ class PosScreen extends StatelessWidget {
                       bottom: 0,
                       left: 0,
                       child: Container(
-                        padding: EdgeInsets.all(8),
+                        padding: EdgeInsets.only(
+                            top: 15, bottom: 8, left: 8, right: 8),
                         height: Config.getDeviceHeight(context) * 0.094,
                         width: Config.getDeviceWidth(context) * 0.158,
                         decoration: BoxDecoration(
@@ -500,7 +531,7 @@ class PosScreen extends StatelessWidget {
                                     textAlign: TextAlign.left,
                                     style: GoogleFonts.ubuntuCondensed(
                                       color: Colors.grey.shade800,
-                                      fontSize: 11,
+                                      fontSize: 12,
                                       fontWeight: FontWeight.bold,
                                       letterSpacing: 0,
                                       wordSpacing: 0.5,
@@ -513,31 +544,31 @@ class PosScreen extends StatelessWidget {
                                     Text(
                                       'PKR ${double.parse(item.price).toInt().toString()}',
                                       style: GoogleFonts.ubuntuCondensed(
-                                        color: Colors.grey.shade500,
-                                        fontSize: 11,
+                                        color: Colors.red.shade500,
+                                        fontSize: 12,
                                         fontWeight: FontWeight.bold,
                                         wordSpacing: 1.0,
                                       ),
                                     ),
-                                    Row(
-                                      children: [
-                                        Icon(
-                                          Icons.star,
-                                          size: 10,
-                                          color: Colors.yellow.shade900,
-                                        ),
-                                        Icon(
-                                          Icons.star,
-                                          size: 10,
-                                          color: Colors.yellow.shade900,
-                                        ),
-                                        Icon(
-                                          Icons.star_half_outlined,
-                                          size: 10,
-                                          color: Colors.yellow.shade900,
-                                        ),
-                                      ],
-                                    ),
+                                    // Row(
+                                    //   children: [
+                                    //     Icon(
+                                    //       Icons.star,
+                                    //       size: 10,
+                                    //       color: Colors.yellow.shade900,
+                                    //     ),
+                                    //     Icon(
+                                    //       Icons.star,
+                                    //       size: 10,
+                                    //       color: Colors.yellow.shade900,
+                                    //     ),
+                                    //     Icon(
+                                    //       Icons.star_half_outlined,
+                                    //       size: 10,
+                                    //       color: Colors.yellow.shade900,
+                                    //     ),
+                                    //   ],
+                                    // ),
                                   ],
                                 ),
                               ],
@@ -552,12 +583,12 @@ class PosScreen extends StatelessWidget {
             ),
           )
           .toList() ??
-      [CircularProgressIndicator()];
+      [AppTheme.progIndicator];
 
   // CREATES CART ITEMS
   List<Widget> getCartItemsWidgets(
           BuildContext context, List<MenuItem> lstItem) =>
-      listCartItems
+      lstItem
           .map((item) => GestureDetector(
                 onTap: () {},
                 child: Card(
@@ -609,7 +640,7 @@ class PosScreen extends StatelessWidget {
 
   List<Widget> getCartItemsNewWidgets(
           BuildContext context, List<MenuItem> lstItem) =>
-      listCartItems
+      lstItem
           .map((item) => Card(
                 elevation: 4,
                 child: ListTile(
@@ -698,10 +729,16 @@ class PosScreen extends StatelessWidget {
                               context: context,
                               builder: (context) => AlertDialog(
                                   title: Text('Comments'),
-                                  content: TextField(
-                                    controller:
-                                        TextEditingController(text: comments),
-                                    onChanged: (value) => comments = value,
+                                  content: ListTile(
+                                    leading: Icon(
+                                      Icons.edit,
+                                      color: Colors.redAccent,
+                                    ),
+                                    title: TextField(
+                                      controller:
+                                          TextEditingController(text: comments),
+                                      onChanged: (value) => comments = value,
+                                    ),
                                   ),
                                   actions: [
                                     TextButton(

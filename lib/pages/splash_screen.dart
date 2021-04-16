@@ -21,13 +21,7 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void _whichScreenToGo() async {
-    Navigator.of(context).pushAndRemoveUntil(
-        new MaterialPageRoute(
-            builder: (context) => BlocProvider(
-                  create: (_) => LoginBloc(),
-                  child: LoginScreen(),
-                )),
-        (route) => false);
+    Navigator.of(context).pushNamed('/login');
   }
 
   @override

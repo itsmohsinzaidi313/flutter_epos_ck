@@ -14,7 +14,7 @@ class Config {
   static String get getItemsApi => '$_apiCommon/Item';
   static String get getTablesApi => '$_apiCommon/Table';
   static String get getWaitersApi => '$_apiCommon/Waiters';
-  static String get getOrdersApi => '$_apiCommon/Orders';
+  static String get getOrdersApi => '$_apiCommon/Order';
   static String get getCustomerApi => '$_apiCommon/Customer';
   static String get getUsersApi => '$_apiCommon/User';
 

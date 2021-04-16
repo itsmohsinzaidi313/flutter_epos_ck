@@ -9,13 +9,14 @@ import 'package:pos_app/repositories/customer_repository.dart';
 import 'package:pos_app/models/objects/customer.dart';
 import 'package:pos_app/repositories/tables_repository.dart';
 import 'package:pos_app/repositories/waiters_repository.dart';
+import 'package:pos_app/shared/config.dart';
 
 part 'order_info_event.dart';
 part 'order_info_state.dart';
 
 class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
   OrderInfoBloc() : super(OrderInfoInitial(type: null));
-  Order customerOrder = Order();
+  Order customerOrder;
   List<Waiter> listWaiters = [];
   List<Tables> listTables = [];
   @override
@@ -23,9 +24,12 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
     OrderInfoEvent event,
   ) async* {
     try {
-      if (event is Build) {
+      if (event is OrderInfoBuild) {
+        customerOrder = Order();
         final waiterResponse = await WaiterRepo.repo.waiters;
         final tablesResponse = await TablesRepo.repo.tables;
+        customerOrder.userId = Config.user.id;
+        customerOrder.orderType = (ORDERTYPE.DINE_IN.index + 1).toString();
         listWaiters = (waiterResponse.data as List<dynamic>)
             .map((e) => Waiter.fromJson(e))
             .toList();
@@ -40,14 +44,34 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
         case ORDERTYPE.DINE_IN:
           final dineIn = ORDERTYPE.DINE_IN;
           if (event is OrderTypeChanged) {
+            customerOrder.orderType = (dineIn.index + 1).toString();
             yield OrderTypeState(type: dineIn);
             yield WaitersState(waiters: listWaiters, type: dineIn);
           } else if (event is WaiterChanged) {
             customerOrder.waiter = event.waiter.id;
+            listWaiters.forEach((e) {
+              if (e.id == event.waiter.id) {
+                e.selected = true;
+              } else {
+                e.selected = false;
+              }
+            });
             yield TablesState(tables: listTables, type: dineIn);
           } else if (event is TableChanged) {
-            customerOrder.table = event.table.id;
-            yield WaitersState(waiters: listWaiters, type: dineIn);
+            if (!event.table.reserved) {
+              customerOrder.table = event.table.id;
+              listTables.forEach((e) {
+                if (e.id == event.table.id) {
+                  e.selected = true;
+                } else {
+                  e.selected = false;
+                }
+              });
+              yield WaitersState(waiters: listWaiters, type: dineIn);
+            } else {
+              yield InvalidTables(
+                  type: event.orderType, message: 'This table is reserved');
+            }
           } else if (event is CoversChanged) {
             customerOrder.covers = event.covers.toString();
             yield Nod(type: dineIn);
@@ -73,6 +97,7 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
         case ORDERTYPE.TAKE_AWAY:
           final takeAway = ORDERTYPE.TAKE_AWAY;
           if (event is OrderTypeChanged) {
+            customerOrder.orderType = (takeAway.index + 1).toString();
             yield OrderTypeState(type: takeAway);
           } else if (event is CustomerChanged) {
             customerOrder.customer = event.customerName;
@@ -126,6 +151,7 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
         case ORDERTYPE.DELIVERY:
           final delivery = ORDERTYPE.DELIVERY;
           if (event is OrderTypeChanged) {
+            customerOrder.orderType = (delivery.index + 1).toString();
             yield OrderTypeState(type: delivery);
           } else if (event is CustomerChanged) {
             customerOrder.customer = event.customerName;
@@ -186,6 +212,9 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
           break;
         default:
           break;
+      }
+      if (event is ResetOrderInfoOrder) {
+        customerOrder.reset();
       }
     } catch (e) {}
   }
