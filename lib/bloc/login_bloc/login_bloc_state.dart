@@ -43,14 +43,14 @@ class InvalidSubmission extends LoginState {
   InvalidSubmission({@required this.message});
 }
 
-class Successful extends LoginState {
+class LoginSuccessful extends LoginState {
   final String message;
-  Successful({this.message});
+  LoginSuccessful({this.message});
 }
 
-class Failed extends LoginState {
+class LoginFailed extends LoginState {
   final String message;
-  Failed({@required this.message});
+  LoginFailed({@required this.message});
 }
 
 

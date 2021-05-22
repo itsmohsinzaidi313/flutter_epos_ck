@@ -48,11 +48,11 @@ class _LoginScreenState extends State<LoginScreen> {
             AppTheme.snackbar(context, state.message);
           } else if (state is ValidSubmission) {
             AppTheme.snackbar(context, state.message);
-          } else if (state is Successful) {
+          } else if (state is LoginSuccessful) {
             AppTheme.snackbar(context, state.message);
             Navigator.of(context)
                 .pushNamedAndRemoveUntil('/menu', (route) => false);
-          } else if (state is Failed) {
+          } else if (state is LoginFailed) {
             AppTheme.snackbar(context, state.message, textColor: Colors.red);
           } else if (state is InvalidSubmission) {
             AppTheme.snackbar(context, state.message);

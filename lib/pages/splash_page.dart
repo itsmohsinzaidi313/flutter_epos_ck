@@ -2,9 +2,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pos_app/bloc/login_bloc/login_bloc.dart';
-import '../pages/login_screen.dart';
+import 'login_page.dart';
 import '../shared/config.dart';
-import 'login_screen.dart';
+import 'login_page.dart';
 
 class SplashScreen extends StatefulWidget {
   @override

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:pos_app/routes/app_routes.dart';
-import './pages/splash_screen.dart';
+import 'pages/splash_page.dart';
 import './shared/config.dart';
 
 

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../config.dart';
 
-class DashboardCard extends StatelessWidget {
-  DashboardCard({
+class MainMenuCard extends StatelessWidget {
+  MainMenuCard({
     @required this.title,
     @required this.onTap,
     @required this.asset

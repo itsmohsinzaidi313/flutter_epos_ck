@@ -6,13 +6,13 @@ import 'package:pos_app/bloc/order_info_bloc/order_info_bloc.dart';
 import 'package:pos_app/bloc/payment_bloc/payment_bloc.dart';
 import 'package:pos_app/bloc/pos_bloc/pos_bloc.dart';
 import 'package:pos_app/models/objects/customer_order.dart';
-import 'package:pos_app/pages/login_screen.dart';
-import 'package:pos_app/pages/menu_screen.dart';
-import 'package:pos_app/pages/order_info_screen.dart';
-import 'package:pos_app/pages/payment_screen%20copy.dart';
-import 'package:pos_app/pages/pos_screen.dart';
-import 'package:pos_app/pages/splash_screen.dart';
-import 'package:pos_app/pages/orders_screen.dart';
+import 'package:pos_app/pages/login_page.dart';
+import 'package:pos_app/pages/menu_page.dart';
+import 'package:pos_app/pages/order_info_page.dart';
+import 'package:pos_app/pages/payment_page%20copy.dart';
+import 'package:pos_app/pages/pos_page.dart';
+import 'package:pos_app/pages/splash_page.dart';
+import 'package:pos_app/pages/orders_page.dart';
 
 class AppRoutes {
   LoginBloc loginBloc;

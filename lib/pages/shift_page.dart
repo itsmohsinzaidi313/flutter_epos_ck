@@ -50,7 +50,8 @@ class _ShiftScreen extends State<ShiftScreen> {
             ),
           ),
         ),
-        floatingActionButton: floatingButtonLayoutController(1));// CHANGES FOATING ACTION BUTTON ICON
+        floatingActionButton: floatingButtonLayoutController(
+            1)); // CHANGES FOATING ACTION BUTTON ICON
   }
 
   Widget bodyLayoutController(int layoutType) {
@@ -77,37 +78,37 @@ class _ShiftScreen extends State<ShiftScreen> {
                 child: Column(
                   children: [
                     Container(
-                        padding: EdgeInsets.all(8),
-                        child: Column(
-                          children: [
-                            Align(
-                                alignment: Alignment.topLeft,
-                                child: Text(
-                                  'Select Shift',
-                                  style: TextStyle(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.normal,
-                                    color: Colors.grey,
-                                  ),
-                                )),
-                            DropdownButton<String>(
-                              value: _dropdown,
-                              icon: Icon(Icons.arrow_drop_down_circle),
-                              iconSize: 24,
-                              elevation: 16,
-                              isExpanded: true,
-                              style: TextStyle(
-                                color: Colors.grey[700],
-                              ),
-                              onChanged: (newValue) {
-                                setState(() {
-                                  _dropdown = newValue;
-                                });
-                              },
-                              items: <DropdownMenuItem<String>>[],
+                      padding: EdgeInsets.all(8),
+                      child: Column(
+                        children: [
+                          Align(
+                              alignment: Alignment.topLeft,
+                              child: Text(
+                                'Select Shift',
+                                style: TextStyle(
+                                  fontSize: 10,
+                                  fontWeight: FontWeight.normal,
+                                  color: Colors.grey,
+                                ),
+                              )),
+                          DropdownButton<String>(
+                            value: _dropdown,
+                            icon: Icon(Icons.arrow_drop_down_circle),
+                            iconSize: 24,
+                            elevation: 16,
+                            isExpanded: true,
+                            style: TextStyle(
+                              color: Colors.grey[700],
                             ),
-                          ],
-                        ),
+                            onChanged: (newValue) {
+                              setState(() {
+                                _dropdown = newValue;
+                              });
+                            },
+                            items: <DropdownMenuItem<String>>[],
+                          ),
+                        ],
+                      ),
                     ),
                     Container(
                       padding: EdgeInsets.symmetric(horizontal: 8.0),
@@ -200,12 +201,11 @@ class _ShiftScreen extends State<ShiftScreen> {
   Widget floatingButtonLayoutController(int layoutType) {
     switch (layoutType) {
       case 1:
-        return FloatingActionButton (
-          onPressed: ()  {
+        return FloatingActionButton(
+          onPressed: () {
             setState(() {
               if (_formKey.currentState.validate()) {
                 _formKey.currentState.save();
-                
               } else {
                 _autoValidate = true;
               }
@@ -218,9 +218,7 @@ class _ShiftScreen extends State<ShiftScreen> {
       case 2:
         return FloatingActionButton(
           onPressed: () async {
-            try {
-             
-            } catch (e) {
+            try {} catch (e) {
               log(e);
             }
           },
