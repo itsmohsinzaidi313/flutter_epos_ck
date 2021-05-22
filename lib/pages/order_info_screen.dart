@@ -104,8 +104,6 @@ class OrderInfoScreen extends StatelessWidget {
         ));
   }
 
-  Widget layoutController(OrderInfoState state) {}
-
   Widget orderTypeButton(BuildContext context, String title, Function onTap,
           ImageProvider image) =>
       Card(
