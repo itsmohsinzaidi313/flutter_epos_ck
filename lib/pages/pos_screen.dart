@@ -375,8 +375,6 @@ class PosScreen extends StatelessWidget {
       context,
       title: 'Question?',
       message: 'Are you sure?',
-      onNo: () => Navigator.of(context).pop(false),
-      onYes: () => Navigator.of(context).pop(true),
     );
 
     if (type) {

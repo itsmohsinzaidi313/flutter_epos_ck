@@ -15,10 +15,10 @@ class OrderInfoScreen extends StatelessWidget {
   final dineInOrdertype = ORDERTYPE.DINE_IN;
   final takeAwayOrderType = ORDERTYPE.TAKE_AWAY;
   final deliveryOrderType = ORDERTYPE.DELIVERY;
-  @override
-  StatelessElement createElement() {
-    return super.createElement();
-  }
+
+  final Widget dineInLayout = DineInLayout();
+  final Widget takeAwayLayout = TakeAwayLayout();
+  final Widget deliveryLayout = DeliveryLayout();
 
   @override
   Widget build(BuildContext context) {
@@ -27,6 +27,8 @@ class OrderInfoScreen extends StatelessWidget {
           if (state is ValidSubmission) {
             Navigator.of(context)
                 .pushNamed('/pos', arguments: state.customerOrder);
+          } else if (state is OrderInfoError) {
+            AppTheme.snackbar(context, state.message, textColor: Colors.red);
           }
         },
         child: Scaffold(
@@ -51,7 +53,20 @@ class OrderInfoScreen extends StatelessWidget {
                     }
                   },
                   builder: (context, state) {
-                    return layoutController(state);
+                    switch (state.orderType) {
+                      case ORDERTYPE.DINE_IN:
+                        return dineInLayout;
+                        break;
+                      case ORDERTYPE.TAKE_AWAY:
+                        return takeAwayLayout;
+                        break;
+                      case ORDERTYPE.DELIVERY:
+                        return deliveryLayout;
+                        break;
+                      default:
+                        return Container();
+                        break;
+                    }
                   },
                 )),
                 Expanded(
@@ -89,22 +104,7 @@ class OrderInfoScreen extends StatelessWidget {
         ));
   }
 
-  Widget layoutController(OrderInfoState state) {
-    switch (state.orderType) {
-      case ORDERTYPE.DINE_IN:
-        return DineInLayout();
-        break;
-      case ORDERTYPE.TAKE_AWAY:
-        return TakeAwayLayout();
-        break;
-      case ORDERTYPE.DELIVERY:
-        return DeliveryLayout();
-        break;
-      default:
-        return Container();
-        break;
-    }
-  }
+  Widget layoutController(OrderInfoState state) {}
 
   Widget orderTypeButton(BuildContext context, String title, Function onTap,
           ImageProvider image) =>
@@ -411,7 +411,8 @@ class TakeAwayLayout extends StatelessWidget {
   final nameController = TextEditingController();
   final contactController = TextEditingController();
   final orderType = ORDERTYPE.TAKE_AWAY;
-
+  static Key nameKey = GlobalKey();
+  static Key contactKey = GlobalKey();
   @override
   Widget build(BuildContext context) {
     return BlocListener<OrderInfoBloc, OrderInfoState>(
@@ -459,6 +460,7 @@ class TakeAwayLayout extends StatelessWidget {
                         ),
                       ),
                       child: TextField(
+                        key: nameKey,
                         controller: contactController,
                         onChanged: (value) => passEvent(context,
                             ContactChanged(type: orderType, contact: value)),
@@ -506,6 +508,7 @@ class TakeAwayLayout extends StatelessWidget {
                         ),
                       ),
                       child: TextField(
+                        key: contactKey,
                         controller: nameController,
                         onChanged: (value) => passEvent(
                             context,
@@ -558,6 +561,10 @@ class DeliveryLayout extends StatelessWidget {
   final contactController = TextEditingController();
   final addressController = TextEditingController();
   final orderType = ORDERTYPE.DELIVERY;
+  static Key nameKey = GlobalKey();
+  static Key contactKey = GlobalKey();
+  static Key addressKey = GlobalKey();
+
   @override
   Widget build(BuildContext context) {
     return BlocListener<OrderInfoBloc, OrderInfoState>(
@@ -609,6 +616,7 @@ class DeliveryLayout extends StatelessWidget {
                         ),
                       ),
                       child: TextField(
+                        key: nameKey,
                         controller: contactController,
                         onChanged: (value) => passEvent(context,
                             ContactChanged(type: orderType, contact: value)),
@@ -656,6 +664,7 @@ class DeliveryLayout extends StatelessWidget {
                         ),
                       ),
                       child: TextField(
+                        key: contactKey,
                         controller: nameController,
                         cursorColor: Colors.yellow.shade700,
                         decoration: InputDecoration(
@@ -685,6 +694,7 @@ class DeliveryLayout extends StatelessWidget {
                         ),
                       ),
                       child: TextField(
+                        key: addressKey,
                         controller: addressController,
                         cursorColor: Colors.yellow.shade700,
                         decoration: InputDecoration(

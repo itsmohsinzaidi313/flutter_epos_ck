@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import '../shared/config.dart';
 
@@ -219,7 +221,7 @@ class _ShiftScreen extends State<ShiftScreen> {
             try {
              
             } catch (e) {
-              Config.log.e(e);
+              log(e);
             }
           },
           child: Icon(Icons.close),

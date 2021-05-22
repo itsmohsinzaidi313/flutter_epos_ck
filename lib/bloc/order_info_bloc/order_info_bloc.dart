@@ -74,7 +74,6 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
             }
           } else if (event is CoversChanged) {
             customerOrder.covers = event.covers.toString();
-            yield Nod(type: dineIn);
           } else if (event is Submit) {
             if (customerOrder.waiter == null || customerOrder.waiter.isEmpty) {
               yield InvalidWaiter(
@@ -90,9 +89,7 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
             } else {
               yield ValidSubmission(customerOrder: customerOrder, type: dineIn);
             }
-          } else {
-            yield Nod(type: dineIn);
-          }
+          } else {}
           break;
         case ORDERTYPE.TAKE_AWAY:
           final takeAway = ORDERTYPE.TAKE_AWAY;
@@ -101,10 +98,8 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
             yield OrderTypeState(type: takeAway);
           } else if (event is CustomerChanged) {
             customerOrder.customer = event.customerName;
-            yield Nod(type: takeAway);
           } else if (event is ContactChanged) {
             customerOrder.contact = event.contact;
-            yield Nod(type: takeAway);
           } else if (event is Submit) {
             if (customerOrder.customer == null ||
                 customerOrder.customer.isEmpty) {
@@ -119,8 +114,7 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
                   customerOrder: customerOrder, type: takeAway);
             }
           } else if (event is SearchCustomer) {
-            if (customerOrder.contact == null &&
-                customerOrder.contact.isEmpty) {
+            if (customerOrder.contact.isEmpty) {
               yield InvalidContact(
                   type: takeAway, message: 'Please enter contact number');
             } else {
@@ -130,10 +124,11 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
                 List<Customer> list = (response.data as List<dynamic>)
                     .map((e) => Customer.fromJson(e))
                     .toList();
-                Customer customer = list.first;
-                customerOrder.customer = customer.name;
-                customerOrder.contact = customer.contact;
+
                 if (list.isNotEmpty) {
+                  Customer customer = list.first;
+                  customerOrder.customer = customer.name;
+                  customerOrder.contact = customer.contact;
                   yield CustomerFound(
                       type: takeAway,
                       customer: customer,
@@ -144,9 +139,7 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
                 }
               } else {}
             }
-          } else {
-            yield Nod(type: takeAway);
-          }
+          } else {}
           break;
         case ORDERTYPE.DELIVERY:
           final delivery = ORDERTYPE.DELIVERY;
@@ -155,13 +148,10 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
             yield OrderTypeState(type: delivery);
           } else if (event is CustomerChanged) {
             customerOrder.customer = event.customerName;
-            yield Nod(type: delivery);
           } else if (event is ContactChanged) {
             customerOrder.contact = event.contact;
-            yield Nod(type: delivery);
           } else if (event is AddressChanged) {
             customerOrder.address = event.address;
-            yield Nod(type: delivery);
           } else if (event is SearchCustomer) {
             if (customerOrder.contact == null &&
                 customerOrder.contact.isEmpty) {
@@ -206,9 +196,7 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
               yield ValidSubmission(
                   customerOrder: customerOrder, type: delivery);
             }
-          } else {
-            yield Nod(type: delivery);
-          }
+          } else {}
           break;
         default:
           break;
@@ -216,6 +204,8 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
       if (event is ResetOrderInfoOrder) {
         customerOrder.reset();
       }
-    } catch (e) {}
+    } catch (e) {
+      yield OrderInfoError(type: event.orderType, message: e.toString());
+    }
   }
 }

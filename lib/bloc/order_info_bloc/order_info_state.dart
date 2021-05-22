@@ -106,3 +106,9 @@ class CustomerNotFound extends OrderInfoState {
 class Nod extends OrderInfoState {
   Nod({@required ORDERTYPE type}) : super(orderType: type);
 }
+
+class OrderInfoError extends OrderInfoState {
+  final String message;
+  OrderInfoError({this.message, @required ORDERTYPE type})
+      : super(orderType: type);
+}

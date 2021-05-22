@@ -168,8 +168,8 @@ class AppTheme {
   }
 
   static Future<bool> showAlertDialogYNFutureReturn(BuildContext context,
-      {String title, String message, Function onYes, Function onNo}) async {
-    await showDialog(
+      {String title, String message}) async {
+    return await showDialog<bool>(
         context: context,
         barrierDismissible: false,
         builder: (value) => AlertDialog(
@@ -178,13 +178,13 @@ class AppTheme {
             actions: [
               TextButton(
                   child: text(text: 'Yes', color: Colors.blue),
-                  onPressed: onYes),
+                  onPressed: () => Navigator.of(context).pop<bool>(true)),
               TextButton(
-                  child: text(text: 'No', color: Colors.blue), onPressed: onNo)
+                  child: text(text: 'No', color: Colors.blue),
+                  onPressed: () => Navigator.of(context).pop<bool>(false))
             ],
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8))));
-    return true;
   }
 
   static Text text(

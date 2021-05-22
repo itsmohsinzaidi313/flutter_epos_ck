@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:logger/logger.dart';
 import 'package:pos_app/models/objects/user.dart';
 
 class Config {
@@ -33,16 +32,6 @@ class Config {
 
   static double getDeviceHeight(BuildContext context) =>
       MediaQuery.of(context).size.height;
-
-  static final Logger log = new Logger(
-    printer: PrettyPrinter(
-        colors: true,
-        errorMethodCount: 1,
-        printEmojis: true,
-        printTime: false,
-        lineLength: 80,
-        methodCount: 0),
-  );
 
   static String getCurrentDateTime() {
     DateTime dateTime = DateTime.now();
