@@ -11,6 +11,10 @@ import 'package:pos_app/shared/config.dart';
 class OrdersScreen extends StatefulWidget {
   final List<Order> ordersList;
   OrdersScreen({@required this.ordersList});
+
+  final enablePayment = false;
+  final enableOrderDelete = false;
+
   @override
   _OrdersScreenState createState() =>
       _OrdersScreenState(ordersList: ordersList);
@@ -21,7 +25,7 @@ class _OrdersScreenState extends State<OrdersScreen>
   List<Order> ordersList;
   List<Tab> tabs;
   TabController tabController;
-  final gridTextStyle = TextStyle(fontSize: 14);
+
   _OrdersScreenState({@required this.ordersList}) {
     Tab dineInTab = Tab(
       child: Text('DINE IN'),
@@ -37,25 +41,19 @@ class _OrdersScreenState extends State<OrdersScreen>
   }
 
   void updateOrders() async {
-    final progDialog =
-        AppTheme.showProgressDialog(context, widget: Text('Loading...'));
-    await progDialog.show();
     try {
+      AppTheme.snackbar(context, 'Refreshing orders...');
       ServerResponse response =
-          await OrderRepo.repo.getAllOrders(userId: Config.user.id, type: '0');
+          await OrderRepo.repo.getOrders(tiltId: Config.user.tiltId, type: '0');
       if (response.status) {
-        await progDialog.hide();
+        final list = (response.data as List<dynamic>) ?? [];
         setState(() {
-          ordersList = (response.data as List<dynamic>)
-              .map((e) => Order.fromJson(e))
-              .toList();
+          ordersList = list.map((e) => Order.fromJson(e)).toList();
         });
       } else {
-        await progDialog.hide();
         AppTheme.snackbar(context, response.message);
       }
     } catch (e) {
-      await progDialog.hide();
       AppTheme.snackbar(context, e.toString(), textColor: Colors.red);
     }
   }
@@ -74,14 +72,23 @@ class _OrdersScreenState extends State<OrdersScreen>
             controller: tabController,
           ),
           actions: [
-            IconButton(
-              icon: Icon(Icons.sync),
+            ElevatedButton(
+              style: ButtonStyle(
+                backgroundColor: MaterialStateProperty.all(Colors.amber),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.sync, color: Colors.red),
+                  Text(
+                    'Refresh',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ],
+              ),
               onPressed: updateOrders,
             )
           ]),
       body: Container(
-        // height: Config.getDeviceHeight(context),
-        // width: Config.getDeviceWidth(context),
         child: TabBarView(
           controller: tabController,
           children: [
@@ -119,6 +126,7 @@ class _OrdersScreenState extends State<OrdersScreen>
         child: Column(
           children: [
             Container(
+              padding: const EdgeInsets.all(2),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.only(
                     topLeft: Radius.circular(15),
@@ -131,7 +139,10 @@ class _OrdersScreenState extends State<OrdersScreen>
                     child: Center(
                       child: Text(
                         'ORDER#: ${order.orderNo}',
-                        style: TextStyle(color: Colors.white, fontSize: 22),
+                        style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold),
                       ),
                     ),
                   ),
@@ -143,137 +154,85 @@ class _OrdersScreenState extends State<OrdersScreen>
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Row(
-                    children: [
-                      Text(
-                        'AMOUNT',
-                        style: gridTextStyle,
-                      ),
-                      Expanded(child: SizedBox()),
-                      Text(
-                        '${order.totalAmount}',
-                        style: gridTextStyle,
-                      ),
-                    ],
-                  ),
+                  // boxTile(title: 'SUBTOTAL', description: order.subTotal),
+                  // Divider(),
+                  // boxTile(title: 'TAX', description: order.totalTaxAmount),
+                  // Divider(),
+                  boxTile(
+                      title: 'AMOUNT',
+                      description: order.totalAmount,
+                      fontWeight: FontWeight.bold),
                   Divider(),
-                  Row(
-                    children: [
-                      Text(
-                        'TIME',
-                        style: gridTextStyle,
-                      ),
-                      Expanded(child: SizedBox()),
-                      Text(
-                        '${order.time}',
-                        style: gridTextStyle,
-                      ),
-                    ],
-                  ),
+                  boxTile(title: 'TIME', description: '${order.time}'),
                   Divider(),
                   order.orderType == '1'
-                      ? Row(
-                          children: [
-                            Text(
-                              'TABLE',
-                              style: gridTextStyle,
-                            ),
-                            Expanded(
-                              child: SizedBox(),
-                            ),
-                            Text(
-                              '${order.table}',
-                              style: gridTextStyle,
-                            ),
-                          ],
-                        )
+                      ? boxTile(title: 'TABLE', description: '${order.tableId}')
                       : Container(),
                   order.orderType != '1'
-                      ? Row(
-                          children: [
-                            Text(
-                              'NAME',
-                              style: gridTextStyle,
-                            ),
-                            Expanded(
-                              child: SizedBox(),
-                            ),
-                            Text(
-                              '${order.customer}',
-                              style: gridTextStyle,
-                            ),
-                          ],
-                        )
+                      ? boxTile(title: 'NAME', description: '${order.customer}')
                       : Container(),
                   order.orderType != '1' ? Divider() : Container(),
                   order.orderType != '1'
-                      ? Row(
-                          children: [
-                            Text(
-                              'CONTACT',
-                              style: gridTextStyle,
-                            ),
-                            Expanded(
-                              child: SizedBox(),
-                            ),
-                            Text(
-                              '${order.contact}',
-                              style: gridTextStyle,
-                            ),
-                          ],
-                        )
+                      ? boxTile(
+                          title: 'CONTACT', description: '${order.contact}')
                       : Container(),
                   order.orderType != '1' ? Divider() : Container(),
                 ],
               ),
             ),
             Expanded(child: SizedBox()),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                IconButton(
-                  icon: Icon(
-                    Icons.edit_rounded,
-                    color: Colors.amber,
+            Container(
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(
+                    icon: Icon(
+                      Icons.edit_rounded,
+                      color: Colors.amber,
+                    ),
+                    onPressed: () async {
+                      order.editOrder = true;
+                      await Navigator.of(context)
+                          .pushNamed('/pos', arguments: order);
+                      updateOrders();
+                    },
                   ),
-                  onPressed: () async {
-                    order.editOrder = true;
-                    await Navigator.of(context)
-                        .pushNamed('/pos', arguments: order);
-                    updateOrders();
-                  },
-                ),
-                IconButton(
-                  icon: Icon(
-                    Icons.monetization_on_outlined,
-                    color: Colors.green,
-                  ),
-                  onPressed: () async {
-                    AppTheme.showAlertDialogYN(context,
-                        title: 'Order Payment',
-                        message: 'Are You Sure?',
-                        onNo: () => Navigator.pop(context),
-                        onYes: () {
-                          Navigator.pop(context);
-                          Navigator.of(context)
-                              .pushNamed('/payment', arguments: order);
-                        });
-                  },
-                ),
-                IconButton(
-                  icon: Icon(
-                    Icons.delete_rounded,
-                    color: Colors.redAccent,
-                  ),
-                  onPressed: () async {
-                    AppTheme.showAlertDialogYN(context,
-                        title: 'Delete Order',
-                        message: 'Are You Sure?',
-                        onNo: () => Navigator.pop(context),
-                        onYes: () => Navigator.pop(context));
-                  },
-                ),
-              ],
+                  widget.enablePayment
+                      ? IconButton(
+                          icon: Icon(
+                            Icons.monetization_on_outlined,
+                            color: Colors.green,
+                          ),
+                          onPressed: () async {
+                            AppTheme.showAlertDialogYN(context,
+                                title: 'Order Payment',
+                                message: 'Are You Sure?',
+                                onNo: () => Navigator.pop(context),
+                                onYes: () {
+                                  Navigator.pop(context);
+                                  Navigator.of(context)
+                                      .pushNamed('/payment', arguments: order);
+                                });
+                          },
+                        )
+                      : Container(),
+                  widget.enableOrderDelete
+                      ? IconButton(
+                          icon: Icon(
+                            Icons.delete_rounded,
+                            color: Colors.redAccent,
+                          ),
+                          onPressed: () async {
+                            AppTheme.showAlertDialogYN(context,
+                                title: 'Delete Order',
+                                message: 'Are You Sure?',
+                                onNo: () => Navigator.pop(context),
+                                onYes: () => Navigator.pop(context));
+                          },
+                        )
+                      : Container(),
+                ],
+              ),
             ),
           ],
         ),
@@ -287,7 +246,7 @@ class _OrdersScreenState extends State<OrdersScreen>
           leading: Text(order.orderNo.toString()),
           title: order.orderType == '1'
               ? Text(
-                  'ORDER#: ${order.orderNo} | TIME: ${order.time} | TABLE: ${order.table}',
+                  'ORDER#: ${order.orderNo} | TIME: ${order.time} | TABLE: ${order.tableId}',
                   style:
                       TextStyle(letterSpacing: 2, fontWeight: FontWeight.bold),
                 )
@@ -304,7 +263,7 @@ class _OrdersScreenState extends State<OrdersScreen>
     return ExpansionTile(
       title: order.orderType == '1'
           ? Text(
-              'ORDER#: ${order.orderNo} | TIME: ${order.time} | TABLE: ${order.table}',
+              'ORDER#: ${order.orderNo} | TIME: ${order.time} | TABLE: ${order.tableId}',
               style: TextStyle(letterSpacing: 2, fontWeight: FontWeight.bold),
             )
           : Text(
@@ -362,16 +321,13 @@ class _OrdersScreenState extends State<OrdersScreen>
 
   Widget getOrdersList({List<Order> order}) {
     if (order.length < 1) {
-      return Expanded(
-        flex: 1,
-        child: Center(
-          child: Text(
-            'No Pending Orders Available',
-            style: TextStyle(
-              fontSize: 30,
-              fontWeight: FontWeight.w500,
-              color: Colors.red,
-            ),
+      return Center(
+        child: Text(
+          'No Pending Orders Available',
+          style: TextStyle(
+            fontSize: 30,
+            fontWeight: FontWeight.w500,
+            color: Colors.red,
           ),
         ),
       );
@@ -393,5 +349,25 @@ class _OrdersScreenState extends State<OrdersScreen>
                 SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4),
             itemBuilder: (context, index) => orderGridItem(order: order[index]),
           );
+  }
+
+  Widget boxTile(
+      {String title,
+      String description,
+      FontWeight fontWeight = FontWeight.normal}) {
+    final gridTextStyle = TextStyle(fontSize: 12, fontWeight: fontWeight);
+    return Row(
+      children: [
+        Text(
+          title,
+          style: gridTextStyle ?? '',
+        ),
+        Expanded(child: SizedBox()),
+        Text(
+          description ?? '',
+          style: gridTextStyle,
+        ),
+      ],
+    );
   }
 }

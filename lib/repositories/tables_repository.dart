@@ -4,12 +4,9 @@ import 'package:pos_app/models/objects/server_response.dart';
 
 class TablesRepo {
   static TablesRepo repo = TablesRepo._internal();
-  String _url;
-  TablesRepo._internal() {
-    _url = Config.getTablesApi;
-  }
+  TablesRepo._internal();
   Future<ServerResponse> get tables async => ServerResponse(
-      response: await get('$_url').timeout(
+      response: await get(await Config.getTablesApi).timeout(
           Duration(seconds: Config.SERVER_TIMEOUT),
           onTimeout: () => null));
 }

@@ -4,11 +4,8 @@ import 'package:pos_app/shared/config.dart';
 
 class UsersRepo {
   static UsersRepo repo = UsersRepo._internal();
-  UsersRepo._internal() {
-    _url = Config.getUsersApi;
-  }
-  String _url;
+  UsersRepo._internal();
 
-  Future<ServerResponse> get users async =>
-      ServerResponse(response: await get(_url));
+  Future<ServerResponse> users() async =>
+      ServerResponse(response: await get(await Config.getUsersApi));
 }

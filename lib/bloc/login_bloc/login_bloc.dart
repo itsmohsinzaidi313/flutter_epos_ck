@@ -20,9 +20,12 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   ) async* {
     try {
       if (event is LoginInit) {
-        final pref = await SharedPreferences.getInstance();
-        Config.serverIp = pref.getString('ipAddress');
-        yield LoginBlocInitial(ipAddress: Config.serverIp, message: 'Welcome.');
+        yield LoginBlocInitial(
+            ipAddress: await Config.serverIp, message: 'Welcome.');
+        if (await Config.loginStatus) {
+          yield* attemptLogin(
+              username: await Config.username, password: await Config.password);
+        }
         // final response = await UsersRepo.repo.users;
         // if (response.status) {
         //   yield UsersLoaded(
@@ -34,14 +37,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         if (event.ipaddress == '') {
           yield InvalidIpAddress(message: 'Ipaddress is required.');
         } else {
-          final pref = await SharedPreferences.getInstance();
-          if (await pref.setString('ipAddress', event.ipaddress)) {
-            Config.serverIp = event.ipaddress;
-            yield ValidIpAddress(
-                message: 'Server IP saved please restart application.');
-          } else {
-            yield ValidIpAddress(message: 'Server IP cannot be saved.');
-          }
+          Config.serverIp = Future.value(event.ipaddress);
+          yield ValidIpAddress(message: 'Server IP saved.');
         }
       } else if (event is UsernameChanged) {
         if (event.username == '') {
@@ -62,19 +59,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
           yield InvalidSubmission(message: 'Please check all fields.');
         } else {
           yield ValidSubmission(message: 'Login request sent.');
-          try {
-            final response = await LoginRepo.repo
-                .login(username: event.username, password: event.password);
-            if (response.status) {
-              Config.user = User.fromJson(response.data);
-              yield LoginSuccessful(message: 'Login successful.');
-            } else {
-              yield LoginFailed(message: response.message);
-            }
-          } catch (e) {
-            log('Login Bloc', error: e);
-            yield LoginFailed(message: e.toString());
-          }
+          yield* attemptLogin(
+              username: event.username, password: event.password);
         }
       } else if (event is SwitchChanged) {
         if (event.online) {
@@ -82,6 +68,20 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       }
     } catch (e) {
       yield LoginFailed(message: e.toString());
+    }
+  }
+
+  Stream<LoginState> attemptLogin({String username, String password}) async* {
+    final response =
+        await LoginRepo.repo.login(username: username, password: password);
+    if (response.status) {
+      Config.user = User.fromJson(response.data);
+      Config.loginStatus = Future.value(true);
+      Config.username = Future.value(username);
+      Config.password = Future.value(password);
+      yield LoginSuccessful(message: 'Login successful.');
+    } else {
+      yield LoginFailed(message: response.message);
     }
   }
 }

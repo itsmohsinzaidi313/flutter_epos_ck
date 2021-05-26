@@ -110,35 +110,35 @@ class AppTheme {
                     borderRadius: BorderRadius.circular(8)),
               ));
 
-  static ProgressDialog showProgressDialog(BuildContext context,
-      {@required Widget widget, bool isDismissible = true}) {
-    final spinKit = new SpinKitCircle(
-      itemBuilder: (context, index) => DecoratedBox(
-        decoration: BoxDecoration(
-          color: appThemeColor,
-          shape: BoxShape.circle,
-        ),
-      ),
-    );
-    ProgressDialog progressDialog = ProgressDialog(context,
-        type: ProgressDialogType.Normal,
-        isDismissible: isDismissible,
-        customBody: Container(
-          height: 250,
-          width: 100,
-          child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: <Widget>[
-                spinKit,
-                SizedBox(
-                  height: 30,
-                ),
-                widget,
-              ]),
-        ));
-    return progressDialog;
-  }
+  // static ProgressDialog showProgressDialog(BuildContext context,
+  //     {@required Widget widget, bool isDismissible = true}) {
+  //   final spinKit = new SpinKitCircle(
+  //     itemBuilder: (context, index) => DecoratedBox(
+  //       decoration: BoxDecoration(
+  //         color: appThemeColor,
+  //         shape: BoxShape.circle,
+  //       ),
+  //     ),
+  //   );
+  //   ProgressDialog progressDialog = ProgressDialog(context,
+  //       type: ProgressDialogType.Normal,
+  //       isDismissible: isDismissible,
+  //       customBody: Container(
+  //         height: 250,
+  //         width: 100,
+  //         child: Column(
+  //             mainAxisAlignment: MainAxisAlignment.center,
+  //             crossAxisAlignment: CrossAxisAlignment.center,
+  //             children: <Widget>[
+  //               spinKit,
+  //               SizedBox(
+  //                 height: 30,
+  //               ),
+  //               widget,
+  //             ]),
+  //       ));
+  //   return progressDialog;
+  // }
 
   static circularProgressIndicator(Color color) {
     return Center(
@@ -233,4 +233,15 @@ class AppTheme {
             style: TextStyle(color: textColor),
           ),
           duration: Duration(seconds: duration)));
+
+  static void showProgressDialog(
+    BuildContext context,
+  ) async =>
+      await showDialog(
+        context: context,
+        builder: (context) => Dialog(
+            child: Center(
+          child: SpinKitCubeGrid(),
+        )),
+      );
 }

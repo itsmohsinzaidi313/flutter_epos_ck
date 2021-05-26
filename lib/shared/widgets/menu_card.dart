@@ -2,19 +2,20 @@ import 'package:flutter/material.dart';
 import '../config.dart';
 
 class MainMenuCard extends StatelessWidget {
-  MainMenuCard({
-    @required this.title,
-    @required this.onTap,
-    @required this.asset
-  });
+  MainMenuCard(
+      {@required this.title,
+      this.subtitle,
+      @required this.onTap,
+      @required this.asset});
   final String asset;
   final String title;
+  final String subtitle;
   final Function onTap;
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: Config.getDeviceHeight(context),
-      width: Config.getDeviceWidth(context),
+      height: Config.getDeviceHeight(context) / 5,
+      width: Config.getDeviceWidth(context) / 5,
       child: Card(
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(10.0),
@@ -30,8 +31,8 @@ class MainMenuCard extends StatelessWidget {
                 Image(
                   image: AssetImage('assets/$asset'),
                   fit: BoxFit.contain,
-                  width: 80,
-                  height: 80,
+                  width: Config.getDeviceWidth(context) * 0.12,
+                  height: Config.getDeviceHeight(context) * 0.12,
                 ),
                 SizedBox(
                   height: 20,
@@ -40,7 +41,7 @@ class MainMenuCard extends StatelessWidget {
                   title,
                   textAlign: TextAlign.center,
                   style: TextStyle(
-                    fontSize: 25,
+                    fontSize: Config.getDeviceWidth(context) * 0.02,
                     fontWeight: FontWeight.bold,
                     fontFamily: 'Ubuntu',
                     letterSpacing: 2.0,
@@ -50,12 +51,12 @@ class MainMenuCard extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.all(3.0),
                   child: Text(
-                    '',
+                    subtitle,
                     maxLines: 2,
                     textAlign: TextAlign.center,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontSize: 10,
+                      fontSize: Config.getDeviceWidth(context) * 0.01,
                       fontWeight: FontWeight.normal,
                       letterSpacing: 2.0,
                       color: Colors.grey,

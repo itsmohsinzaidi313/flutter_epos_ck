@@ -664,6 +664,10 @@ class DeliveryLayout extends StatelessWidget {
                       child: TextField(
                         key: contactKey,
                         controller: nameController,
+                        onChanged: (value) => passEvent(
+                            context,
+                            CustomerChanged(
+                                type: orderType, customerName: value)),
                         cursorColor: Colors.yellow.shade700,
                         decoration: InputDecoration(
                             icon: Icon(
@@ -694,6 +698,8 @@ class DeliveryLayout extends StatelessWidget {
                       child: TextField(
                         key: addressKey,
                         controller: addressController,
+                        onChanged: (value) => passEvent(context,
+                            AddressChanged(type: orderType, address: value)),
                         cursorColor: Colors.yellow.shade700,
                         decoration: InputDecoration(
                             icon: Icon(

@@ -17,46 +17,30 @@ class PosScreen extends StatelessWidget {
     context.read<POSBloc>().add(POSBuild());
     return BlocListener<POSBloc, POSState>(
         listener: (context, state) async {
-          final prog = AppTheme.showProgressDialog(context,
-              widget: Text('Please wait...'), isDismissible: true);
           if (state is SubmissionInvalid) {
             AppTheme.snackbar(context, state.message);
           } else if (state is SubmissionValid) {
           } else if (state is CartItems) {
             totalAmount.text = state.totalAmount;
           } else if (state is POSLoading) {
-            if (!prog.isShowing()) {
-              await prog.show();
-            }
           } else if (state is POSError) {
             await AppTheme.showAlertDialogOK(context,
                 message: state.message,
                 title: 'Error',
                 onOK: () => Navigator.of(context).pop());
-            if (prog.isShowing()) {
-              await prog.hide();
-            }
           } else if (state is OrderPostFailed) {
             await AppTheme.showAlertDialogOK(context,
                 message: state.message,
                 title: 'Failed',
                 onOK: () => Navigator.of(context).pop());
-            if (prog.isShowing()) {
-              await prog.hide();
-            }
           } else if (state is OrderPosted) {
             AppTheme.snackbar(context, state.message);
-            if (prog.isShowing()) {
-              await prog.hide();
-            }
+
             Navigator.of(context)
                 .pushNamedAndRemoveUntil('/menu', (route) => false);
           } else if (state is OrderUpdated) {
             AppTheme.snackbar(context, state.message);
             Navigator.of(context).pop();
-          }
-          if (prog.isShowing()) {
-            await prog.hide();
           }
         },
         child: Scaffold(

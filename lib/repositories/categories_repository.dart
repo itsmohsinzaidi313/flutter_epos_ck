@@ -6,11 +6,8 @@ import 'package:pos_app/shared/config.dart';
 class CategoryRepo {
   static CategoryRepo repo = CategoryRepo._internal();
 
-  CategoryRepo._internal() {
-    _url = Config.getCategoryApi;
-  }
-  String _url;
+  CategoryRepo._internal();
 
   Future<ServerResponse> get rawCategories async =>
-      ServerResponse(response: await get(_url));
+      ServerResponse(response: await get(await Config.getCategoryApi).timeout(Duration(seconds: Config.SERVER_TIMEOUT), onTimeout: () => null));
 }

@@ -7,17 +7,19 @@ import 'package:pos_app/models/objects/customer.dart';
 class CustomerRepo {
   static CustomerRepo repo = CustomerRepo._internal();
 
-  CustomerRepo._internal() {
-    _url = Config.getCustomerApi;
-  }
-  String _url;
+  CustomerRepo._internal();
 
   Future<ServerResponse> customer({@required String contact}) async =>
-      ServerResponse(response: await get('$_url?contact=$contact'));
+      ServerResponse(
+          response: await get('${await Config.getCustomerApi}?contact=$contact')
+              .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
+                  onTimeout: () => null));
 
   Future<ServerResponse> postCustomer({@required Customer customer}) async =>
       ServerResponse(
-          response: await post(_url,
-              headers: {'Content-type': 'application/json'},
-              body: '"${customer.toJson.replaceAll('"', '\\"')}"'));
+          response: await post(await Config.getCustomerApi,
+                  headers: {'Content-type': 'application/json'},
+                  body: '"${customer.toJson.replaceAll('"', '\\"')}"')
+              .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
+                  onTimeout: () => null));
 }

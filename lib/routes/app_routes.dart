@@ -5,27 +5,32 @@ import 'package:pos_app/bloc/login_bloc/login_bloc.dart';
 import 'package:pos_app/bloc/order_info_bloc/order_info_bloc.dart';
 import 'package:pos_app/bloc/payment_bloc/payment_bloc.dart';
 import 'package:pos_app/bloc/pos_bloc/pos_bloc.dart';
+import 'package:pos_app/bloc/report_bloc/report_bloc.dart';
 import 'package:pos_app/models/objects/customer_order.dart';
+import 'package:pos_app/pages/feedback_page.dart';
 import 'package:pos_app/pages/login_page.dart';
-import 'package:pos_app/pages/menu_page.dart';
+import 'package:pos_app/pages/menu_pages/menu_page.dart';
 import 'package:pos_app/pages/order_info_page.dart';
 import 'package:pos_app/pages/payment_page%20copy.dart';
 import 'package:pos_app/pages/pos_page.dart';
+import 'package:pos_app/pages/report_pages/reports_page.dart';
 import 'package:pos_app/pages/splash_page.dart';
 import 'package:pos_app/pages/orders_page.dart';
 
 class AppRoutes {
-  LoginBloc loginBloc;
-  OrderInfoBloc orderInfoBloc;
-  POSBloc posBloc;
-  PaymentBloc paymentBloc;
-  final Order customerOrder = Order();
+  LoginBloc _loginBloc;
+  OrderInfoBloc _orderInfoBloc;
+  POSBloc _posBloc;
+  PaymentBloc _paymentBloc;
+  ReportBloc _reportBloc;
+  final Order _customerOrder = Order();
 
   AppRoutes() {
-    loginBloc = LoginBloc();
-    orderInfoBloc = OrderInfoBloc();
-    posBloc = POSBloc();
-    paymentBloc = PaymentBloc();
+    _loginBloc = LoginBloc();
+    _orderInfoBloc = OrderInfoBloc();
+    _posBloc = POSBloc();
+    _paymentBloc = PaymentBloc();
+    _reportBloc = ReportBloc();
   }
 
   Route onGeneratedRoute(RouteSettings routeSettings) {
@@ -36,7 +41,7 @@ class AppRoutes {
       case '/login':
         return MaterialPageRoute(
           builder: (context) => BlocProvider.value(
-            value: loginBloc,
+            value: _loginBloc,
             child: LoginScreen(),
           ),
         );
@@ -45,30 +50,30 @@ class AppRoutes {
         return MaterialPageRoute(builder: (context) => MenuScreen());
         break;
       case '/orderInfo':
-        orderInfoBloc.add(OrderInfoBuild());
+        _orderInfoBloc.add(OrderInfoBuild());
         return MaterialPageRoute(
           builder: (context) => BlocProvider.value(
-            value: orderInfoBloc,
+            value: _orderInfoBloc,
             child: OrderInfoScreen(),
           ),
         );
         break;
       case '/pos':
-        posBloc
+        _posBloc
             .add(LoadPOSOrder(customerOrder: routeSettings.arguments as Order));
         return MaterialPageRoute(
           builder: (context) => BlocProvider.value(
-            value: posBloc,
+            value: _posBloc,
             child: PosScreen(),
           ),
         );
         break;
       case '/payment':
-        paymentBloc
-            .add(LoadPaymentOrder(customerOrder: routeSettings.arguments as Order));
+        _paymentBloc.add(
+            LoadPaymentOrder(customerOrder: routeSettings.arguments as Order));
         return MaterialPageRoute(
           builder: (context) => BlocProvider.value(
-            value: paymentBloc,
+            value: _paymentBloc,
             child: PaymentScreen(),
           ),
         );
@@ -78,6 +83,22 @@ class AppRoutes {
           builder: (context) =>
               OrdersScreen(ordersList: routeSettings.arguments),
         );
+        break;
+      case '/feedback':
+        return MaterialPageRoute(
+          builder: (context) => FeedbackScreen(
+            order: routeSettings.arguments,
+          ),
+        );
+        break;
+      case '/reports':
+        return MaterialPageRoute(
+          builder: (context) => BlocProvider.value(
+            value: _reportBloc,
+            child: ReportsPage(),
+          ),
+        );
+        break;
       default:
         return null;
         break;
@@ -85,9 +106,10 @@ class AppRoutes {
   }
 
   void dispose() {
-    loginBloc.close();
-    orderInfoBloc.close();
-    posBloc.close();
-    paymentBloc.close();
+    _loginBloc.close();
+    _orderInfoBloc.close();
+    _posBloc.close();
+    _paymentBloc.close();
+    _reportBloc.close();
   }
 }

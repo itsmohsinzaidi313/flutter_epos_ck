@@ -1,21 +1,54 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:pos_app/models/objects/user.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Config {
   static const String appTitle = 'POS';
-  static String serverIp;
-  static User user;
-  static String _apiCommon = 'http://$serverIp/api/pos';
+  static Future<String> get serverIp async {
+    final pref = await SharedPreferences.getInstance();
+    return pref.getString('ipAddress') ?? '';
+  }
 
-  static String get getLoginApi => '$_apiCommon/Login';
-  static String get getCategoryApi => '$_apiCommon/Category';
-  static String get getItemsApi => '$_apiCommon/Item';
-  static String get getTablesApi => '$_apiCommon/Table';
-  static String get getWaitersApi => '$_apiCommon/Waiters';
-  static String get getOrdersApi => '$_apiCommon/Order';
-  static String get getCustomerApi => '$_apiCommon/Customer';
-  static String get getUsersApi => '$_apiCommon/User';
+  static set serverIp(Future<String> fServerIp) =>
+      SharedPreferences.getInstance().then((pref) =>
+          fServerIp.then((serverIp) => pref.setString('ipAddress', serverIp)));
+
+  static User user;
+  static Future<String> get _apiCommon async =>
+      'http://${await serverIp}/api/pos';
+
+  static Future<String> get getLoginApi async => '${await _apiCommon}/Login';
+  static Future<String> get getCategoryApi async =>
+      '${await _apiCommon}/Category';
+  static Future<String> get getItemsApi async => '${await _apiCommon}/Item';
+  static Future<String> get getTablesApi async => '${await _apiCommon}/Table';
+  static Future<String> get getWaitersApi async =>
+      '${await _apiCommon}/Waiters';
+  static Future<String> get getOrdersApi async => '${await _apiCommon}/Order';
+  static Future<String> get getCustomerApi async =>
+      '${await _apiCommon}/Customer';
+  static Future<String> get getUsersApi async => '${await _apiCommon}/User';
+  static Future<String> get postFeedbackApi async =>
+      '${await _apiCommon}/Feedback';
+
+  static Future<bool> get loginStatus async =>
+      (await SharedPreferences.getInstance()).getBool('loginStatus');
+  static set loginStatus(Future<bool> fLoginStatus) =>
+      SharedPreferences.getInstance().then((pref) => fLoginStatus
+          .then((loginStatus) => pref.setBool('loginStatus', loginStatus)));
+
+  static Future<String> get username async =>
+      (await SharedPreferences.getInstance()).getString('username');
+  static set username(Future<String> fUsername) =>
+      SharedPreferences.getInstance().then((pref) =>
+          fUsername.then((username) => pref.setString('username', username)));
+
+  static Future<String> get password async =>
+      (await SharedPreferences.getInstance()).getString('password');
+  static set password(Future<String> fPassword) =>
+      SharedPreferences.getInstance().then((pref) =>
+          fPassword.then((password) => pref.setString('password', password)));
 
   static String _authToken;
   static set authToken(String value) => _authToken = value;

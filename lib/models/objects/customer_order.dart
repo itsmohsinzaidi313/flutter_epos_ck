@@ -1,5 +1,6 @@
 import 'package:pos_app/bloc/payment_bloc/payment_bloc.dart';
 import 'package:pos_app/models/objects/menu_item.dart';
+import 'package:pos_app/models/objects/user.dart';
 
 class Order {
   static const OrderIdKey = 'id';
@@ -19,8 +20,8 @@ class Order {
 
   List<MenuItem> items = [];
   String id,
-      waiter,
-      table,
+      waiterId,
+      tableId,
       userId,
       orderType,
       orderNo,
@@ -31,6 +32,7 @@ class Order {
       time,
       date,
       tax,
+      tiltId,
       discountedAmount,
       payment,
       cardNumber;
@@ -39,8 +41,8 @@ class Order {
 
   Order(
       {this.id,
-      this.waiter,
-      this.table,
+      this.waiterId,
+      this.tableId,
       this.address,
       this.contact,
       this.covers,
@@ -50,8 +52,8 @@ class Order {
 
   Order.fromJson(Map<String, dynamic> map)
       : id = map[OrderIdKey].toString(),
-        waiter = map[WaiterKey],
-        table = map[TableKey],
+        waiterId = map[WaiterKey],
+        tableId = map[TableKey],
         address = map[AddressKey],
         contact = map[ContactKey],
         covers = map[CoversKey].toString(),
@@ -68,15 +70,16 @@ class Order {
 
   Map<String, dynamic> get toJson => {
         ItemsKey: items.map((e) => e.toJson()).toList(),
-        OrderIdKey: id,
-        WaiterKey: waiter,
-        TableKey: table,
-        AddressKey: address,
-        ContactKey: contact,
-        CoversKey: covers,
-        CustomerKey: customer,
-        OrderTypeKey: orderType,
-        UserIdKey: userId
+        OrderIdKey: id ?? '0',
+        WaiterKey: waiterId ?? '0',
+        TableKey: tableId ?? '0',
+        AddressKey: address ?? '0',
+        ContactKey: contact ?? '0',
+        CoversKey: covers ?? '0',
+        CustomerKey: customer ?? '0',
+        OrderTypeKey: orderType ?? '0',
+        UserIdKey: userId ?? '0',
+        User.TiltIdKey: tiltId ?? '0'
       };
 
   List<MenuItem> get cartItems => items ?? [];
@@ -118,27 +121,31 @@ class Order {
       items.where((element) => element.id == itemId.toString()).first.comment =
           comment;
 
-  String get totalAmount {
-    double total = 0;
+  String get subTotal {
+    double amount = 0;
     items.forEach((e) {
-      total += double.parse(e.price) * e.quantity;
+      amount += double.parse(e.price) * e.quantity;
     });
-    return total.toStringAsFixed(2);
+    return amount.toStringAsFixed(2);
   }
 
   String get totalTaxAmount {
-    double totalTax = 0;
+    double amount = 0;
     items.forEach((e) {
-      totalTax += double.parse(e.taxAmount);
+      amount += double.parse(e.taxAmount);
     });
-    return totalTax.toStringAsFixed(2);
+    return amount.toStringAsFixed(2);
   }
+
+  String get totalAmount =>
+      (double.parse(totalTaxAmount) + double.parse(subTotal))
+          .toStringAsFixed(2);
 
   void reset() {
     items = [];
     id = '';
-    waiter = '';
-    table = '';
+    waiterId = '';
+    tableId = '';
     address = '';
     contact = '';
     covers = '';
@@ -155,8 +162,8 @@ class Order {
   void copyOrder(Order order) {
     items = order.items;
     id = order.id;
-    waiter = order.waiter;
-    table = order.table;
+    waiterId = order.waiterId;
+    tableId = order.tableId;
     address = order.address;
     contact = order.contact;
     covers = order.covers;

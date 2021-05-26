@@ -48,7 +48,7 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
             yield OrderTypeState(type: dineIn);
             yield WaitersState(waiters: listWaiters, type: dineIn);
           } else if (event is WaiterChanged) {
-            customerOrder.waiter = event.waiter.id;
+            customerOrder.waiterId = event.waiter.id;
             listWaiters.forEach((e) {
               if (e.id == event.waiter.id) {
                 e.selected = true;
@@ -59,7 +59,7 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
             yield TablesState(tables: listTables, type: dineIn);
           } else if (event is TableChanged) {
             if (!event.table.reserved) {
-              customerOrder.table = event.table.id;
+              customerOrder.tableId = event.table.id;
               listTables.forEach((e) {
                 if (e.id == event.table.id) {
                   e.selected = true;
@@ -75,15 +75,15 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
           } else if (event is CoversChanged) {
             customerOrder.covers = event.covers.toString();
           } else if (event is Submit) {
-            if (customerOrder.waiter == null || customerOrder.waiter.isEmpty) {
+            if (customerOrder.waiterId == null || customerOrder.waiterId.isEmpty) {
               yield InvalidWaiter(
                   message: 'Please select waiter.', type: dineIn);
             } else if (customerOrder.covers == null ||
                 customerOrder.covers.isEmpty) {
               yield InvalidCovers(
                   message: 'Please enter covers.', type: dineIn);
-            } else if (customerOrder.table == null ||
-                customerOrder.table.isEmpty) {
+            } else if (customerOrder.tableId == null ||
+                customerOrder.tableId.isEmpty) {
               yield InvalidTables(
                   message: 'Please select table.', type: dineIn);
             } else {

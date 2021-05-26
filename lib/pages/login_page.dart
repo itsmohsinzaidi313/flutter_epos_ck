@@ -41,10 +41,10 @@ class _LoginScreenState extends State<LoginScreen> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: BlocListener<LoginBloc, LoginState>(
-        listener: (context, state) {
+        listener: (context, state) async {
           if (state is LoginBlocInitial) {
-            Config.serverIp = state.ipAddress;
-            ipController.text = Config.serverIp;
+            Config.serverIp = Future.value(state.ipAddress);
+            ipController.text = (await Config.serverIp) ?? '';
             AppTheme.snackbar(context, state.message);
           } else if (state is ValidSubmission) {
             AppTheme.snackbar(context, state.message);

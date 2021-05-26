@@ -10,6 +10,7 @@ import 'package:pos_app/models/objects/server_response.dart';
 import 'package:pos_app/repositories/categories_repository.dart';
 import 'package:pos_app/repositories/menu_items_repository.dart';
 import 'package:pos_app/repositories/order_repository.dart';
+import 'package:pos_app/shared/config.dart';
 part 'pos_event.dart';
 part 'pos_state.dart';
 
@@ -44,7 +45,7 @@ class POSBloc extends Bloc<POSEvents, POSState> {
                 .toList());
         yield CartItems(
             list: customerOrder.cartItems,
-            totalAmount: customerOrder.totalAmount);
+            totalAmount: customerOrder.subTotal);
       } else if (event is CategoryChanged) {
         listCategories.forEach((e) {
           if (e.id == event.categoryId) {
@@ -69,28 +70,48 @@ class POSBloc extends Bloc<POSEvents, POSState> {
             .first);
         yield CartItems(
             list: customerOrder.cartItems,
-            totalAmount: customerOrder.totalAmount);
+            totalAmount: customerOrder.subTotal);
       } else if (event is ReduceItem) {
-        customerOrder.reduceCartItem(event.itemId);
+        if (customerOrder.editOrder) {
+          double qty = 0;
+          customerOrder.cartItems.forEach((element) => qty += element.quantity);
+          if (qty > 1) {
+            customerOrder.reduceCartItem(event.itemId);
+          } else {
+            yield SubmissionInvalid(
+                message: 'There should be atleast on item in cart');
+          }
+        } else {
+          customerOrder.reduceCartItem(event.itemId);
+        }
         yield CartItems(
             list: customerOrder.cartItems,
-            totalAmount: customerOrder.totalAmount);
+            totalAmount: customerOrder.subTotal);
       } else if (event is RemoveItem) {
-        customerOrder.removeCartItem(event.itemId);
+        if (customerOrder.editOrder) {
+          if (customerOrder.cartItems.length > 1) {
+            customerOrder.removeCartItem(event.itemId);
+          } else {
+            yield SubmissionInvalid(
+                message: 'There should be atleast on item in cart');
+          }
+        } else {
+          customerOrder.removeCartItem(event.itemId);
+        }
         yield CartItems(
             list: customerOrder.cartItems,
-            totalAmount: customerOrder.totalAmount);
+            totalAmount: customerOrder.subTotal);
       } else if (event is AddComment) {
         customerOrder.addItemComment(event.itemId, event.comment);
         yield CartItems(
             list: customerOrder.cartItems,
-            totalAmount: customerOrder.totalAmount);
+            totalAmount: customerOrder.subTotal);
       } else if (event is PostOrder) {
         yield POSLoading();
+        customerOrder.tiltId = Config.user.tiltId;
         if (customerOrder.cartItems.length > 0) {
           ServerResponse response;
           if (customerOrder.editOrder) {
-            
             response =
                 await OrderRepo.repo.updateOrder(customerOrder: customerOrder);
           } else {
