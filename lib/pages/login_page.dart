@@ -45,6 +45,7 @@ class _LoginScreenState extends State<LoginScreen> {
           if (state is LoginBlocInitial) {
             Config.serverIp = Future.value(state.ipAddress);
             ipController.text = (await Config.serverIp) ?? '';
+            ipAddress = ipController.text;
             AppTheme.snackbar(context, state.message);
           } else if (state is ValidSubmission) {
             AppTheme.snackbar(context, state.message);
@@ -212,8 +213,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                           textInputAction: TextInputAction.next,
                                           keyboardType:
                                               TextInputType.emailAddress,
-                                          onChanged: (value) =>
-                                              username = value,
+                                          onChanged: (value) {
+                                            return username = value;
+                                          },
                                         ),
                                       ),
 
@@ -290,9 +292,9 @@ class _LoginScreenState extends State<LoginScreen> {
                                       onTap: () {
                                         context.read<LoginBloc>().add(
                                             LoginPressed(
-                                                ipaddress: ipAddress,
-                                                username: username,
-                                                password: password));
+                                                ipaddress: ipAddress ?? '',
+                                                username: username ?? '',
+                                                password: password ?? ''));
                                       },
                                       child: Center(
                                         child: Text(

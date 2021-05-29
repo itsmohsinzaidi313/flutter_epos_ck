@@ -75,24 +75,34 @@ class OrderInfoScreen extends StatelessWidget {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
-                          orderTypeButton(
-                              context,
-                              'Dine-In',
-                              () => passEvent(context,
-                                  OrderTypeChanged(type: dineInOrdertype)),
-                              dineIn),
-                          orderTypeButton(
-                              context,
-                              'Takeaway',
-                              () => passEvent(context,
-                                  OrderTypeChanged(type: takeAwayOrderType)),
-                              takeAway),
-                          orderTypeButton(
-                              context,
-                              'Delivery',
-                              () => passEvent(context,
-                                  OrderTypeChanged(type: deliveryOrderType)),
-                              delivery),
+                          Config.allowDineIn
+                              ? orderTypeButton(
+                                  context,
+                                  'Dine-In',
+                                  () => passEvent(context,
+                                      OrderTypeChanged(type: dineInOrdertype)),
+                                  dineIn)
+                              : Container(),
+                          Config.allowTakeAway
+                              ? orderTypeButton(
+                                  context,
+                                  'Takeaway',
+                                  () => passEvent(
+                                      context,
+                                      OrderTypeChanged(
+                                          type: takeAwayOrderType)),
+                                  takeAway)
+                              : Container(),
+                          Config.allowDelivery
+                              ? orderTypeButton(
+                                  context,
+                                  'Delivery',
+                                  () => passEvent(
+                                      context,
+                                      OrderTypeChanged(
+                                          type: deliveryOrderType)),
+                                  delivery)
+                              : Container(),
                         ],
                       ),
                     ),

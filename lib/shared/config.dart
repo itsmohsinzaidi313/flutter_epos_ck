@@ -5,6 +5,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class Config {
   static const String appTitle = 'POS';
+
+  static const allowDineIn = true;
+  static const allowTakeAway = true;
+  static const allowDelivery = false;
+  // APIS
   static Future<String> get serverIp async {
     final pref = await SharedPreferences.getInstance();
     return pref.getString('ipAddress') ?? '';
@@ -31,24 +36,8 @@ class Config {
   static Future<String> get getUsersApi async => '${await _apiCommon}/User';
   static Future<String> get postFeedbackApi async =>
       '${await _apiCommon}/Feedback';
-
-  static Future<bool> get loginStatus async =>
-      (await SharedPreferences.getInstance()).getBool('loginStatus');
-  static set loginStatus(Future<bool> fLoginStatus) =>
-      SharedPreferences.getInstance().then((pref) => fLoginStatus
-          .then((loginStatus) => pref.setBool('loginStatus', loginStatus)));
-
-  static Future<String> get username async =>
-      (await SharedPreferences.getInstance()).getString('username');
-  static set username(Future<String> fUsername) =>
-      SharedPreferences.getInstance().then((pref) =>
-          fUsername.then((username) => pref.setString('username', username)));
-
-  static Future<String> get password async =>
-      (await SharedPreferences.getInstance()).getString('password');
-  static set password(Future<String> fPassword) =>
-      SharedPreferences.getInstance().then((pref) =>
-          fPassword.then((password) => pref.setString('password', password)));
+  static Future<String> get checkServerApi async =>
+      '${await _apiCommon}/Status';
 
   static String _authToken;
   static set authToken(String value) => _authToken = value;

@@ -47,7 +47,12 @@ class AppRoutes {
         );
         break;
       case '/menu':
-        return MaterialPageRoute(builder: (context) => MenuScreen());
+        return MaterialPageRoute(
+          builder: (context) => BlocProvider.value(
+            value: _loginBloc,
+            child: MenuScreen(),
+          ),
+        );
         break;
       case '/orderInfo':
         _orderInfoBloc.add(OrderInfoBuild());

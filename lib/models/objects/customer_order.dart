@@ -1,22 +1,24 @@
+import 'dart:developer';
+
 import 'package:pos_app/bloc/payment_bloc/payment_bloc.dart';
 import 'package:pos_app/models/objects/menu_item.dart';
-import 'package:pos_app/models/objects/user.dart';
 
 class Order {
-  static const OrderIdKey = 'id';
-  static const ItemsKey = 'items';
-  static const WaiterKey = 'waiter';
-  static const TableKey = 'table';
-  static const OrderTypeKey = 'orderType';
-  static const CoversKey = 'covers';
-  static const CustomerKey = 'customer';
-  static const ContactKey = 'contact';
-  static const AddressKey = 'address';
-  static const UserIdKey = 'userId';
-  static const OrderNoKey = 'orderNo';
-  static const OrderTimeKey = 'time';
-  static const OrderDateKey = 'date';
-  static const TaxKey = 'tax';
+  static const _OrderIdKey = 'id';
+  static const _ItemsKey = 'items';
+  static const _WaiterKey = 'waiter';
+  static const _TableKey = 'table';
+  static const _OrderTypeKey = 'orderType';
+  static const _CoversKey = 'covers';
+  static const _CustomerKey = 'customer';
+  static const _ContactKey = 'contact';
+  static const _AddressKey = 'address';
+  static const _UserIdKey = 'userId';
+  static const _OrderNoKey = 'orderNo';
+  static const _OrderTimeKey = 'time';
+  static const _OrderDateKey = 'date';
+  static const _TiltIdKey = 'TiltId';
+  static const _TaxKey = 'tax';
 
   List<MenuItem> items = [];
   String id,
@@ -51,35 +53,35 @@ class Order {
       this.orderNo});
 
   Order.fromJson(Map<String, dynamic> map)
-      : id = map[OrderIdKey].toString(),
-        waiterId = map[WaiterKey],
-        tableId = map[TableKey],
-        address = map[AddressKey],
-        contact = map[ContactKey],
-        covers = map[CoversKey].toString(),
-        customer = map[CustomerKey],
-        orderType = map[OrderTypeKey],
-        userId = map[UserIdKey],
-        orderNo = map[OrderNoKey].toString(),
-        time = map[OrderTimeKey],
-        date = map[OrderDateKey],
-        tax = map[TaxKey],
-        items = (map[ItemsKey] as List<dynamic>)
+      : id = map[_OrderIdKey].toString(),
+        waiterId = map[_WaiterKey],
+        tableId = map[_TableKey],
+        address = map[_AddressKey],
+        contact = map[_ContactKey],
+        covers = map[_CoversKey].toString(),
+        customer = map[_CustomerKey],
+        orderType = map[_OrderTypeKey],
+        userId = map[_UserIdKey],
+        orderNo = map[_OrderNoKey].toString(),
+        time = map[_OrderTimeKey],
+        date = map[_OrderDateKey],
+        tax = map[_TaxKey],
+        items = (map[_ItemsKey] as List<dynamic>)
             .map((e) => MenuItem.fromJson(e))
             .toList();
 
   Map<String, dynamic> get toJson => {
-        ItemsKey: items.map((e) => e.toJson()).toList(),
-        OrderIdKey: id ?? '0',
-        WaiterKey: waiterId ?? '0',
-        TableKey: tableId ?? '0',
-        AddressKey: address ?? '0',
-        ContactKey: contact ?? '0',
-        CoversKey: covers ?? '0',
-        CustomerKey: customer ?? '0',
-        OrderTypeKey: orderType ?? '0',
-        UserIdKey: userId ?? '0',
-        User.TiltIdKey: tiltId ?? '0'
+        _ItemsKey: items.map((e) => e.toJson()).toList(),
+        _OrderIdKey: id ?? '0',
+        _WaiterKey: waiterId ?? '0',
+        _TableKey: tableId ?? '0',
+        _AddressKey: address ?? '0',
+        _ContactKey: contact ?? '0',
+        _CoversKey: covers ?? '0',
+        _CustomerKey: customer ?? '0',
+        _OrderTypeKey: orderType ?? '0',
+        _UserIdKey: userId ?? '0',
+        _TiltIdKey: tiltId ?? '0'
       };
 
   List<MenuItem> get cartItems => items ?? [];
@@ -132,14 +134,10 @@ class Order {
   String get totalTaxAmount {
     double amount = 0;
     items.forEach((e) {
-      amount += double.parse(e.taxAmount);
+      amount += double.parse(e.taxAmount) * e.quantity;
     });
     return amount.toStringAsFixed(2);
   }
-
-  String get totalAmount =>
-      (double.parse(totalTaxAmount) + double.parse(subTotal))
-          .toStringAsFixed(2);
 
   void reset() {
     items = [];

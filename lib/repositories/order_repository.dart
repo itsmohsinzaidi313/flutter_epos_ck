@@ -20,10 +20,11 @@ class OrderRepo {
       String orderDate = ''}) async {
     log('${await Config.getOrdersApi}?tiltId=${tiltId ?? Config.user.tiltId}&type=$type&orderNo=$orderNo&orderDate=$orderDate');
     return ServerResponse(
-        response: await get(Uri.parse(
-                '${await Config.getOrdersApi}?tiltId=${tiltId ?? Config.user.tiltId}&type=$type&orderNo=$orderNo&orderDate=$orderDate'))
-            .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
-                onTimeout: () => null));
+      response: await get(Uri.parse(
+              '${await Config.getOrdersApi}?tiltId=${tiltId ?? Config.user.tiltId}&type=$type&orderNo=$orderNo&orderDate=$orderDate'))
+          .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
+              onTimeout: () => null),
+    );
   }
 
   Future<ServerResponse> postOrder({@required Order customerOrder}) async {

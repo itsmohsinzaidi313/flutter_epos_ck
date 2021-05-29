@@ -27,6 +27,7 @@ class _OrdersScreenState extends State<OrdersScreen>
   TabController tabController;
 
   _OrdersScreenState({@required this.ordersList}) {
+    tabs = [];
     Tab dineInTab = Tab(
       child: Text('DINE IN'),
     );
@@ -36,7 +37,12 @@ class _OrdersScreenState extends State<OrdersScreen>
     Tab deliveryTab = Tab(
       child: Text('DELIVERY'),
     );
-    tabs = [dineInTab, takeAwayTab, deliveryTab];
+    final tabsBuffer = [dineInTab, takeAwayTab, deliveryTab];
+    // tabs = tabsBuffer;
+    if (Config.allowDineIn) tabs.add(tabsBuffer[0]);
+    if (Config.allowTakeAway) tabs.add(tabsBuffer[1]);
+    if (Config.allowDelivery) tabs.add(tabsBuffer[2]);
+
     tabController = TabController(length: tabs.length, vsync: this);
   }
 
@@ -91,32 +97,65 @@ class _OrdersScreenState extends State<OrdersScreen>
       body: Container(
         child: TabBarView(
           controller: tabController,
-          children: [
-            getOrdersList(
-                order: ordersList.where((e) {
-              if (e.orderType == '1')
-                return true;
-              else
-                return false;
-            }).toList()),
-            getOrdersList(
-                order: ordersList.where((e) {
-              if (e.orderType == '2')
-                return true;
-              else
-                return false;
-            }).toList()),
-            getOrdersList(
-                order: ordersList.where((e) {
-              if (e.orderType == '3')
-                return true;
-              else
-                return false;
-            }).toList()),
-          ],
+          children:
+              getTabWidgets(),
+          //     [
+          //   getOrdersList(
+          //       order: ordersList.where((e) {
+          //     if (e.orderType == '1')
+          //       return true;
+          //     else
+          //       return false;
+          //   }).toList()),
+          //   getOrdersList(
+          //       order: ordersList.where((e) {
+          //     if (e.orderType == '2')
+          //       return true;
+          //     else
+          //       return false;
+          //   }).toList()),
+          //   getOrdersList(
+          //       order: ordersList.where((e) {
+          //     if (e.orderType == '3')
+          //       return true;
+          //     else
+          //       return false;
+          //   }).toList()),
+          // ],
         ),
       ),
     );
+  }
+
+  List<Widget> getTabWidgets() {
+    final widgetsBuffer = <Widget>[
+      getOrdersList(
+          order: ordersList.where((e) {
+        if (e.orderType == '1')
+          return true;
+        else
+          return false;
+      }).toList()),
+      getOrdersList(
+          order: ordersList.where((e) {
+        if (e.orderType == '2')
+          return true;
+        else
+          return false;
+      }).toList()),
+      getOrdersList(
+          order: ordersList.where((e) {
+        if (e.orderType == '3')
+          return true;
+        else
+          return false;
+      }).toList()),
+    ];
+    final tabWidgets = <Widget>[];
+    if (Config.allowDineIn) tabWidgets.add(widgetsBuffer[0]);
+    if (Config.allowTakeAway) tabWidgets.add(widgetsBuffer[1]);
+    if (Config.allowDelivery) tabWidgets.add(widgetsBuffer[2]);
+    return tabWidgets;
   }
 
   Widget orderGridItem({@required Order order}) {
@@ -160,7 +199,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                   // Divider(),
                   boxTile(
                       title: 'AMOUNT',
-                      description: order.totalAmount,
+                      description: order.totalTaxAmount,
                       fontWeight: FontWeight.bold),
                   Divider(),
                   boxTile(title: 'TIME', description: '${order.time}'),

@@ -41,3 +41,4 @@ class SwitchChanged extends LoginEvent {
   SwitchChanged({@required this.online});
 }
 
+class LogoutPressed extends LoginEvent {}

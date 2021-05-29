@@ -1,6 +1,8 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:pos_app/bloc/login_bloc/login_bloc.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pos_app/models/objects/customer_order.dart';
 import 'package:pos_app/repositories/order_repository.dart';
 import 'package:pos_app/shared/app_library.dart';
@@ -53,9 +55,7 @@ class MenuPageButtons {
               bool x = await AppTheme.showAlertDialogYNFutureReturn(context,
                   title: 'Attention', message: 'Are you sure?');
               if (x) {
-                Config.loginStatus = Future.value(false);
-                Config.username = Future.value('');
-                Config.password = Future.value('');
+                context.read<LoginBloc>().add(LogoutPressed());
                 Navigator.of(context)
                     .pushNamedAndRemoveUntil('/login', (route) => false);
               }
