@@ -14,7 +14,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
   // REMEMBER LOGIN
   Future<bool> get _loginStatus async =>
-      (await SharedPreferences.getInstance()).getBool('loginStatus');
+      (await SharedPreferences.getInstance()).getBool('loginStatus') ??
+      Future.value(false);
   set _loginStatus(Future<bool> fLoginStatus) =>
       SharedPreferences.getInstance().then((pref) => fLoginStatus
           .then((loginStatus) => pref.setBool('loginStatus', loginStatus)));

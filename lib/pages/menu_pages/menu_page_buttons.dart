@@ -61,151 +61,151 @@ class MenuPageButtons {
               }
             },
             asset: 'logout.png'),
-        MainMenuCard(
-            title: 'Feedback',
-            subtitle: 'take customer feedback',
-            onTap: () {
-              final nameController = TextEditingController();
-              final contactController = TextEditingController();
-              final orderNoController = TextEditingController();
-              final dateController = TextEditingController();
-              showDialog(
-                context: context,
-                builder: (context) {
-                  return Dialog(
-                    child: SingleChildScrollView(
-                      child: StatefulBuilder(
-                        builder: (context, setState) => Container(
-                          width: Config.getDeviceWidth(context) * 0.5,
-                          child: Wrap(
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: Colors.red,
-                                        borderRadius: BorderRadius.only(
-                                          topLeft: const Radius.circular(4),
-                                          topRight: const Radius.circular(4),
-                                        ),
-                                      ),
-                                      child: Center(
-                                        child: Text(
-                                          'Customer Info',
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 22,
-                                              fontWeight: FontWeight.bold),
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Column(
-                                  children: [
-                                    TextField(
-                                      controller: nameController,
-                                      keyboardType: TextInputType.name,
-                                      decoration: InputDecoration(
-                                          icon: Icon(Icons.person),
-                                          labelText: 'Customer name',
-                                          errorText: nameController.text == ''
-                                              ? 'Required'
-                                              : null),
-                                    ),
-                                    TextField(
-                                      controller: contactController,
-                                      keyboardType: TextInputType.phone,
-                                      decoration: InputDecoration(
-                                          icon: Icon(Icons.dialpad),
-                                          labelText: 'Customer contact',
-                                          errorText:
-                                              contactController.text == ''
-                                                  ? 'Required'
-                                                  : null),
-                                    ),
-                                    TextField(
-                                      controller: orderNoController,
-                                      keyboardType: TextInputType.number,
-                                      decoration: InputDecoration(
-                                          icon: Icon(Icons.edit),
-                                          labelText: 'Order number',
-                                          errorText:
-                                              orderNoController.text == ''
-                                                  ? 'Required'
-                                                  : null),
-                                    ),
-                                    StatefulBuilder(
-                                        builder: (context, setState) {
-                                      return TextField(
-                                        controller: dateController,
-                                        keyboardType: TextInputType.datetime,
-                                        decoration: InputDecoration(
-                                            icon: Icon(Icons.calendar_today),
-                                            labelText: 'Order date',
-                                            errorText: dateController.text == ''
-                                                ? 'Required'
-                                                : null),
-                                        onTap: () async {
-                                          final date = await showDatePicker(
-                                              context: context,
-                                              initialDate: DateTime.now(),
-                                              firstDate: DateTime(
-                                                  DateTime.now().year - 1),
-                                              lastDate: DateTime(
-                                                  DateTime.now().year + 5));
-                                          if (date != null) {
-                                            dateController.text = date
-                                                .toIso8601String()
-                                                .substring(0, 10);
-                                          }
-                                        },
-                                      );
-                                    }),
-                                    ButtonBar(
-                                      children: [
-                                        ElevatedButton(
-                                          child: Text('Ok'),
-                                          onPressed: () => _onFeedbackPressed(
-                                              context,
-                                              name: nameController.text,
-                                              contact: contactController.text,
-                                              orderNo: orderNoController.text,
-                                              date: dateController.text),
-                                        ),
-                                        ElevatedButton(
-                                          child: Text('Cancel'),
-                                          onPressed: () =>
-                                              Navigator.of(context).pop(),
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              );
-            },
-            asset: 'feedback3.png'),
-        MainMenuCard(
-            title: 'Reports',
-            subtitle: 'view financial reports of your sales',
-            onTap: () async {
-              await Lib.forcePortraitView(); // Forces potrate mode
-              await Navigator.of(context).pushNamed('/reports');
-              await Lib.forceLandscapeView(); // Resets to landscape mode
-            },
-            asset: 'report.png'),
+        // MainMenuCard(
+        //     title: 'Feedback',
+        //     subtitle: 'take customer feedback',
+        //     onTap: () {
+        //       final nameController = TextEditingController();
+        //       final contactController = TextEditingController();
+        //       final orderNoController = TextEditingController();
+        //       final dateController = TextEditingController();
+        //       showDialog(
+        //         context: context,
+        //         builder: (context) {
+        //           return Dialog(
+        //             child: SingleChildScrollView(
+        //               child: StatefulBuilder(
+        //                 builder: (context, setState) => Container(
+        //                   width: Config.getDeviceWidth(context) * 0.5,
+        //                   child: Wrap(
+        //                     children: [
+        //                       Row(
+        //                         children: [
+        //                           Expanded(
+        //                             child: Container(
+        //                               decoration: BoxDecoration(
+        //                                 color: Colors.red,
+        //                                 borderRadius: BorderRadius.only(
+        //                                   topLeft: const Radius.circular(4),
+        //                                   topRight: const Radius.circular(4),
+        //                                 ),
+        //                               ),
+        //                               child: Center(
+        //                                 child: Text(
+        //                                   'Customer Info',
+        //                                   style: TextStyle(
+        //                                       color: Colors.white,
+        //                                       fontSize: 22,
+        //                                       fontWeight: FontWeight.bold),
+        //                                 ),
+        //                               ),
+        //                             ),
+        //                           ),
+        //                         ],
+        //                       ),
+        //                       Padding(
+        //                         padding: const EdgeInsets.all(8.0),
+        //                         child: Column(
+        //                           children: [
+        //                             TextField(
+        //                               controller: nameController,
+        //                               keyboardType: TextInputType.name,
+        //                               decoration: InputDecoration(
+        //                                   icon: Icon(Icons.person),
+        //                                   labelText: 'Customer name',
+        //                                   errorText: nameController.text == ''
+        //                                       ? 'Required'
+        //                                       : null),
+        //                             ),
+        //                             TextField(
+        //                               controller: contactController,
+        //                               keyboardType: TextInputType.phone,
+        //                               decoration: InputDecoration(
+        //                                   icon: Icon(Icons.dialpad),
+        //                                   labelText: 'Customer contact',
+        //                                   errorText:
+        //                                       contactController.text == ''
+        //                                           ? 'Required'
+        //                                           : null),
+        //                             ),
+        //                             TextField(
+        //                               controller: orderNoController,
+        //                               keyboardType: TextInputType.number,
+        //                               decoration: InputDecoration(
+        //                                   icon: Icon(Icons.edit),
+        //                                   labelText: 'Order number',
+        //                                   errorText:
+        //                                       orderNoController.text == ''
+        //                                           ? 'Required'
+        //                                           : null),
+        //                             ),
+        //                             StatefulBuilder(
+        //                                 builder: (context, setState) {
+        //                               return TextField(
+        //                                 controller: dateController,
+        //                                 keyboardType: TextInputType.datetime,
+        //                                 decoration: InputDecoration(
+        //                                     icon: Icon(Icons.calendar_today),
+        //                                     labelText: 'Order date',
+        //                                     errorText: dateController.text == ''
+        //                                         ? 'Required'
+        //                                         : null),
+        //                                 onTap: () async {
+        //                                   final date = await showDatePicker(
+        //                                       context: context,
+        //                                       initialDate: DateTime.now(),
+        //                                       firstDate: DateTime(
+        //                                           DateTime.now().year - 1),
+        //                                       lastDate: DateTime(
+        //                                           DateTime.now().year + 5));
+        //                                   if (date != null) {
+        //                                     dateController.text = date
+        //                                         .toIso8601String()
+        //                                         .substring(0, 10);
+        //                                   }
+        //                                 },
+        //                               );
+        //                             }),
+        //                             ButtonBar(
+        //                               children: [
+        //                                 ElevatedButton(
+        //                                   child: Text('Ok'),
+        //                                   onPressed: () => _onFeedbackPressed(
+        //                                       context,
+        //                                       name: nameController.text,
+        //                                       contact: contactController.text,
+        //                                       orderNo: orderNoController.text,
+        //                                       date: dateController.text),
+        //                                 ),
+        //                                 ElevatedButton(
+        //                                   child: Text('Cancel'),
+        //                                   onPressed: () =>
+        //                                       Navigator.of(context).pop(),
+        //                                 ),
+        //                               ],
+        //                             ),
+        //                           ],
+        //                         ),
+        //                       ),
+        //                     ],
+        //                   ),
+        //                 ),
+        //               ),
+        //             ),
+        //           );
+        //         },
+        //       );
+        //     },
+        //     asset: 'feedback3.png'),
+        // MainMenuCard(
+        //     title: 'Reports',
+        //     subtitle: 'view financial reports of your sales',
+        //     onTap: () async {
+        //       await Lib.forcePortraitView(); // Forces potrate mode
+        //       await Navigator.of(context).pushNamed('/reports');
+        //       await Lib.forceLandscapeView(); // Resets to landscape mode
+        //     },
+        //     asset: 'report.png'),
       ];
 
   Future<void> _onFeedbackPressed(BuildContext context,
