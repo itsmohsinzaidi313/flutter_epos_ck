@@ -8,7 +8,7 @@ import 'package:pos_app/repositories/order_repository.dart';
 import 'package:pos_app/shared/app_library.dart';
 import 'package:pos_app/shared/app_theme.dart';
 import 'package:pos_app/shared/config.dart';
-import 'package:pos_app/shared/widgets/menu_card.dart';
+import 'package:pos_app/pages/widgets/menu_card.dart';
 
 class MenuPageButtons {
   final BuildContext context;

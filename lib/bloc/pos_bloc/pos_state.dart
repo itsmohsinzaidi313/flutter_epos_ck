@@ -25,8 +25,10 @@ class ItemsLoaded extends POSState {
 
 class CartItems extends POSState {
   final String totalAmount;
+  final String taxAmount;
+  final String subTotal;
   final List<MenuItem> list;
-  CartItems({this.list, this.totalAmount});
+  CartItems({this.list, this.totalAmount, this.taxAmount, this.subTotal});
 
   // @override
   // List<Object> get props => [list];
@@ -63,4 +65,7 @@ class POSError extends POSState {
   POSError({this.message});
 }
 
-class POSLoading extends POSState {}
+class POSLoading extends POSState {
+  final String message;
+  POSLoading({this.message});
+}

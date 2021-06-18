@@ -4,21 +4,21 @@ import 'package:pos_app/bloc/payment_bloc/payment_bloc.dart';
 import 'package:pos_app/models/objects/menu_item.dart';
 
 class Order {
-  static const _OrderIdKey = 'id';
-  static const _ItemsKey = 'items';
-  static const _WaiterKey = 'waiter';
-  static const _TableKey = 'table';
-  static const _OrderTypeKey = 'orderType';
-  static const _CoversKey = 'covers';
-  static const _CustomerKey = 'customer';
-  static const _ContactKey = 'contact';
-  static const _AddressKey = 'address';
-  static const _UserIdKey = 'userId';
-  static const _OrderNoKey = 'orderNo';
-  static const _OrderTimeKey = 'time';
-  static const _OrderDateKey = 'date';
+  static const _OrderIdKey = 'Id';
+  static const _ItemsKey = 'Items';
+  static const _WaiterKey = 'Waiter';
+  static const _TableKey = 'Table';
+  static const _OrderTypeKey = 'OrderType';
+  static const _CoversKey = 'Covers';
+  static const _CustomerKey = 'Customer';
+  static const _ContactKey = 'Contact';
+  static const _AddressKey = 'Address';
+  static const _UserIdKey = 'UserId';
+  static const _OrderNoKey = 'OrderNo';
+  static const _OrderTimeKey = 'Time';
+  static const _OrderDateKey = 'Date';
   static const _TiltIdKey = 'TiltId';
-  static const _TaxKey = 'tax';
+  static const _TaxKey = 'TotalTax';
 
   List<MenuItem> items = [];
   String id,
@@ -65,7 +65,6 @@ class Order {
         orderNo = map[_OrderNoKey].toString(),
         time = map[_OrderTimeKey],
         date = map[_OrderDateKey],
-        tax = map[_TaxKey],
         items = (map[_ItemsKey] as List<dynamic>)
             .map((e) => MenuItem.fromJson(e))
             .toList();
@@ -131,13 +130,17 @@ class Order {
     return amount.toStringAsFixed(2);
   }
 
-  String get totalTaxAmount {
+  String get totalTaxedAmount {
     double amount = 0;
     items.forEach((e) {
       amount += double.parse(e.taxAmount) * e.quantity;
     });
     return amount.toStringAsFixed(2);
   }
+
+  String get totalTax => ((double.tryParse(totalTaxedAmount) ?? 0) -
+          (double.tryParse(subTotal) ?? 0))
+      .toStringAsFixed(2);
 
   void reset() {
     items = [];

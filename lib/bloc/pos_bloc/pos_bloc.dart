@@ -18,6 +18,7 @@ class POSBloc extends Bloc<POSEvents, POSState> {
   Order customerOrder;
   List<Category> listCategories = [];
   List<MenuItem> listItems = [];
+  bool requestSubmitted = false;
   POSBloc() : super(PosInitial());
 
   @override
@@ -30,7 +31,7 @@ class POSBloc extends Bloc<POSEvents, POSState> {
           customerOrder = Order();
         }
         final cateResponse = await CategoryRepo.repo.rawCategories;
-        final itemResponse = await MenuItemRepo.repo.allItems;
+        final itemResponse = await MenuItemRepo.repo.allItems();
         listCategories = (cateResponse.data as List<dynamic>)
             .map((e) => Category.fromJson(e))
             .toList();
@@ -43,9 +44,13 @@ class POSBloc extends Bloc<POSEvents, POSState> {
             list: listItems
                 .where((e) => e.categoryId == listCategories.first.id)
                 .toList());
+
         yield CartItems(
-            list: customerOrder.cartItems,
-            totalAmount: customerOrder.subTotal);
+          list: customerOrder.cartItems,
+          subTotal: customerOrder.subTotal,
+          totalAmount: customerOrder.totalTaxedAmount,
+          taxAmount: customerOrder.totalTax,
+        );
       } else if (event is CategoryChanged) {
         listCategories.forEach((e) {
           if (e.id == event.categoryId) {
@@ -69,8 +74,11 @@ class POSBloc extends Bloc<POSEvents, POSState> {
             .where((element) => element.id == '${event.itemId}')
             .first);
         yield CartItems(
-            list: customerOrder.cartItems,
-            totalAmount: customerOrder.subTotal);
+          list: customerOrder.cartItems,
+          subTotal: customerOrder.subTotal,
+          totalAmount: customerOrder.totalTaxedAmount,
+          taxAmount: customerOrder.totalTax,
+        );
       } else if (event is ReduceItem) {
         if (customerOrder.editOrder) {
           double qty = 0;
@@ -85,8 +93,11 @@ class POSBloc extends Bloc<POSEvents, POSState> {
           customerOrder.reduceCartItem(event.itemId);
         }
         yield CartItems(
-            list: customerOrder.cartItems,
-            totalAmount: customerOrder.subTotal);
+          list: customerOrder.cartItems,
+          subTotal: customerOrder.subTotal,
+          totalAmount: customerOrder.totalTaxedAmount,
+          taxAmount: customerOrder.totalTax,
+        );
       } else if (event is RemoveItem) {
         if (customerOrder.editOrder) {
           if (customerOrder.cartItems.length > 1) {
@@ -99,24 +110,36 @@ class POSBloc extends Bloc<POSEvents, POSState> {
           customerOrder.removeCartItem(event.itemId);
         }
         yield CartItems(
-            list: customerOrder.cartItems,
-            totalAmount: customerOrder.subTotal);
+          list: customerOrder.cartItems,
+          subTotal: customerOrder.subTotal,
+          totalAmount: customerOrder.totalTaxedAmount,
+          taxAmount: customerOrder.totalTax,
+        );
       } else if (event is AddComment) {
         customerOrder.addItemComment(event.itemId, event.comment);
         yield CartItems(
-            list: customerOrder.cartItems,
-            totalAmount: customerOrder.subTotal);
+          list: customerOrder.cartItems,
+          subTotal: customerOrder.subTotal,
+          totalAmount: customerOrder.totalTaxedAmount,
+          taxAmount: customerOrder.totalTax,
+        );
       } else if (event is PostOrder) {
-        yield POSLoading();
+        yield POSLoading(message: 'Submitting order please wait...');
         customerOrder.tiltId = Config.user.tiltId;
         if (customerOrder.cartItems.length > 0) {
           ServerResponse response;
-          if (customerOrder.editOrder) {
-            response =
-                await OrderRepo.repo.updateOrder(customerOrder: customerOrder);
+          if (!requestSubmitted) {
+            requestSubmitted = true;
+            if (customerOrder.editOrder) {
+              response = await OrderRepo.repo
+                  .updateOrder(customerOrder: customerOrder);
+            } else {
+              response =
+                  await OrderRepo.repo.postOrder(customerOrder: customerOrder);
+            }
+            requestSubmitted = false;
           } else {
-            response =
-                await OrderRepo.repo.postOrder(customerOrder: customerOrder);
+            yield POSLoading(message: 'Submitting order please wait...');
           }
           if (response.status) {
             if (customerOrder.editOrder) {
@@ -137,7 +160,7 @@ class POSBloc extends Bloc<POSEvents, POSState> {
         customerOrder = event.customerOrder;
       }
     } catch (e) {
-      yield POSError(message: e);
+      yield POSError(message: e.toString());
     }
   }
 }

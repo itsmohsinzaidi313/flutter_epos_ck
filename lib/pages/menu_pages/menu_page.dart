@@ -1,13 +1,7 @@
-import 'dart:developer';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:pos_app/models/objects/customer_order.dart';
 import 'package:pos_app/pages/menu_pages/menu_page_buttons.dart';
-import 'package:pos_app/repositories/order_repository.dart';
-import 'package:pos_app/shared/app_library.dart';
 import 'package:pos_app/shared/app_theme.dart';
-import '../../shared/config.dart';
-import '../../shared/widgets/menu_card.dart';
+import 'package:pos_app/shared/config.dart';
 
 class MenuScreen extends StatelessWidget {
   final closingAmount = TextEditingController();

@@ -25,6 +25,7 @@ dependencies:
   equatable: ^2.0.2
   flutter_bloc: ^7.0.0
   get_mac: ^0.0.1
+  flutter_typeahead: ^2.0.0
 
   cupertino_icons: ^1.0.3
 

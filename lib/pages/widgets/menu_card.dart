@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../config.dart';
+import 'package:pos_app/shared/config.dart';
 
 class MainMenuCard extends StatelessWidget {
   MainMenuCard(

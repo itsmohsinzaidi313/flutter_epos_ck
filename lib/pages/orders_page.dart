@@ -199,7 +199,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                   // Divider(),
                   boxTile(
                       title: 'AMOUNT',
-                      description: order.totalTaxAmount,
+                      description: order.totalTaxedAmount,
                       fontWeight: FontWeight.bold),
                   Divider(),
                   boxTile(title: 'TIME', description: '${order.time}'),

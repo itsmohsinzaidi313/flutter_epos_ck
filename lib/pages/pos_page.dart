@@ -6,12 +6,31 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pos_app/bloc/pos_bloc/pos_bloc.dart';
 import 'package:pos_app/models/objects/items_category.dart';
 import 'package:pos_app/models/objects/menu_item.dart';
-import '../shared/app_theme.dart';
-import '../shared/config.dart';
+import 'package:pos_app/pages/widgets/category_button.dart';
+import 'package:pos_app/pages/widgets/custom_appbar.dart';
+import 'package:pos_app/pages/widgets/menu_item.dart';
+import 'package:pos_app/repositories/menu_items_repository.dart';
+import 'package:pos_app/shared/app_theme.dart';
+import 'package:pos_app/shared/config.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_typeahead/flutter_typeahead.dart';
 
 class PosScreen extends StatelessWidget {
-  final totalAmount = TextEditingController();
+  // final subTotal = TextEditingController();
+  // final taxAmount = TextEditingController();
+  String subTotal = '';
+  String taxAmount = '';
+  String totalAmount = '';
+  final _autoCompleteController = TextEditingController(text: '');
+  final TextStyle titleStyle = TextStyle(
+    color: Colors.black,
+    fontWeight: FontWeight.bold,
+  );
+  final TextStyle textStyle = TextStyle(
+    color: Colors.black,
+  );
+  final _listKey = GlobalKey<AnimatedListState>();
+  final _cartKey = GlobalKey<AnimatedListState>();
   @override
   Widget build(BuildContext context) {
     context.read<POSBloc>().add(POSBuild());
@@ -21,8 +40,13 @@ class PosScreen extends StatelessWidget {
             AppTheme.snackbar(context, state.message);
           } else if (state is SubmissionValid) {
           } else if (state is CartItems) {
-            totalAmount.text = state.totalAmount;
+            subTotal = state.subTotal;
+            taxAmount = state.taxAmount;
+            totalAmount = ((double.tryParse(state.subTotal) ?? 0) +
+                    (double.tryParse(state.taxAmount) ?? 0))
+                .toStringAsFixed(2);
           } else if (state is POSLoading) {
+            AppTheme.snackbar(context, state.message);
           } else if (state is POSError) {
             await AppTheme.showAlertDialogOK(context,
                 message: state.message,
@@ -45,12 +69,22 @@ class PosScreen extends StatelessWidget {
         },
         child: Scaffold(
           backgroundColor: Colors.grey[200],
-          appBar: AppTheme.appBarNormal(
-            context: context,
-            appBarTitle: 'Menu',
-            appBarElevation: 0.0,
-            appBarBgColor: AppTheme.appBarColor,
+          appBar: PreferredSize(
+            preferredSize: Size(double.maxFinite, double.maxFinite),
+            child: CustomAppBar(
+              appBarTitle: 'Choose you items',
+              searchBar: autoCompleteSearchBar(context),
+              radioButtons: SizedBox(),
+              onBackPressed: () => Navigator.pop(context),
+            ),
           ),
+          // AppTheme.appBarNormal(
+          //   context: context,
+          //   appBarTitle: 'Menu',
+          //   appBarElevation: 0.0,
+          //   appBarBgColor: AppTheme.appBarColor,
+
+          // ),
           body: Stack(
             children: [
               Container(
@@ -129,30 +163,63 @@ class PosScreen extends StatelessWidget {
                                   ),
                                 ),
                                 Container(
-                                    height:
-                                        Config.getDeviceHeight(context) * 0.12,
-                                    padding: EdgeInsets.only(top: 5),
-                                    // decoration: BoxDecoration(border: Border.all(width: 2)),
-                                    child: BlocBuilder<POSBloc, POSState>(
-                                      buildWhen: (previous, current) {
-                                        if (current is CategoriesLoaded) {
-                                          return true;
-                                        } else {
-                                          return false;
-                                        }
-                                      },
-                                      builder: (context, state) {
-                                        if (state is CategoriesLoaded) {
-                                          return ListView(
-                                            scrollDirection: Axis.horizontal,
-                                            children: getCategoryWidgets(
-                                                context, state.list),
-                                          );
-                                        } else {
-                                          return AppTheme.progIndicator;
-                                        }
-                                      },
-                                    )),
+                                  height:
+                                      Config.getDeviceHeight(context) * 0.12,
+                                  padding: EdgeInsets.only(top: 5),
+                                  // decoration: BoxDecoration(border: Border.all(width: 2)),
+                                  child: BlocBuilder<POSBloc, POSState>(
+                                    buildWhen: (previous, current) {
+                                      if (current is CategoriesLoaded) {
+                                        return true;
+                                      } else {
+                                        return false;
+                                      }
+                                    },
+                                    builder: (context, state) {
+                                      List<Category> list = [];
+                                      Future f = Future(() {});
+                                      if (state is CategoriesLoaded) {
+                                        //   state.list.forEach((element) {
+                                        //     f = f.then((value) => Future.delayed(
+                                        //             Duration(milliseconds: 50),
+                                        //             () {
+                                        //           list.add(element);
+                                        //           _listKey.currentState
+                                        //               .insertItem(
+                                        //                   list.length - 1);
+                                        //         }));
+                                        //   });
+                                        // }
+                                        // Tween<Offset> _offset = Tween(
+                                        //     begin: Offset(0, -1),
+                                        //     end: Offset(0, 0));
+                                        // return AnimatedList(
+                                        //   key: _listKey,
+                                        //   scrollDirection: Axis.horizontal,
+                                        //   initialItemCount: list.length,
+                                        //   itemBuilder:
+                                        //       (context, index, animation) =>
+                                        //           SlideTransition(
+                                        //     position: animation.drive(_offset),
+                                        //     child: categoryButton(
+                                        //       context,
+                                        //       list,
+                                        //       index,
+                                        //     ),
+                                        //   ),
+                                        // );
+
+                                        return ListView(
+                                          scrollDirection: Axis.horizontal,
+                                          children: getCategoryWidgets(
+                                              context, state.list),
+                                        );
+                                      } else {
+                                        return AppTheme.progIndicator;
+                                      }
+                                    },
+                                  ),
+                                ),
                                 Container(
                                   padding: EdgeInsets.symmetric(vertical: 8.0),
                                   child: Text(
@@ -255,56 +322,52 @@ class PosScreen extends StatelessWidget {
                                               child: Row(
                                                 children: [
                                                   Expanded(
-                                                    child: TextField(
-                                                      controller:
-                                                          TextEditingController(
-                                                              text: 'Amount: '),
-                                                      style: TextStyle(
-                                                        color: Colors.grey,
-                                                        letterSpacing: 0,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
+                                                    child: Column(
+                                                      children: [
+                                                        Text(
+                                                          'Subtotal'
+                                                              .toUpperCase(),
+                                                          style: titleStyle,
+                                                        ),
+                                                        Text(
+                                                          subTotal,
+                                                          style: textStyle,
+                                                        ),
+                                                      ],
                                                     ),
                                                   ),
                                                   Expanded(
-                                                    flex: 4,
-                                                    child: TextField(
-                                                      controller: totalAmount,
-                                                      style: TextStyle(
-                                                        color: Colors.black,
-                                                        letterSpacing: 1,
-                                                        fontWeight:
-                                                            FontWeight.bold,
-                                                      ),
+                                                    child: Column(
+                                                      children: [
+                                                        Text(
+                                                          'Tax'.toUpperCase(),
+                                                          style: titleStyle,
+                                                        ),
+                                                        Text(
+                                                          taxAmount,
+                                                          style: textStyle,
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                  Expanded(
+                                                    child: Column(
+                                                      children: [
+                                                        Text(
+                                                          'Total'.toUpperCase(),
+                                                          style: titleStyle,
+                                                        ),
+                                                        Text(
+                                                          totalAmount,
+                                                          style: textStyle,
+                                                        ),
+                                                      ],
                                                     ),
                                                   ),
                                                 ],
                                               ),
                                             ),
-
-                                            // RichText(
-                                            //   text: TextSpan(
-                                            //     text: 'Tax Amount: ',
-                                            //     style: TextStyle(
-                                            //       color: Colors.grey,
-                                            //       fontSize: 16,
-                                            //       letterSpacing: 0,
-                                            //       fontWeight: FontWeight.bold,
-                                            //     ),
-                                            //     children: <TextSpan>[
-                                            //       TextSpan(
-                                            //         text: '${states.totalCartTaxAmount.toString()}',
-                                            //         style: TextStyle(
-                                            //           color: Colors.black,
-                                            //           fontSize: 18,
-                                            //           letterSpacing: 1,
-                                            //           fontWeight: FontWeight.bold,
-                                            //         ),
-                                            //       ),
-                                            //     ],
-                                            //   ),
-                                            // ),
+                                            Divider(),
                                             Expanded(
                                               child: ListView(
                                                 children:
@@ -445,123 +508,14 @@ class PosScreen extends StatelessWidget {
                 borderRadius: BorderRadius.circular(10),
               ),
               elevation: 3,
-              color: Colors.white,
+              // color: Colors.redAccent,
               child: InkWell(
-                onTap: () => context
-                    .read<POSBloc>()
-                    .add(AddItem(itemId: int.parse(item.id))),
-                child: Stack(
-                  children: [
-                    Positioned(
-                      left: 0,
-                      top: 0,
-                      child: Container(
-                        height: Config.getDeviceHeight(context) * 0.2,
-                        width: Config.getDeviceWidth(context) * 0.159,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.rectangle,
-                          borderRadius: BorderRadius.only(
-                            topLeft: Radius.circular(10),
-                            topRight: Radius.circular(10),
-                          ),
-                          image: DecorationImage(
-                            image: item.image != null
-                                ? NetworkImage(item.image)
-                                : AssetImage('assets/no_image1.jpg'),
-                            fit: BoxFit.cover,
-                          ),
+                  onTap: () => context.read<POSBloc>().add(
+                        AddItem(
+                          itemId: int.parse(item.id),
                         ),
                       ),
-                    ),
-                    item.image == null
-                        ? Align(
-                            alignment: Alignment.center,
-                            child: Text(
-                              'No Image'.toUpperCase(),
-                              style: GoogleFonts.anton(
-                                color: Colors.white70,
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          )
-                        : Container(),
-                    Positioned(
-                      bottom: 0,
-                      left: 0,
-                      child: Container(
-                        padding: EdgeInsets.only(
-                            top: 15, bottom: 8, left: 8, right: 8),
-                        height: Config.getDeviceHeight(context) * 0.094,
-                        width: Config.getDeviceWidth(context) * 0.158,
-                        decoration: BoxDecoration(
-                          shape: BoxShape.rectangle,
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(10),
-                            bottomRight: Radius.circular(10),
-                          ),
-                        ),
-                        child: Column(
-                          children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                Expanded(
-                                  flex: 2,
-                                  child: Text(
-                                    item.name.toUpperCase(),
-                                    textAlign: TextAlign.left,
-                                    style: GoogleFonts.ubuntuCondensed(
-                                      color: Colors.grey.shade800,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: 0,
-                                      wordSpacing: 0.5,
-                                    ),
-                                  ),
-                                ),
-                                Column(
-                                  // mainAxisAlignment: MainAxisAlignment.end,
-                                  children: [
-                                    Text(
-                                      'PKR ${double.parse(item.price).toInt().toString()}',
-                                      style: GoogleFonts.ubuntuCondensed(
-                                        color: Colors.red.shade500,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.bold,
-                                        wordSpacing: 1.0,
-                                      ),
-                                    ),
-                                    // Row(
-                                    //   children: [
-                                    //     Icon(
-                                    //       Icons.star,
-                                    //       size: 10,
-                                    //       color: Colors.yellow.shade900,
-                                    //     ),
-                                    //     Icon(
-                                    //       Icons.star,
-                                    //       size: 10,
-                                    //       color: Colors.yellow.shade900,
-                                    //     ),
-                                    //     Icon(
-                                    //       Icons.star_half_outlined,
-                                    //       size: 10,
-                                    //       color: Colors.yellow.shade900,
-                                    //     ),
-                                    //   ],
-                                    // ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
+                  child: itemButton2(context, item)),
             ),
           )
           .toList() ??
@@ -752,4 +706,52 @@ class PosScreen extends StatelessWidget {
               ))
           .toList() ??
       [];
+
+  Widget autoCompleteSearchBar(BuildContext context) {
+    return TypeAheadField(
+      hideOnEmpty: true,
+      textFieldConfiguration: TextFieldConfiguration(
+        autofocus: false,
+        decoration: InputDecoration(
+          hintText: 'Search by item name here',
+          prefixIcon: Icon(Icons.search),
+          suffixIcon: IconButton(
+            icon: Icon(
+              Icons.close,
+            ),
+            onPressed: () => _autoCompleteController.text = '',
+          ),
+        ),
+      ),
+      suggestionsCallback: (pattern) async {
+        List<MenuItem> list = [];
+        if (pattern != '') {
+          final serverResponse =
+              await MenuItemRepo.repo.searchItems(phrase: pattern);
+          if (serverResponse.status) {
+            for (var item in (serverResponse.data as List)) {
+              list.add(MenuItem.fromJson(item));
+            }
+          }
+        }
+        return list;
+      },
+      itemBuilder: (context, itemData) {
+        return ListTile(
+          title: Text(itemData.name),
+          subtitle: Text(
+            'PKR: ${itemData.price}/=\nCode: ${itemData.id}',
+          ),
+        );
+      },
+      onSuggestionSelected: (suggestion) => context.read<POSBloc>().add(
+            AddItem(
+              itemId: int.parse(suggestion.id),
+            ),
+          ),
+      noItemsFoundBuilder: (context) => ListTile(
+        title: Text('No Item Found!'),
+      ),
+    );
+  }
 }
