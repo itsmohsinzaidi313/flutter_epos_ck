@@ -111,15 +111,14 @@ class FeedbackScreen extends StatelessWidget {
                     rating: rating,
                   ));
                 });
-
                 try {
                   log('${jsonEncode(feedback.toMap())}');
                   ServerResponse response =
                       await FeedbackRepo.repo.uploadFeedback(feedback);
                   if (response.status) {
                     AppTheme.snackbar(context, 'Thankyou for your time.');
-                    // Navigator.pushNamedAndRemoveUntil(
-                    //     context, '/menu', (route) => false);
+                    Navigator.pushNamedAndRemoveUntil(
+                        context, '/menu', (route) => false);
                   } else {
                     AppTheme.snackbar(context,
                         'Your feedback could be saved at the moment. Please check WiFi connectivity or contact I.T. Support.\n${response.data.toString()}');
