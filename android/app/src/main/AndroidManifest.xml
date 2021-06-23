@@ -5,7 +5,7 @@
 
 
     <application
-        android:icon="@drawable/logo"
+        android:icon="@mipmap/ic_launcher"
         android:label="POS"
         android:usesCleartextTraffic="true"
         android:allowBackup="true">
