@@ -28,11 +28,12 @@ class MainMenuCard extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Image(
-                  image: AssetImage('assets/$asset'),
-                  fit: BoxFit.contain,
-                  width: Config.getDeviceWidth(context) * 0.12,
-                  height: Config.getDeviceHeight(context) * 0.12,
+                Expanded(
+                  flex: 4,
+                                  child: Image(
+                    image: AssetImage('assets/$asset'),
+                    fit: BoxFit.contain,
+                  ),
                 ),
                 SizedBox(
                   height: 20,

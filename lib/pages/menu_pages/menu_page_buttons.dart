@@ -5,7 +5,6 @@ import 'package:pos_app/bloc/login_bloc/login_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pos_app/models/objects/customer_order.dart';
 import 'package:pos_app/repositories/order_repository.dart';
-import 'package:pos_app/shared/app_library.dart';
 import 'package:pos_app/shared/app_theme.dart';
 import 'package:pos_app/shared/config.dart';
 import 'package:pos_app/pages/widgets/menu_card.dart';
@@ -139,33 +138,33 @@ class MenuPageButtons {
                                                   ? 'Required'
                                                   : null),
                                     ),
-                                    StatefulBuilder(
-                                        builder: (context, setState) {
-                                      return TextField(
-                                        controller: dateController,
-                                        keyboardType: TextInputType.datetime,
-                                        decoration: InputDecoration(
-                                            icon: Icon(Icons.calendar_today),
-                                            labelText: 'Order date',
-                                            errorText: dateController.text == ''
-                                                ? 'Required'
-                                                : null),
-                                        onTap: () async {
-                                          final date = await showDatePicker(
-                                              context: context,
-                                              initialDate: DateTime.now(),
-                                              firstDate: DateTime(
-                                                  DateTime.now().year - 1),
-                                              lastDate: DateTime(
-                                                  DateTime.now().year + 5));
-                                          if (date != null) {
-                                            dateController.text = date
-                                                .toIso8601String()
-                                                .substring(0, 10);
-                                          }
-                                        },
-                                      );
-                                    }),
+                                    // StatefulBuilder(
+                                    //     builder: (context, setState) {
+                                    //   return TextField(
+                                    //     controller: dateController,
+                                    //     keyboardType: TextInputType.datetime,
+                                    //     decoration: InputDecoration(
+                                    //         icon: Icon(Icons.calendar_today),
+                                    //         labelText: 'Order date',
+                                    //         errorText: dateController.text == ''
+                                    //             ? 'Required'
+                                    //             : null),
+                                    //     onTap: () async {
+                                    //       final date = await showDatePicker(
+                                    //           context: context,
+                                    //           initialDate: DateTime.now(),
+                                    //           firstDate: DateTime(
+                                    //               DateTime.now().year - 1),
+                                    //           lastDate: DateTime(
+                                    //               DateTime.now().year + 5));
+                                    //       if (date != null) {
+                                    //         dateController.text = date
+                                    //             .toIso8601String()
+                                    //             .substring(0, 10);
+                                    //       }
+                                    //     },
+                                    //   );
+                                    // }),
                                     ButtonBar(
                                       children: [
                                         ElevatedButton(
@@ -174,8 +173,7 @@ class MenuPageButtons {
                                               context,
                                               name: nameController.text,
                                               contact: contactController.text,
-                                              orderNo: orderNoController.text,
-                                              date: dateController.text),
+                                              orderNo: orderNoController.text),
                                         ),
                                         ElevatedButton(
                                           child: Text('Cancel'),
@@ -211,10 +209,9 @@ class MenuPageButtons {
   Future<void> _onFeedbackPressed(BuildContext context,
       {@required String name,
       @required String contact,
-      @required String orderNo,
-      @required String date}) async {
-    if (orderNo != '' && name != '' && contact != '' && date != '') {
-      Order order = await _getOrder(context, orderNo, date);
+      @required String orderNo}) async {
+    if (orderNo != '' && name != '' && contact != '') {
+      Order order = await _getOrder(context, orderNo);
       if (order != null) {
         order.customer = name;
         order.contact = contact;
@@ -224,9 +221,9 @@ class MenuPageButtons {
   }
 
   Future<Order> _getOrder(
-      BuildContext context, String orderNo, String orderDate) async {
+      BuildContext context, String orderNo) async {
     final response = await OrderRepo.repo
-        .getOrders(orderNo: orderNo, orderDate: orderDate, type: '1');
+        .getOrders(orderNo: orderNo, type: '1');
     if (response.status) {
       return Order.fromJson(response.data);
     } else {

@@ -8,9 +8,9 @@ import '../models/objects/customer_table.dart' as t;
 import 'package:google_fonts/google_fonts.dart';
 
 class OrderInfoScreen extends StatelessWidget {
-  final ImageProvider dineIn = AssetImage('assets/dine_in.jpg'),
-      takeAway = AssetImage('assets/takeaway.jpg'),
-      delivery = AssetImage('assets/delivery.jpg');
+  final String dineIn = 'assets/dine_in.jpg',
+      takeAway = 'assets/takeaway.jpg',
+      delivery = 'assets/delivery.jpg';
 
   final dineInOrdertype = ORDERTYPE.DINE_IN;
   final takeAwayOrderType = ORDERTYPE.TAKE_AWAY;
@@ -114,8 +114,8 @@ class OrderInfoScreen extends StatelessWidget {
         ));
   }
 
-  Widget orderTypeButton(BuildContext context, String title, Function onTap,
-          ImageProvider image) =>
+  Widget orderTypeButton(
+          BuildContext context, String title, Function onTap, String asset) =>
       Card(
         color: Color(0xff7c94b6),
         elevation: 5,
@@ -125,7 +125,7 @@ class OrderInfoScreen extends StatelessWidget {
             decoration: BoxDecoration(
               image: DecorationImage(
                 fit: BoxFit.cover,
-                image: image,
+                image: AssetImage(asset),
                 colorFilter: new ColorFilter.mode(
                     Colors.black.withOpacity(0.6), BlendMode.dstATop),
               ),

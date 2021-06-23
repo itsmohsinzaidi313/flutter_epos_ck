@@ -12,12 +12,9 @@ class LoginRepo {
   static LoginRepo repo = LoginRepo._internal();
   LoginRepo._internal();
   Future<ServerResponse> login(
-      {@required String username, @required String password}) async {
-    log('${await Config.getLoginApi}?username=$username&password=$password&mac=${await GetMac.macAddress}');
-    return ServerResponse(
+      {@required String username, @required String password}) async => ServerResponse(
         response: await get(
                 '${await Config.getLoginApi}?username=$username&password=$password&mac=${await GetMac.macAddress}')
             .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
                 onTimeout: () => null));
-  }
 }

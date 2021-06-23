@@ -15,13 +15,10 @@ class FeedbackRepo {
         'Please rate your visit on value for the money?',
         'Cleanliness?',
       ];
-  Future<ServerResponse> uploadFeedback(CustomerFeedback feedback) async {
-    final response = ServerResponse(
+  Future<ServerResponse> uploadFeedback(CustomerFeedback feedback) async => ServerResponse(
         response: await post(Uri.parse(await Config.postFeedbackApi),
                 headers: {'Content-type': 'application/json'},
                 body: jsonEncode(feedback.toMap()))
             .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
                 onTimeout: () => null));
-    return response;
-  }
 }

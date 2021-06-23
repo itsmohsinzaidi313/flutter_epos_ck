@@ -16,34 +16,24 @@ class OrderRepo {
   Future<ServerResponse> getOrders(
       {String tiltId,
       String type = '',
-      String orderNo = '',
-      String orderDate = ''}) async {
-    log('${await Config.getOrdersApi}?tiltId=${tiltId ?? Config.user.tiltId}&type=$type&orderNo=$orderNo&orderDate=$orderDate');
-    return ServerResponse(
+      String orderNo = ''}) async => ServerResponse(
       response: await get(Uri.parse(
-              '${await Config.getOrdersApi}?tiltId=${tiltId ?? Config.user.tiltId}&type=$type&orderNo=$orderNo&orderDate=$orderDate'))
+              '${await Config.getOrdersApi}?tiltId=${tiltId ?? Config.user.tiltId}&type=$type&orderNo=$orderNo'))
           .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
               onTimeout: () => null),
     );
-  }
 
-  Future<ServerResponse> postOrder({@required Order customerOrder}) async {
-    log('"${jsonEncode(customerOrder.toJson).replaceAll('"', '\\"').toString()}"');
-    return ServerResponse(
+  Future<ServerResponse> postOrder({@required Order customerOrder}) async => ServerResponse(
         response: await post(await Config.getOrdersApi,
                 headers: {'Content-type': 'application/json'},
                 body:
                     '"${jsonEncode(customerOrder.toJson).replaceAll('"', '\\"').toString()}"')
             .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
                 onTimeout: () => null));
-  }
 
-  Future<ServerResponse> updateOrder({@required Order customerOrder}) async {
-    log('"${jsonEncode(customerOrder.toJson).replaceAll('"', '\\"').toString()}"');
-    return ServerResponse(
+  Future<ServerResponse> updateOrder({@required Order customerOrder}) async => ServerResponse(
         response: await put(await Config.getOrdersApi,
             headers: {'Content-type': 'application/json'},
             body:
                 '"${jsonEncode(customerOrder.toJson).replaceAll('"', '\\"').toString()}"'));
-  }
 }

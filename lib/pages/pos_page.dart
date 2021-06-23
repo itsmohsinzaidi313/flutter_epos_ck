@@ -83,7 +83,6 @@ class PosScreen extends StatelessWidget {
           //   appBarTitle: 'Menu',
           //   appBarElevation: 0.0,
           //   appBarBgColor: AppTheme.appBarColor,
-
           // ),
           body: Stack(
             children: [
@@ -450,9 +449,9 @@ class PosScreen extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: InkWell(
-                    onTap: () => context
-                        .read<POSBloc>()
-                        .add(CategoryChanged(categoryId: category.id)),
+                    onTap: () => context.read<POSBloc>().add(
+                          CategoryChanged(categoryId: category.id),
+                        ),
                     child: Row(
                       children: [
                         CircleAvatar(
@@ -470,24 +469,21 @@ class PosScreen extends StatelessWidget {
                           ),
                         ),
                         Container(
-                          height: Config.getDeviceHeight(context) * 0.1,
-                          width: Config.getDeviceHeight(context) * 0.18,
+                          padding: EdgeInsets.all(8),
                           color: category.selected
                               ? Colors.redAccent[200]
                               : Colors.white,
-                          child: Center(
-                            child: Text(
-                              category.name.toUpperCase(),
-                              textAlign: TextAlign.center,
-                              style: GoogleFonts.ubuntuCondensed(
-                                color: category.selected
-                                    ? Colors.white
-                                    : Colors.red.shade700,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w700,
-                                letterSpacing: 1.2,
-                                wordSpacing: 1.0,
-                              ),
+                          child: Text(
+                            category.name.toUpperCase(),
+                            textAlign: TextAlign.center,
+                            style: GoogleFonts.ubuntuCondensed(
+                              color: category.selected
+                                  ? Colors.white
+                                  : Colors.red.shade700,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w700,
+                              letterSpacing: 1.2,
+                              wordSpacing: 1.0,
                             ),
                           ),
                         ),
