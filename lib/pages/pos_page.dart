@@ -6,14 +6,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pos_app/bloc/pos_bloc/pos_bloc.dart';
 import 'package:pos_app/models/objects/items_category.dart';
 import 'package:pos_app/models/objects/menu_item.dart';
-import 'package:pos_app/pages/widgets/category_button.dart';
-import 'package:pos_app/pages/widgets/custom_appbar.dart';
-import 'package:pos_app/pages/widgets/menu_item.dart';
 import 'package:pos_app/repositories/menu_items_repository.dart';
 import 'package:pos_app/shared/app_theme.dart';
 import 'package:pos_app/shared/config.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
+import 'package:pos_app/pages/widgets/app_widgets.dart';
 
 class PosScreen extends StatelessWidget {
   // final subTotal = TextEditingController();
@@ -33,7 +31,7 @@ class PosScreen extends StatelessWidget {
   final _cartKey = GlobalKey<AnimatedListState>();
   @override
   Widget build(BuildContext context) {
-    context.read<POSBloc>().add(POSBuild());
+    passEvent(context, POSBuild());
     return BlocListener<POSBloc, POSState>(
         listener: (context, state) async {
           if (state is SubmissionInvalid) {
@@ -369,9 +367,8 @@ class PosScreen extends StatelessWidget {
                                             Divider(),
                                             Expanded(
                                               child: ListView(
-                                                children:
-                                                    getCartItemsNewWidgets(
-                                                        context, state.list),
+                                                children: getCartItemsWidgets(
+                                                    context, state.list),
                                               ),
                                             ),
                                           ],
@@ -400,7 +397,7 @@ class PosScreen extends StatelessWidget {
                   appBarElevation: 0.0,
                   appBarBgColor: AppTheme.appBarColor,
                 ),
-                offset: new Offset(
+                offset: Offset(
                   Config.getDeviceWidth(context) * 0.91,
                   Config.getDeviceHeight(context) * 0.72,
                 ),
@@ -409,7 +406,7 @@ class PosScreen extends StatelessWidget {
                   size: 35,
                   color: Colors.white,
                 ),
-                onPressed: () => context.read<POSBloc>().add(PostOrder()),
+                onPressed: () => passEvent(context, PostOrder()),
               ),
             ],
           ),
@@ -449,9 +446,10 @@ class PosScreen extends StatelessWidget {
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: InkWell(
-                    onTap: () => context.read<POSBloc>().add(
-                          CategoryChanged(categoryId: category.id),
-                        ),
+                    onTap: () => passEvent(
+                      context,
+                      CategoryChanged(categoryId: category.id),
+                    ),
                     child: Row(
                       children: [
                         CircleAvatar(
@@ -506,11 +504,23 @@ class PosScreen extends StatelessWidget {
               elevation: 3,
               // color: Colors.redAccent,
               child: InkWell(
-                  onTap: () => context.read<POSBloc>().add(
+                  onTap: () {
+                    if (item.code == MenuItem.OPENFOOD_CODE.toString()) {
+                      openFoodDialog(context, item.categoryId)
+                      .then((openItem) {
+                        if (openItem != null) {
+                          passEvent(context, AddOpenItem(openItem: openItem));
+                        }
+                      });
+                    } else {
+                      passEvent(
+                        context,
                         AddItem(
-                          itemId: int.parse(item.id),
-                        ),
-                      ),
+                            code: int.parse(item.code),
+                            itemId: int.parse(item.id)),
+                      );
+                    }
+                  },
                   child: itemButton2(context, item)),
             ),
           )
@@ -520,188 +530,183 @@ class PosScreen extends StatelessWidget {
   // CREATES CART ITEMS
   List<Widget> getCartItemsWidgets(
           BuildContext context, List<MenuItem> lstItem) =>
-      lstItem
-          .map((item) => GestureDetector(
-                onTap: () {},
-                child: Card(
-                  elevation: 4,
-                  child: ListTile(
-                    leading: CircleAvatar(
-                      backgroundColor: Colors.yellow.shade700,
-                      radius: 16,
-                      child: CircleAvatar(
-                        radius: 14,
-                        backgroundImage: item.image != null
-                            ? NetworkImage(item.image)
-                            : AssetImage('assets/no_image1.jpg'),
-                      ),
-                    ),
-                    title: Text(
-                      item.name.toUpperCase(),
-                      style: GoogleFonts.ubuntuCondensed(
-                        color: Colors.black87,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.5,
-                        wordSpacing: 0.5,
-                      ),
-                    ),
-                    subtitle: Text(
-                      ' ${double.parse(item.price).toInt().toString()} x ${item.quantity.toString()} '
-                      '= ${(double.parse(item.price).toInt() * item.quantity).toString()}',
-                      style: TextStyle(
-                        color: Colors.grey.shade700,
-                        fontSize: 10,
-                      ),
-                    ),
-                    trailing: IconButton(
-                      icon: Icon(
-                        Icons.delete_outline_rounded,
-                        color: Colors.yellow.shade800,
-                        size: 20,
-                      ),
-                      onPressed: () => context
-                          .read<POSBloc>()
-                          .add(RemoveItem(itemId: int.parse(item.id))),
-                    ),
+      lstItem.map((item) {
+        final controller =
+            TextEditingController(text: item.quantity.toString());
+        controller.selection = TextSelection(
+            baseOffset: item.quantity.toString().length,
+            extentOffset: item.quantity.toString().length);
+        return Card(
+          elevation: 4,
+          child: ListTile(
+            // leading: CircleAvatar(
+            //   backgroundColor: Colors.yellow.shade700,
+            //   radius: 16,
+            //   child: CircleAvatar(
+            //     radius: 14,
+            //     backgroundImage: AssetImage('assets/no_image1.jpg'),
+            //   ),
+            // ),
+            title: Text(
+              item.name.toUpperCase(),
+              style: GoogleFonts.ubuntuCondensed(
+                color: Colors.black87,
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.8,
+                wordSpacing: 0.5,
+              ),
+            ),
+            subtitle: Column(
+              mainAxisAlignment: MainAxisAlignment.start,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                SizedBox(
+                  height: 8,
+                ),
+                Text(
+                  ' ${double.parse(item.price).toInt().toString()} x ${item.quantity} '
+                  '= ${(double.parse(item.price).toInt() * item.quantity).toString()}',
+                  style: TextStyle(
+                    color: Colors.grey.shade800,
+                    fontSize: 12,
                   ),
                 ),
-              ))
-          .toList() ??
-      [];
-
-  List<Widget> getCartItemsNewWidgets(
-          BuildContext context, List<MenuItem> lstItem) =>
-      lstItem
-          .map((item) => Card(
-                elevation: 4,
-                child: ListTile(
-                  // leading: CircleAvatar(
-                  //   backgroundColor: Colors.yellow.shade700,
-                  //   radius: 16,
-                  //   child: CircleAvatar(
-                  //     radius: 14,
-                  //     backgroundImage: AssetImage('assets/no_image1.jpg'),
-                  //   ),
-                  // ),
-                  title: Text(
-                    item.name.toUpperCase(),
-                    style: GoogleFonts.ubuntuCondensed(
-                      color: Colors.black87,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.8,
-                      wordSpacing: 0.5,
+                Row(
+                  children: [
+                    IconButton(
+                      icon: Icon(
+                        Icons.remove,
+                        color: Colors.red,
+                      ),
+                      onPressed: () => passEvent(
+                          context,
+                          ReduceItem(
+                              code: int.parse(item.code),
+                              itemId: int.parse(item.id))),
                     ),
-                  ),
-                  subtitle: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      SizedBox(
-                        height: 8,
-                      ),
-                      Text(
-                        ' ${double.parse(item.price).toInt().toString()} x ${item.quantity} '
-                        '= ${(double.parse(item.price).toInt() * item.quantity).toString()}',
-                        style: TextStyle(
-                          color: Colors.grey.shade800,
-                          fontSize: 12,
-                        ),
-                      ),
-                      Row(
+                    // Text(
+                    //   item.quantity.toString(),
+                    //   style: TextStyle(
+                    //     color: Colors.grey.shade900,
+                    //     fontSize: 12,
+                    //     fontWeight: FontWeight.bold,
+                    //   ),
+                    // ),
+                    Container(
+                      width: Config.getDeviceWidth(context) * 0.05,
+                      child: Row(
                         children: [
-                          IconButton(
-                            icon: Icon(
-                              Icons.remove,
-                              color: Colors.red,
-                            ),
-                            onPressed: () {
-                              context
+                          Expanded(
+                            child: TextField(
+                              onSubmitted: (value) => context
                                   .read<POSBloc>()
-                                  .add(ReduceItem(itemId: int.parse(item.id)));
-                            },
-                          ),
-                          Text(
-                            item.quantity.toString(),
-                            style: TextStyle(
-                              color: Colors.grey.shade900,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
+                                  .add(
+                                    ItemQuantityChanged(
+                                      code: int.tryParse(item.code),
+                                      itemId: int.parse(item.id),
+                                      quantity: double.tryParse(value) ?? 0.0,
+                                    ),
+                                  ),
+                              decoration: InputDecoration(
+                                labelText: 'Quantity',
+                              ),
+                              controller: controller,
+                              style: TextStyle(
+                                color: Colors.grey.shade900,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
-                          ),
-                          IconButton(
-                            icon: Icon(
-                              Icons.add,
-                              color: Colors.red,
-                            ),
-                            onPressed: () => context
-                                .read<POSBloc>()
-                                .add(AddItem(itemId: int.parse(item.id))),
                           ),
                         ],
                       ),
-                    ],
+                    ),
+                    IconButton(
+                      icon: Icon(
+                        Icons.add,
+                        color: Colors.red,
+                      ),
+                      onPressed: () => passEvent(
+                        context,
+                        AddItem(
+                          code: int.parse(item.code),
+                          itemId: int.parse(item.id),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+            isThreeLine: true,
+            trailing: SizedBox(
+              width: 96,
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: Icon(
+                      Icons.edit,
+                      color: Colors.red.shade800,
+                      size: 22,
+                    ),
+                    onPressed: () async {
+                      String comments = item.comment;
+                      await showDialog(
+                        context: context,
+                        builder: (context) => AlertDialog(
+                            title: Text('Comments'),
+                            content: ListTile(
+                              leading: Icon(
+                                Icons.edit,
+                                color: Colors.redAccent,
+                              ),
+                              title: TextField(
+                                controller:
+                                    TextEditingController(text: comments),
+                                onChanged: (value) => comments = value,
+                              ),
+                            ),
+                            actions: [
+                              TextButton(
+                                onPressed: () => Navigator.of(context).pop(),
+                                child: Text('Ok'),
+                              ),
+                            ]),
+                      );
+                      item.comment = comments;
+                      passEvent(
+                          context,
+                          AddComment(
+                              code: int.parse(item.code),
+                              itemId: int.parse(item.id),
+                              comment: comments));
+                    },
                   ),
-                  isThreeLine: true,
-                  trailing: SizedBox(
-                    width: 96,
-                    child: Row(
-                      children: [
-                        IconButton(
-                          icon: Icon(
-                            Icons.edit,
-                            color: Colors.red.shade800,
-                            size: 22,
-                          ),
-                          onPressed: () async {
-                            String comments = item.comment;
-
-                            await showDialog(
-                              context: context,
-                              builder: (context) => AlertDialog(
-                                  title: Text('Comments'),
-                                  content: ListTile(
-                                    leading: Icon(
-                                      Icons.edit,
-                                      color: Colors.redAccent,
-                                    ),
-                                    title: TextField(
-                                      controller:
-                                          TextEditingController(text: comments),
-                                      onChanged: (value) => comments = value,
-                                    ),
-                                  ),
-                                  actions: [
-                                    TextButton(
-                                      onPressed: () =>
-                                          Navigator.of(context).pop(),
-                                      child: Text('Ok'),
-                                    ),
-                                  ]),
-                            );
-                            item.comment = comments;
-                            context.read<POSBloc>().add(AddComment(
-                                itemId: int.parse(item.id), comment: comments));
-                          },
-                        ),
-                        IconButton(
-                          icon: Icon(
-                            Icons.delete_forever,
-                            color: Colors.yellow.shade800,
-                            size: 22,
-                          ),
-                          onPressed: () => context
-                              .read<POSBloc>()
-                              .add(RemoveItem(itemId: int.parse(item.id))),
-                        ),
-                      ],
+                  IconButton(
+                    icon: Icon(
+                      Icons.delete_forever,
+                      color: Colors.yellow.shade800,
+                      size: 22,
+                    ),
+                    onPressed: () => passEvent(
+                      context,
+                      RemoveItem(
+                        code: int.parse(item.code),
+                        itemId: int.parse(item.id),
+                      ),
                     ),
                   ),
-                ),
-              ))
-          .toList() ??
+                ],
+              ),
+            ),
+          ),
+        );
+      }).toList() ??
       [];
+
+  void passEvent(BuildContext context, POSEvents event) =>
+      context.read<POSBloc>().add(event);
 
   Widget autoCompleteSearchBar(BuildContext context) {
     return TypeAheadField(
@@ -740,11 +745,13 @@ class PosScreen extends StatelessWidget {
           ),
         );
       },
-      onSuggestionSelected: (suggestion) => context.read<POSBloc>().add(
-            AddItem(
-              itemId: int.parse(suggestion.id),
-            ),
-          ),
+      onSuggestionSelected: (suggestion) => passEvent(
+        context,
+        AddItem(
+          code: int.parse((suggestion as MenuItem).code),
+          itemId: int.parse((suggestion as MenuItem).id),
+        ),
+      ),
       noItemsFoundBuilder: (context) => ListTile(
         title: Text('No Item Found!'),
       ),

@@ -122,6 +122,10 @@ class Order {
       items.where((element) => element.id == itemId.toString()).first.comment =
           comment;
 
+  void setItemQuantity(int itemId, double quantity) =>
+      items.where((element) => element.id == itemId.toString()).first.quantity =
+          quantity;
+
   String get subTotal {
     double amount = 0;
     items.forEach((e) {

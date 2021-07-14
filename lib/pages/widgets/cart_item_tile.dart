@@ -50,7 +50,7 @@ Widget cartMenuItem(BuildContext context, List<MenuItem> items, int index, Anima
                   onPressed: () {
                     context
                         .read<POSBloc>()
-                        .add(ReduceItem(itemId: int.parse(items[index].id)));
+                        .add(ReduceItem(code: int.parse(items[index].code), itemId: int.parse(items[index].id),),);
                   },
                 ),
                 Text(
@@ -68,7 +68,7 @@ Widget cartMenuItem(BuildContext context, List<MenuItem> items, int index, Anima
                   ),
                   onPressed: () => context
                       .read<POSBloc>()
-                      .add(AddItem(itemId: int.parse(items[index].id))),
+                      .add(AddItem(code: int.parse(items[index].code), itemId: int.parse(items[index].id),),),
                 ),
               ],
             ),
@@ -111,7 +111,7 @@ Widget cartMenuItem(BuildContext context, List<MenuItem> items, int index, Anima
                   );
                   items[index].comment = comments;
                   context.read<POSBloc>().add(AddComment(
-                      itemId: int.parse(items[index].id), comment: comments));
+                      code: int.parse(items[index].code), itemId: int.parse(items[index].id), comment: comments));
                 },
               ),
               IconButton(
@@ -122,7 +122,7 @@ Widget cartMenuItem(BuildContext context, List<MenuItem> items, int index, Anima
                 ),
                 onPressed: () => context
                     .read<POSBloc>()
-                    .add(RemoveItem(itemId: int.parse(items[index].id))),
+                    .add(RemoveItem(code: int.parse(items[index].id), itemId: int.parse(items[index].id),),),
               ),
             ],
           ),

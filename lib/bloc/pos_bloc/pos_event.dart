@@ -24,30 +24,34 @@ class CategoryChanged extends POSEvents {
 }
 
 class AddItem extends POSEvents {
+  final int code;
   final int itemId;
-  AddItem({@required this.itemId});
+  AddItem({@required this.code, @required this.itemId});
   // @override
   // List<Object> get props => [item];
 }
 
 class RemoveItem extends POSEvents {
+  final int code;
   final int itemId;
-  RemoveItem({@required this.itemId});
+  RemoveItem({@required this.code, @required this.itemId});
   // @override
   // List<Object> get props => [item];
 }
 
 class ReduceItem extends POSEvents {
+  final int code;
   final int itemId;
-  ReduceItem({@required this.itemId});
+  ReduceItem({@required this.code, @required this.itemId});
   // @override
   // List<Object> get props => [item];
 }
 
 class AddComment extends POSEvents {
+  final int code;
   final int itemId;
   final String comment;
-  AddComment({@required this.itemId, @required this.comment});
+  AddComment({@required this.code, @required this.itemId, @required this.comment});
   // @override
   // List<Object> get props => [item];
 }
@@ -59,4 +63,16 @@ class ResetPOSOrder extends POSEvents {}
 class LoadPOSOrder extends POSEvents {
   final Order customerOrder;
   LoadPOSOrder({@required this.customerOrder});
+}
+
+class ItemQuantityChanged extends POSEvents {
+  final int code;
+  final int itemId;
+  final double quantity;
+  ItemQuantityChanged({this.code, @required this.itemId, this.quantity});
+}
+
+class AddOpenItem extends POSEvents {
+  final MenuItem openItem;
+  AddOpenItem({this.openItem});
 }
