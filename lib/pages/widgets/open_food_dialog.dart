@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:pos_app/models/objects/menu_item.dart';
 import 'package:pos_app/shared/config.dart';
 
+const double _WIDTH_FACTOR = 0.6;
 Future<MenuItem> openFoodDialog(BuildContext context, String categoryId) async {
   final nameCntrlr = TextEditingController(text: '');
   final priceCntrlr = TextEditingController(text: '0');
@@ -34,7 +35,7 @@ Future<MenuItem> openFoodDialog(BuildContext context, String categoryId) async {
                   Row(
                     children: [
                       Container(
-                        width: Config.getDeviceWidth(context) * 0.8,
+                        width: Config.getDeviceWidth(context) * _WIDTH_FACTOR,
                         child: TextField(
                           controller: nameCntrlr,
                           decoration: InputDecoration(
@@ -49,7 +50,7 @@ Future<MenuItem> openFoodDialog(BuildContext context, String categoryId) async {
                   Row(
                     children: [
                       Container(
-                        width: Config.getDeviceWidth(context) * 0.8,
+                        width: Config.getDeviceWidth(context) * _WIDTH_FACTOR,
                         child: TextField(
                           controller: priceCntrlr,
                           decoration: InputDecoration(
@@ -65,7 +66,7 @@ Future<MenuItem> openFoodDialog(BuildContext context, String categoryId) async {
                   Row(
                     children: [
                       Container(
-                        width: Config.getDeviceWidth(context) * 0.8,
+                        width: Config.getDeviceWidth(context) * _WIDTH_FACTOR,
                         child: TextField(
                           controller: qtyCntrlr,
                           decoration: InputDecoration(
@@ -80,7 +81,7 @@ Future<MenuItem> openFoodDialog(BuildContext context, String categoryId) async {
                   Row(
                     children: [
                       Container(
-                        width: Config.getDeviceWidth(context) * 0.8,
+                        width: Config.getDeviceWidth(context) * _WIDTH_FACTOR,
                         child: TextField(
                           controller: taxCntrlr,
                           decoration: InputDecoration(

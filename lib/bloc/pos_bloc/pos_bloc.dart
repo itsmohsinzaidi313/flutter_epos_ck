@@ -16,8 +16,8 @@ part 'pos_state.dart';
 
 class POSBloc extends Bloc<POSEvents, POSState> {
   Order customerOrder;
-  static List<Category> listCategories = [];
-  static List<MenuItem> listItems = [];
+  List<Category> listCategories = [];
+  List<MenuItem> listItems = [];
   bool requestSubmitted = false;
   POSBloc() : super(PosInitial());
 
@@ -32,15 +32,15 @@ class POSBloc extends Bloc<POSEvents, POSState> {
         }
         final cateResponse = await CategoryRepo.repo.rawCategories;
         final itemResponse = await MenuItemRepo.repo.allItems();
-        if (listCategories.isEmpty) {
+        try {
           listCategories = (cateResponse.data as List<dynamic>)
               .map((e) => Category.fromJson(e))
               .toList();
-        }
-        if (listItems.isEmpty) {
           listItems = (itemResponse.data as List<dynamic>)
               .map((e) => MenuItem.fromJson(e))
               .toList();
+        } catch (e) {
+          yield POSError(message: e.toString());
         }
         listCategories.first.selected = true;
         yield CategoriesLoaded(list: listCategories);

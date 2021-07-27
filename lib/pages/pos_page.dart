@@ -506,8 +506,7 @@ class PosScreen extends StatelessWidget {
               child: InkWell(
                   onTap: () {
                     if (item.code == MenuItem.OPENFOOD_CODE.toString()) {
-                      openFoodDialog(context, item.categoryId)
-                      .then((openItem) {
+                      openFoodDialog(context, item.categoryId).then((openItem) {
                         if (openItem != null) {
                           passEvent(context, AddOpenItem(openItem: openItem));
                         }
@@ -516,8 +515,9 @@ class PosScreen extends StatelessWidget {
                       passEvent(
                         context,
                         AddItem(
-                            code: int.parse(item.code),
-                            itemId: int.parse(item.id)),
+                          code: int.parse(item.code),
+                          itemId: int.parse(item.id),
+                        ),
                       );
                     }
                   },
@@ -651,30 +651,8 @@ class PosScreen extends StatelessWidget {
                       size: 22,
                     ),
                     onPressed: () async {
-                      String comments = item.comment;
-                      await showDialog(
-                        context: context,
-                        builder: (context) => AlertDialog(
-                            title: Text('Comments'),
-                            content: ListTile(
-                              leading: Icon(
-                                Icons.edit,
-                                color: Colors.redAccent,
-                              ),
-                              title: TextField(
-                                controller:
-                                    TextEditingController(text: comments),
-                                onChanged: (value) => comments = value,
-                              ),
-                            ),
-                            actions: [
-                              TextButton(
-                                onPressed: () => Navigator.of(context).pop(),
-                                child: Text('Ok'),
-                              ),
-                            ]),
-                      );
-                      item.comment = comments;
+                      String comments =
+                          await openItemCommentDialog(context, item.name);
                       passEvent(
                           context,
                           AddComment(

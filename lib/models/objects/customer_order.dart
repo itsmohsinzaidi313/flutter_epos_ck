@@ -128,17 +128,17 @@ class Order {
 
   String get subTotal {
     double amount = 0;
-    items.forEach((e) {
-      amount += double.parse(e.price) * e.quantity;
-    });
+    for (var item in items) {
+      amount += double.parse(item.price) * item.quantity;
+    }
     return amount.toStringAsFixed(2);
   }
 
   String get totalTaxedAmount {
     double amount = 0;
-    items.forEach((e) {
-      amount += double.parse(e.taxAmount) * e.quantity;
-    });
+    for (var item in items) {
+      amount += double.parse(item.taxAmount) * item.quantity;
+    }
     return amount.toStringAsFixed(2);
   }
 

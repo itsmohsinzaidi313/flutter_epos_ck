@@ -14,31 +14,25 @@ class OrderRepo {
   /// To get all orders posted from this device pass [tiltId] and set [type] to [0]
   /// To get single order pass [tiltId], [orderNo] and [orderDate] and set [type] to [1]
   Future<ServerResponse> getOrders(
-      {String tiltId, String type = '', String orderNo = ''}) async {
-    // log('${await Config.getOrdersApi}?tiltId=${tiltId ?? Config.user.tiltId}&type=$type&orderNo=$orderNo');
-    return ServerResponse(
+      {String tiltId, String type = '', String orderNo = ''}) async => ServerResponse(
       response: await get(Uri.parse(
               '${await Config.getOrdersApi}?tiltId=${tiltId ?? Config.user.tiltId}&type=$type&orderNo=$orderNo'))
           .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
               onTimeout: () => null),
     );
-  }
 
-  Future<ServerResponse> newOrder({@required Order customerOrder}) async {
-    // log(await Config.getOrdersApi);
-    // log('"${jsonEncode(customerOrder.toJson).replaceAll('"', '\\"').toString()}"');
-    return ServerResponse(
-        response: await post(await Config.getOrdersApi,
-                headers: {'Content-type': 'application/json'},
-                body:
-                    '"${jsonEncode(customerOrder.toJson).replaceAll('"', '\\"').toString()}"')
-            .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
-                onTimeout: () => null));
-  }
+  Future<ServerResponse> newOrder({@required Order customerOrder}) async => ServerResponse(
+      response: await post(await Config.getOrdersApi,
+              headers: {'Content-type': 'application/json'},
+              body:
+                  '"${jsonEncode(customerOrder.toJson).replaceAll('"', '\\"').toString()}"')
+          .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
+              onTimeout: () => null),
+    );
 
   Future<ServerResponse> updateOrder({@required Order customerOrder}) async {
-    // log(await Config.getOrdersApi);
-    // log('"${jsonEncode(customerOrder.toJson).replaceAll('"', '\\"').toString()}"');
+    log(await Config.getOrdersApi);
+    log('"${jsonEncode(customerOrder.toJson).replaceAll('"', '\\"').toString()}"');
     return ServerResponse(
         response: await put(await Config.getOrdersApi,
             headers: {'Content-type': 'application/json'},

@@ -7,10 +7,12 @@ import '../shared/config.dart';
 import '../models/objects/customer_table.dart' as t;
 import 'package:google_fonts/google_fonts.dart';
 
+import 'widgets/app_widgets.dart';
+
 class OrderInfoScreen extends StatelessWidget {
-  final String dineIn = 'assets/dine_in.jpg',
-      takeAway = 'assets/takeaway.jpg',
-      delivery = 'assets/delivery.jpg';
+  final ImageProvider dineIn = AssetImage('assets/dine_in.jpg'),
+      takeAway = AssetImage('assets/takeaway.jpg'),
+      delivery = AssetImage('assets/delivery.jpg');
 
   final dineInOrdertype = ORDERTYPE.DINE_IN;
   final takeAwayOrderType = ORDERTYPE.TAKE_AWAY;
@@ -113,45 +115,6 @@ class OrderInfoScreen extends StatelessWidget {
           ),
         ));
   }
-
-  Widget orderTypeButton(
-          BuildContext context, String title, Function onTap, String asset) =>
-      Card(
-        color: Color(0xff7c94b6),
-        elevation: 5,
-        child: InkWell(
-          onTap: onTap,
-          child: Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                fit: BoxFit.cover,
-                image: AssetImage(asset),
-                colorFilter: new ColorFilter.mode(
-                    Colors.black.withOpacity(0.6), BlendMode.dstATop),
-              ),
-            ),
-            padding: EdgeInsets.symmetric(
-              horizontal: 16,
-              vertical: 2,
-            ),
-            height: Config.getDeviceHeight(context) * 0.25,
-            width: Config.getDeviceWidth(context),
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: Text(
-                title,
-                style: GoogleFonts.ptSans(
-                  fontSize: 35,
-                  letterSpacing: 3.0,
-                  wordSpacing: 1.0,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-          ),
-        ),
-      );
 
   void passEvent(BuildContext c, OrderInfoEvent event) =>
       c.read<OrderInfoBloc>().add(event);

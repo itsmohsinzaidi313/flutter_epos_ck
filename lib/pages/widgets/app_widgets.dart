@@ -6,3 +6,5 @@ export 'menu_item.dart';
 export 'open_food_dialog.dart';
 export 'row_custom_item.dart';
 export 'tab_bar_view.dart';
+export 'order_type_button.dart';
+export 'item_comment.dart';
