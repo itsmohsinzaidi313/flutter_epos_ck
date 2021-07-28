@@ -12,8 +12,8 @@ class Lib {
   static forceLandscapeView() async =>
       await SystemChrome.setPreferredOrientations(
           [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
-          
-  // static Future<Response> get timeout => Future.value(Response(
-  //     jsonEncode({'Status': false, 'Message': 'Offline', 'Data': 0}),
-  //     HttpStatus.requestTimeout));
+
+  static Response get timeout => Response(
+      jsonEncode({'Status': false, 'Message': 'Offline', 'Data': 0}),
+      HttpStatus.requestTimeout);
 }

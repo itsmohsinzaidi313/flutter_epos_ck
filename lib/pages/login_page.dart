@@ -12,8 +12,8 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   String username;
   String password;
-  String ipAddress;
-  TextEditingController ipController;
+  String deviceKey;
+  TextEditingController dKeyController;
 
   bool _obscureText = true;
   bool isLoading = false;
@@ -33,7 +33,7 @@ class _LoginScreenState extends State<LoginScreen> {
   void initState() {
     super.initState();
     context.read<LoginBloc>().add(LoginInit());
-    ipController = TextEditingController();
+    dKeyController = TextEditingController();
   }
 
   @override
@@ -43,9 +43,9 @@ class _LoginScreenState extends State<LoginScreen> {
       body: BlocListener<LoginBloc, LoginState>(
         listener: (context, state) async {
           if (state is LoginBlocInitial) {
-            Config.serverIp = Future.value(state.ipAddress);
-            ipController.text = (await Config.serverIp) ?? '';
-            ipAddress = ipController.text;
+            Config.deviceKey = Future.value(state.deviceKey);
+            dKeyController.text = (await Config.deviceKey) ?? '';
+            deviceKey = dKeyController.text;
             AppTheme.snackbar(context, state.message);
           } else if (state is ValidSubmission) {
             AppTheme.snackbar(context, state.message);
@@ -59,7 +59,7 @@ class _LoginScreenState extends State<LoginScreen> {
             AppTheme.snackbar(context, state.message);
           } else if (state is ValidIpAddress) {
             AppTheme.snackbar(context, state.message);
-          } else if (state is InvalidIpAddress) {
+          } else if (state is InvalidDeviceKey) {
             AppTheme.snackbar(context, state.message);
           }
         },
@@ -68,7 +68,6 @@ class _LoginScreenState extends State<LoginScreen> {
             return SingleChildScrollView(
               child: SafeArea(
                 child: Container(
-                  // margin: EdgeInsets.all(8.0),
                   height: Config.getDeviceHeight(context),
                   width: Config.getDeviceWidth(context),
                   child: Row(
@@ -124,30 +123,6 @@ class _LoginScreenState extends State<LoginScreen> {
                                   child: Column(
                                     crossAxisAlignment: CrossAxisAlignment.end,
                                     children: <Widget>[
-                                      // Row(
-                                      //   mainAxisAlignment:
-                                      //       MainAxisAlignment.end,
-                                      //   children: [
-                                      //     Text(
-                                      //       Config.activeStatus,
-                                      //       style: GoogleFonts.ubuntuCondensed(
-                                      //           fontWeight: FontWeight.w600,
-                                      //           fontSize: 13,
-                                      //           letterSpacing: 1.0,
-                                      //           color: activeColor),
-                                      //     ),
-                                      //     Switch(
-                                      //       value: true,
-                                      //       onChanged: _onSwitchTap,
-                                      //       activeTrackColor:
-                                      //           Colors.yellowAccent[600],
-                                      //       activeColor: Colors.yellow[700],
-                                      //       inactiveTrackColor:
-                                      //           Colors.grey[200],
-                                      //       inactiveThumbColor: Colors.grey,
-                                      //     ),
-                                      //   ],
-                                      // ),
                                       Row(
                                         children: [
                                           Expanded(
@@ -160,17 +135,17 @@ class _LoginScreenState extends State<LoginScreen> {
                                                 ),
                                               ),
                                               child: TextField(
-                                                controller: ipController,
+                                                controller: dKeyController,
                                                 enabled: true,
                                                 decoration: InputDecoration(
                                                   icon: Icon(Icons.computer),
                                                   border: InputBorder.none,
-                                                  labelText: 'Ip Address',
+                                                  labelText: 'Device Key',
                                                   labelStyle: TextStyle(
                                                     color: Colors.grey[400],
                                                   ),
                                                   errorText:
-                                                      state is InvalidIpAddress
+                                                      state is InvalidDeviceKey
                                                           ? 'Required'
                                                           : null,
                                                 ),
@@ -178,7 +153,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                                     TextInputAction.next,
                                                 keyboardType: TextInputType.url,
                                                 onChanged: (value) =>
-                                                    ipAddress = value,
+                                                    deviceKey = value,
                                               ),
                                             ),
                                           ),
@@ -186,8 +161,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                             child: Text('SUBMIT'),
                                             onPressed: () => context
                                                 .read<LoginBloc>()
-                                                .add(IpAddressChanged(
-                                                    ipaddress: ipAddress)),
+                                                .add(DeviceKeyChanged(
+                                                    ipaddress: deviceKey)),
                                           )
                                         ],
                                       ),
@@ -292,7 +267,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       onTap: () {
                                         context.read<LoginBloc>().add(
                                             LoginPressed(
-                                                ipaddress: ipAddress ?? '',
+                                                deviceKey: deviceKey ?? '',
                                                 username: username ?? '',
                                                 password: password ?? ''));
                                       },

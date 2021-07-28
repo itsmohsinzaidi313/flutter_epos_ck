@@ -1,19 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:pos_app/shared/config.dart';
-import 'package:http/http.dart';
-import 'package:pos_app/models/objects/server_response.dart';
+import 'package:pos_app/models/objects/item.dart';
 
 class MenuItemRepo {
   static MenuItemRepo repo = MenuItemRepo._internal();
   MenuItemRepo._internal();
-  Future<ServerResponse> allItems() async => ServerResponse(
-      response: await get('${await Config.getItemsApi}?phrase=*').timeout(
-          Duration(seconds: Config.SERVER_TIMEOUT),
-          onTimeout: () => null));
+  Future<List<Item>> allItems() async => [];
 
-  Future<ServerResponse> searchItems({@required String phrase}) async =>
-      ServerResponse(
-          response: await get('${await Config.getItemsApi}?phrase=$phrase')
-              .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
-                  onTimeout: () => null));
+  Future<List<Item>> searchItems({@required String phrase}) async =>[];
 }

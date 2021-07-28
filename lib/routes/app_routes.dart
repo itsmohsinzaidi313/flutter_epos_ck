@@ -6,8 +6,6 @@ import 'package:pos_app/bloc/order_info_bloc/order_info_bloc.dart';
 import 'package:pos_app/bloc/payment_bloc/payment_bloc.dart';
 import 'package:pos_app/bloc/pos_bloc/pos_bloc.dart';
 import 'package:pos_app/bloc/report_bloc/report_bloc.dart';
-import 'package:pos_app/models/objects/customer_order.dart';
-import 'package:pos_app/pages/feedback_page.dart';
 import 'package:pos_app/pages/login_page.dart';
 import 'package:pos_app/pages/menu_pages/menu_page.dart';
 import 'package:pos_app/pages/order_info_page.dart';
@@ -23,7 +21,6 @@ class AppRoutes {
   POSBloc _posBloc;
   PaymentBloc _paymentBloc;
   ReportBloc _reportBloc;
-  final Order _customerOrder = Order();
 
   AppRoutes() {
     _loginBloc = LoginBloc();
@@ -64,8 +61,6 @@ class AppRoutes {
         );
         break;
       case '/pos':
-        _posBloc
-            .add(LoadPOSOrder(customerOrder: routeSettings.arguments as Order));
         return MaterialPageRoute(
           builder: (context) => BlocProvider.value(
             value: _posBloc,
@@ -74,8 +69,6 @@ class AppRoutes {
         );
         break;
       case '/payment':
-        _paymentBloc.add(
-            LoadPaymentOrder(customerOrder: routeSettings.arguments as Order));
         return MaterialPageRoute(
           builder: (context) => BlocProvider.value(
             value: _paymentBloc,
@@ -87,13 +80,6 @@ class AppRoutes {
         return MaterialPageRoute(
           builder: (context) =>
               OrdersScreen(ordersList: routeSettings.arguments),
-        );
-        break;
-      case '/feedback':
-        return MaterialPageRoute(
-          builder: (context) => FeedbackScreen(
-            order: routeSettings.arguments,
-          ),
         );
         break;
       case '/reports':

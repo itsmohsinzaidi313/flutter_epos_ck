@@ -122,7 +122,7 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
                   .customer(contact: customerOrder.contact);
               if (response.status) {
                 List<Customer> list = (response.data as List<dynamic>)
-                    .map((e) => Customer.fromJson(e))
+                    .map((e) => Customer.fromMap(e))
                     .toList();
 
                 if (list.isNotEmpty) {
@@ -162,7 +162,7 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
                   .customer(contact: customerOrder.contact);
               if (response.status) {
                 List<Customer> list = (response.data as List<dynamic>)
-                    .map((e) => Customer.fromJson(e))
+                    .map((e) => Customer.fromMap(e))
                     .toList();
                 if (list.isNotEmpty) {
                   Customer customer = list.first;

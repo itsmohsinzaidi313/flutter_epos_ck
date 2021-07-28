@@ -3,9 +3,9 @@ part of 'login_bloc.dart';
 @immutable
 abstract class LoginEvent{}
 
-class IpAddressChanged extends LoginEvent {
+class DeviceKeyChanged extends LoginEvent {
   final String ipaddress;
-  IpAddressChanged({@required this.ipaddress});
+  DeviceKeyChanged({@required this.ipaddress});
 }
 
 class UsernameChanged extends LoginEvent {
@@ -22,16 +22,16 @@ class PasswordChanged extends LoginEvent {
 }
 
 class SubmitPressed extends LoginEvent {
-  final String ipaddress;
-  SubmitPressed({@required this.ipaddress});
+  final String deviceKey;
+  SubmitPressed({@required this.deviceKey});
 }
 
 class LoginPressed extends LoginEvent {
-  final String ipaddress;
+  final String deviceKey;
   final String username;
   final String password;
   LoginPressed(
-      {@required this.ipaddress,
+      {@required this.deviceKey,
       @required this.username,
       @required this.password});
 }

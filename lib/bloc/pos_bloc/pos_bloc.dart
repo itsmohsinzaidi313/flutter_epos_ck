@@ -4,7 +4,7 @@ import 'dart:developer';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:pos_app/models/objects/customer_order.dart';
-import 'package:pos_app/models/objects/items_category.dart';
+import 'package:pos_app/models/objects/item_category.dart';
 import 'package:pos_app/models/objects/menu_item.dart';
 import 'package:pos_app/models/objects/server_response.dart';
 import 'package:pos_app/repositories/categories_repository.dart';
@@ -30,14 +30,14 @@ class POSBloc extends Bloc<POSEvents, POSState> {
         if (customerOrder == null) {
           customerOrder = Order();
         }
-        final cateResponse = await CategoryRepo.repo.rawCategories;
+        final cateResponse = await CategoryRepo.repo.getCategories;
         final itemResponse = await MenuItemRepo.repo.allItems();
         try {
           listCategories = (cateResponse.data as List<dynamic>)
-              .map((e) => Category.fromJson(e))
+              .map((e) => Category.fromMap(e))
               .toList();
           listItems = (itemResponse.data as List<dynamic>)
-              .map((e) => MenuItem.fromJson(e))
+              .map((e) => MenuItem.fromMap(e))
               .toList();
         } catch (e) {
           yield POSError(message: e.toString());

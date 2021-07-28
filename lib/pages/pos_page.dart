@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pos_app/bloc/pos_bloc/pos_bloc.dart';
-import 'package:pos_app/models/objects/items_category.dart';
+import 'package:pos_app/models/objects/item_category.dart';
 import 'package:pos_app/models/objects/menu_item.dart';
 import 'package:pos_app/repositories/menu_items_repository.dart';
 import 'package:pos_app/shared/app_theme.dart';
@@ -709,7 +709,7 @@ class PosScreen extends StatelessWidget {
               await MenuItemRepo.repo.searchItems(phrase: pattern);
           if (serverResponse.status) {
             for (var item in (serverResponse.data as List)) {
-              list.add(MenuItem.fromJson(item));
+              list.add(MenuItem.fromMap(item));
             }
           }
         }

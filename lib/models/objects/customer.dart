@@ -1,29 +1,65 @@
-import 'dart:convert';
-
 class Customer {
-  static const String IdKey = 'Id';
-  static const String NameKey = 'Name';
-  static const String ContactKey = 'Contact';
-  static const String AddressKey = 'Address';
+  String remoteId;
+  final String serverId;
+  final String name;
+  final String phone;
+  final String email;
+  final String address;
+  final String gstNumber;
+  final String areaId;
+  final String userId;
+  final String companyId;
+  final String delStatus;
+  final String dateOfBirth;
+  final String dateOfAnniversary;
+  final String isUpload;
 
-  final String id, name, contact, address;
-  Customer({this.id, this.name, this.contact, this.address});
-  
-  Customer.empty()
-      : id = '',
-        name = '',
-        contact = '',
-        address = '';
+  Customer(
+      {this.serverId,
+      this.name,
+      this.phone,
+      this.email,
+      this.address,
+      this.gstNumber,
+      this.areaId,
+      this.userId,
+      this.companyId,
+      this.delStatus,
+      this.dateOfBirth,
+      this.dateOfAnniversary,
+      this.isUpload});
 
-  Customer.fromJson(Map<String, dynamic> map)
-      : id = map[IdKey],
-        name = map[NameKey],
-        contact = map[ContactKey],
-        address = map[AddressKey];
+  Customer.fromMap(Map<String, dynamic> map)
+      : remoteId = map['local_id'].toString(),
+        serverId = map['id'],
+        name = map['name'],
+        phone = map['phone'],
+        email = map['email'],
+        address = map['address'],
+        gstNumber = map['gst_number'],
+        areaId = map['area_id'],
+        userId = map['user_id'],
+        companyId = map['company_id'],
+        delStatus = map['del_status'],
+        dateOfBirth = map['date_of_birth'],
+        dateOfAnniversary = map['date_of_anniversary'],
+        isUpload = map['is_upload'];
 
-  String get toJson => {
-        jsonEncode(NameKey): jsonEncode(name),
-        jsonEncode(ContactKey): jsonEncode(contact),
-        jsonEncode(AddressKey): jsonEncode(address)
-      }.toString();
+  Map<String, dynamic> toMap(Customer customer) {
+    return {
+      'id': customer.serverId,
+      'name': customer.name,
+      'phone': customer.phone,
+      'email': customer.email,
+      'address': customer.address,
+      'gst_number': customer.gstNumber,
+      'area_id': customer.areaId,
+      'user_id': customer.userId,
+      'company_id': customer.companyId,
+      'del_status': customer.delStatus,
+      'date_of_birth': customer.dateOfBirth,
+      'date_of_anniversary': customer.dateOfAnniversary,
+      'is_upload': customer.isUpload
+    };
+  }
 }
