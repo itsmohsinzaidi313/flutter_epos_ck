@@ -9,29 +9,29 @@ class OrdersTable extends SqlCommons {
   static const String RESERVED = 'Reserved';
   static const String FREE = 'Free';
 
-  static const String tableName = 'orders_table';
+  static const String TABLE_NAME = 'orders_table';
 
-  static const String localId = 'local_id';
-  static const String persons = 'persons';
-  static const String bookingTime = 'booking_time';
-  static const String saleId = 'sale_id';
-  static const String saleNo = 'sale_no';
-  static const String outletId = 'outlet_id';
-  static const String tableId = 'table_id';
-  static const String delStatus = 'del_status';
+  static const String LOCAL_ID = 'local_id';
+  static const String PERSONS = 'persons';
+  static const String BOOKING_TIME = 'booking_time';
+  static const String SALE_ID = 'sale_id';
+  static const String SALE_NO = 'sale_no';
+  static const String OUTLET_ID = 'outlet_id';
+  static const String TABLE_ID = 'table_id';
+  static const String DEL_STATUS = 'del_status';
 
-  static const List<String> columnsName = [
-    localId,
-    persons,
-    bookingTime,
-    saleId,
-    saleNo,
-    outletId,
-    tableId,
-    delStatus
+  static const List<String> COLUMN_NAMES = [
+    LOCAL_ID,
+    PERSONS,
+    BOOKING_TIME,
+    SALE_ID,
+    SALE_NO,
+    OUTLET_ID,
+    TABLE_ID,
+    DEL_STATUS
   ];
 
-  static const List<String> columnsType = [
+  static const List<String> COLUMN_TYPES = [
     SqlCommons.INT_PRIMARYKEY,
     SqlCommons.INTEGER,
     SqlCommons.TEXT,
@@ -43,5 +43,5 @@ class OrdersTable extends SqlCommons {
 
   ];
 
-  OrdersTable(String dbTableName, List<String> dbColumns, List<String> dbColumnsDataTypes, Database database, VerboseBloc bloc) : super(dbTableName, dbColumns, dbColumnsDataTypes, database, bloc);
+  OrdersTable(Database database, VerboseBloc bloc) : super(TABLE_NAME, COLUMN_NAMES, COLUMN_TYPES, database, bloc);
 }

@@ -6,23 +6,23 @@ import 'package:sqflite_common/sqlite_api.dart';
 
 class ErrorDetailTable extends SqlCommons{
 
-  static const String tableName = 'error_detail';
+  static const String TABLE_NAME = 'error_detail';
 
-  static const String id = 'id';
-  static const String errorMasterId = 'error_master_id';
-  static const String error = 'error';
+  static const String ID = 'id';
+  static const String ERROR_MASTER_ID = 'error_master_id';
+  static const String ERROR = 'error';
 
-  static const List<String> columnsName = [
-    id,
-    errorMasterId,
-    error
+  static const List<String> COLUMN_NAMES = [
+    ID,
+    ERROR_MASTER_ID,
+    ERROR
   ];
 
-  static const List<String> columnsType = [
+  static const List<String> COLUMN_TYPES = [
     SqlCommons.INT_PRIMARYKEY,
     SqlCommons.INTEGER,
     SqlCommons.TEXT
   ];
 
-  ErrorDetailTable(String dbTableName, List<String> dbColumns, List<String> dbColumnsDataTypes, Database database, VerboseBloc bloc) : super(dbTableName, dbColumns, dbColumnsDataTypes, database, bloc);
+  ErrorDetailTable(Database database, VerboseBloc bloc) : super(TABLE_NAME, COLUMN_NAMES, COLUMN_TYPES, database, bloc);
 }

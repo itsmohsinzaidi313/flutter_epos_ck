@@ -6,31 +6,31 @@ import 'package:sqflite_common/sqlite_api.dart';
 
 class ItemTable extends SqlCommons{
 
-  static const String tableName = 'item_menus';
+  static const String TABLE_NAME = 'item_menus';
 
-  static const String localId = 'local_id';
-  static const String serverId = 'id';
-  static const String code = 'code';
-  static const String name = 'name';
-  static const String salePrice = 'sale_price';
-  static const String photo = 'photo';
-  static const String categoryName = 'category_name';
-  static const String percentage = 'percentage';
-  static const String quantity = 'quantity';
+  static const String LOCAL_ID = 'local_id';
+  static const String SERVER_ID = 'id';
+  static const String CODE = 'code';
+  static const String NAME = 'name';
+  static const String SALE_PRICE = 'sale_price';
+  static const String PHOTO = 'photo';
+  static const String CATEGORY_NAME = 'category_name';
+  static const String PERCENTAGE = 'percentage';
+  static const String QUANTITY = 'quantity';
 
-  static const List<String> columnsName = [
-    localId,
-    serverId,
-    code,
-    name,
-    salePrice,
-    photo,
-    categoryName,
-    percentage,
-    quantity
+  static const List<String> COLUMN_NAMES = [
+    LOCAL_ID,
+    SERVER_ID,
+    CODE,
+    NAME,
+    SALE_PRICE,
+    PHOTO,
+    CATEGORY_NAME,
+    PERCENTAGE,
+    QUANTITY
   ];
 
-  static const List<String> columnsType = [
+  static const List<String> COLUMN_TYPES = [
     SqlCommons.INT_PRIMARYKEY,
     SqlCommons.INTEGER,
     SqlCommons.TEXT,
@@ -43,5 +43,5 @@ class ItemTable extends SqlCommons{
 
   ];
 
-  ItemTable(String dbTableName, List<String> dbColumns, List<String> dbColumnsDataTypes, Database database, VerboseBloc bloc) : super(dbTableName, dbColumns, dbColumnsDataTypes, database, bloc);
+  ItemTable(Database database, VerboseBloc bloc) : super(TABLE_NAME, COLUMN_NAMES, COLUMN_TYPES, database, bloc);
 }

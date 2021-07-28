@@ -448,7 +448,7 @@ class PosScreen extends StatelessWidget {
                   child: InkWell(
                     onTap: () => passEvent(
                       context,
-                      CategoryChanged(categoryId: category.id),
+                      CategoryChanged(categoryId: category.LOCAL_ID),
                     ),
                     child: Row(
                       children: [
@@ -472,7 +472,7 @@ class PosScreen extends StatelessWidget {
                               ? Colors.redAccent[200]
                               : Colors.white,
                           child: Text(
-                            category.name.toUpperCase(),
+                            category.NAME.toUpperCase(),
                             textAlign: TextAlign.center,
                             style: GoogleFonts.ubuntuCondensed(
                               color: category.selected
@@ -505,7 +505,7 @@ class PosScreen extends StatelessWidget {
               // color: Colors.redAccent,
               child: InkWell(
                   onTap: () {
-                    if (item.code == MenuItem.OPENFOOD_CODE.toString()) {
+                    if (item.CODE == MenuItem.OPENFOOD_CODE.toString()) {
                       openFoodDialog(context, item.categoryId).then((openItem) {
                         if (openItem != null) {
                           passEvent(context, AddOpenItem(openItem: openItem));
@@ -515,8 +515,8 @@ class PosScreen extends StatelessWidget {
                       passEvent(
                         context,
                         AddItem(
-                          code: int.parse(item.code),
-                          itemId: int.parse(item.id),
+                          code: int.parse(item.CODE),
+                          itemId: int.parse(item.LOCAL_ID),
                         ),
                       );
                     }
@@ -532,10 +532,10 @@ class PosScreen extends StatelessWidget {
           BuildContext context, List<MenuItem> lstItem) =>
       lstItem.map((item) {
         final controller =
-            TextEditingController(text: item.quantity.toString());
+            TextEditingController(text: item.QUANTITY.toString());
         controller.selection = TextSelection(
-            baseOffset: item.quantity.toString().length,
-            extentOffset: item.quantity.toString().length);
+            baseOffset: item.QUANTITY.toString().length,
+            extentOffset: item.QUANTITY.toString().length);
         return Card(
           elevation: 4,
           child: ListTile(
@@ -548,7 +548,7 @@ class PosScreen extends StatelessWidget {
             //   ),
             // ),
             title: Text(
-              item.name.toUpperCase(),
+              item.NAME.toUpperCase(),
               style: GoogleFonts.ubuntuCondensed(
                 color: Colors.black87,
                 fontSize: 14,
@@ -565,8 +565,8 @@ class PosScreen extends StatelessWidget {
                   height: 8,
                 ),
                 Text(
-                  ' ${double.parse(item.price).toInt().toString()} x ${item.quantity} '
-                  '= ${(double.parse(item.price).toInt() * item.quantity).toString()}',
+                  ' ${double.parse(item.PRICE).toInt().toString()} x ${item.QUANTITY} '
+                  '= ${(double.parse(item.PRICE).toInt() * item.QUANTITY).toString()}',
                   style: TextStyle(
                     color: Colors.grey.shade800,
                     fontSize: 12,
@@ -582,8 +582,8 @@ class PosScreen extends StatelessWidget {
                       onPressed: () => passEvent(
                           context,
                           ReduceItem(
-                              code: int.parse(item.code),
-                              itemId: int.parse(item.id))),
+                              code: int.parse(item.CODE),
+                              itemId: int.parse(item.LOCAL_ID))),
                     ),
                     // Text(
                     //   item.quantity.toString(),
@@ -603,8 +603,8 @@ class PosScreen extends StatelessWidget {
                                   .read<POSBloc>()
                                   .add(
                                     ItemQuantityChanged(
-                                      code: int.tryParse(item.code),
-                                      itemId: int.parse(item.id),
+                                      code: int.tryParse(item.CODE),
+                                      itemId: int.parse(item.LOCAL_ID),
                                       quantity: double.tryParse(value) ?? 0.0,
                                     ),
                                   ),
@@ -630,8 +630,8 @@ class PosScreen extends StatelessWidget {
                       onPressed: () => passEvent(
                         context,
                         AddItem(
-                          code: int.parse(item.code),
-                          itemId: int.parse(item.id),
+                          code: int.parse(item.CODE),
+                          itemId: int.parse(item.LOCAL_ID),
                         ),
                       ),
                     ),
@@ -652,12 +652,12 @@ class PosScreen extends StatelessWidget {
                     ),
                     onPressed: () async {
                       String comments =
-                          await openItemCommentDialog(context, item.name);
+                          await openItemCommentDialog(context, item.NAME);
                       passEvent(
                           context,
                           AddComment(
-                              code: int.parse(item.code),
-                              itemId: int.parse(item.id),
+                              code: int.parse(item.CODE),
+                              itemId: int.parse(item.LOCAL_ID),
                               comment: comments));
                     },
                   ),
@@ -670,8 +670,8 @@ class PosScreen extends StatelessWidget {
                     onPressed: () => passEvent(
                       context,
                       RemoveItem(
-                        code: int.parse(item.code),
-                        itemId: int.parse(item.id),
+                        code: int.parse(item.CODE),
+                        itemId: int.parse(item.LOCAL_ID),
                       ),
                     ),
                   ),
@@ -707,7 +707,7 @@ class PosScreen extends StatelessWidget {
         if (pattern != '') {
           final serverResponse =
               await MenuItemRepo.repo.searchItems(phrase: pattern);
-          if (serverResponse.status) {
+          if (serverResponse.STATUS) {
             for (var item in (serverResponse.data as List)) {
               list.add(MenuItem.fromMap(item));
             }
@@ -717,17 +717,17 @@ class PosScreen extends StatelessWidget {
       },
       itemBuilder: (context, itemData) {
         return ListTile(
-          title: Text(itemData.name),
+          title: Text(itemData.NAME),
           subtitle: Text(
-            'PKR: ${itemData.price}/=\nCode: ${itemData.id}',
+            'PKR: ${itemData.PRICE}/=\nCode: ${itemData.LOCAL_ID}',
           ),
         );
       },
       onSuggestionSelected: (suggestion) => passEvent(
         context,
         AddItem(
-          code: int.parse((suggestion as MenuItem).code),
-          itemId: int.parse((suggestion as MenuItem).id),
+          code: int.parse((suggestion as MenuItem).CODE),
+          itemId: int.parse((suggestion as MenuItem).LOCAL_ID),
         ),
       ),
       noItemsFoundBuilder: (context) => ListTile(

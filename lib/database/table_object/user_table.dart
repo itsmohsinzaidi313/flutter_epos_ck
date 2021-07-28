@@ -6,45 +6,45 @@ import 'package:sqflite_common/sqlite_api.dart';
 
 class UserTable extends SqlCommons{
 
-  static const String tableName = 'users';
+  static const String TABLE_NAME = 'users';
 
-  static const String localId = 'local_id';
-  static const String serverId = 'id';
-  static const String fullName = 'full_name';
-  static const String phone = 'phone';
-  static const String emailAddress = 'email_address';
-  static const String password = 'password';
-  static const String designation = 'designation';
-  static const String willLogin = 'will_login';
-  static const String role = 'role';
-  static const String outletId = 'outlet_id';
-  static const String companyId = 'company_id';
-  static const String accountCreationDate = 'account_creation_date';
-  static const String language = 'language';
-  static const String lastLogin = 'last_login';
-  static const String activeStatus = 'active_status';
-  static const String delStatus = 'del_status';
+  static const String LOCAL_ID = 'local_id';
+  static const String SERVER_ID = 'id';
+  static const String FULL_NAME = 'full_name';
+  static const String PHONE = 'phone';
+  static const String EMAIL = 'email_address';
+  static const String PASSWORD = 'password';
+  static const String DESIGNATION = 'designation';
+  static const String WILL_LOGIN = 'will_login';
+  static const String ROLE = 'role';
+  static const String OUTLET_ID = 'outlet_id';
+  static const String COMPANY_ID = 'company_id';
+  static const String ACCOUNT_CREATED_DATE = 'account_creation_date';
+  static const String LANGUAGE = 'language';
+  static const String LAST_LOGIN = 'last_login';
+  static const String ACTIVE_STATUS = 'active_status';
+  static const String DEL_STATUS = 'del_status';
 
-  static const List<String> columnsName = [
-    localId,
-    serverId,
-    fullName,
-    phone,
-    emailAddress,
-    password,
-    designation,
-    willLogin,
-    role,
-    outletId,
-    companyId,
-    accountCreationDate,
-    language,
-    lastLogin,
-    activeStatus,
-    delStatus
+  static const List<String> COLUMN_NAMES = [
+    LOCAL_ID,
+    SERVER_ID,
+    FULL_NAME,
+    PHONE,
+    EMAIL,
+    PASSWORD,
+    DESIGNATION,
+    WILL_LOGIN,
+    ROLE,
+    OUTLET_ID,
+    COMPANY_ID,
+    ACCOUNT_CREATED_DATE,
+    LANGUAGE,
+    LAST_LOGIN,
+    ACTIVE_STATUS,
+    DEL_STATUS
   ];
 
-  static const List<String> columnsType = [
+  static const List<String> COLUMN_TYPES = [
     SqlCommons.INT_PRIMARYKEY,
     SqlCommons.INTEGER,
     SqlCommons.TEXT,
@@ -63,5 +63,5 @@ class UserTable extends SqlCommons{
     SqlCommons.INTEGER
   ];
 
-  UserTable(String dbTableName, List<String> dbColumns, List<String> dbColumnsDataTypes, Database database, VerboseBloc bloc) : super(dbTableName, dbColumns, dbColumnsDataTypes, database, bloc);
+  UserTable(Database database, VerboseBloc bloc) : super(TABLE_NAME, COLUMN_NAMES, COLUMN_TYPES, database, bloc);
 }

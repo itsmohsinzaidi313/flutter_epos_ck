@@ -46,18 +46,18 @@ class POSBloc extends Bloc<POSEvents, POSState> {
         yield CategoriesLoaded(list: listCategories);
         yield ItemsLoaded(
             list: listItems
-                .where((e) => e.categoryId == listCategories.first.id)
+                .where((e) => e.categoryId == listCategories.first.LOCAL_ID)
                 .toList());
 
         yield CartItems(
           list: customerOrder.cartItems,
-          subTotal: customerOrder.subTotal,
+          subTotal: customerOrder.SUBTOTAL,
           totalAmount: customerOrder.totalTaxedAmount,
           taxAmount: customerOrder.totalTax,
         );
       } else if (event is CategoryChanged) {
         listCategories.forEach((e) {
-          if (e.id == event.categoryId) {
+          if (e.LOCAL_ID == event.categoryId) {
             e.selected = true;
           } else {
             e.selected = false;
@@ -77,25 +77,25 @@ class POSBloc extends Bloc<POSEvents, POSState> {
         if (event.code == MenuItem.OPENFOOD_CODE) {
           customerOrder.addCartItem(
             MenuItem(
-              code: event.code.toString(),
-              id: event.itemId.toString(),
+              CODE: event.code.toString(),
+              LOCAL_ID: event.itemId.toString(),
             ),
           );
         } else {
           customerOrder.addCartItem(listItems
-              .where((element) => element.code == '${event.code}')
+              .where((element) => element.CODE == '${event.code}')
               .first);
         }
         yield CartItems(
           list: customerOrder.cartItems,
-          subTotal: customerOrder.subTotal,
+          subTotal: customerOrder.SUBTOTAL,
           totalAmount: customerOrder.totalTaxedAmount,
           taxAmount: customerOrder.totalTax,
         );
       } else if (event is ReduceItem) {
         if (customerOrder.editOrder) {
           double qty = 0;
-          customerOrder.cartItems.forEach((element) => qty += element.quantity);
+          customerOrder.cartItems.forEach((element) => qty += element.QUANTITY);
           if (qty > 1) {
             customerOrder.reduceCartItem(event.itemId);
           } else {
@@ -107,7 +107,7 @@ class POSBloc extends Bloc<POSEvents, POSState> {
         }
         yield CartItems(
           list: customerOrder.cartItems,
-          subTotal: customerOrder.subTotal,
+          subTotal: customerOrder.SUBTOTAL,
           totalAmount: customerOrder.totalTaxedAmount,
           taxAmount: customerOrder.totalTax,
         );
@@ -120,7 +120,7 @@ class POSBloc extends Bloc<POSEvents, POSState> {
         }
         yield CartItems(
           list: customerOrder.cartItems,
-          subTotal: customerOrder.subTotal,
+          subTotal: customerOrder.SUBTOTAL,
           totalAmount: customerOrder.totalTaxedAmount,
           taxAmount: customerOrder.totalTax,
         );
@@ -137,7 +137,7 @@ class POSBloc extends Bloc<POSEvents, POSState> {
         }
         yield CartItems(
           list: customerOrder.cartItems,
-          subTotal: customerOrder.subTotal,
+          subTotal: customerOrder.SUBTOTAL,
           totalAmount: customerOrder.totalTaxedAmount,
           taxAmount: customerOrder.totalTax,
         );
@@ -145,7 +145,7 @@ class POSBloc extends Bloc<POSEvents, POSState> {
         customerOrder.addCartItem(event.openItem);
         yield CartItems(
           list: customerOrder.cartItems,
-          subTotal: customerOrder.subTotal,
+          subTotal: customerOrder.SUBTOTAL,
           totalAmount: customerOrder.totalTaxedAmount,
           taxAmount: customerOrder.totalTax,
         );
@@ -153,7 +153,7 @@ class POSBloc extends Bloc<POSEvents, POSState> {
         customerOrder.addItemComment(event.itemId, event.comment);
         yield CartItems(
           list: customerOrder.cartItems,
-          subTotal: customerOrder.subTotal,
+          subTotal: customerOrder.SUBTOTAL,
           totalAmount: customerOrder.totalTaxedAmount,
           taxAmount: customerOrder.totalTax,
         );
@@ -204,7 +204,7 @@ class POSBloc extends Bloc<POSEvents, POSState> {
     }
 
     for (var item in order.cartItems) {
-      if (item.quantity <= 0) {
+      if (item.QUANTITY <= 0) {
         return false;
       }
     }

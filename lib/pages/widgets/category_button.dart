@@ -16,7 +16,7 @@ Widget categoryButton(BuildContext context, List<Category> list, int index) => C
         child: InkWell(
           onTap: () => context
               .read<POSBloc>()
-              .add(CategoryChanged(categoryId: list[index].id)),
+              .add(CategoryChanged(categoryId: list[index].LOCAL_ID)),
           child: Row(
             children: [
               CircleAvatar(
@@ -40,7 +40,7 @@ Widget categoryButton(BuildContext context, List<Category> list, int index) => C
                     list[index].selected ? Colors.redAccent[200] : Colors.white,
                 child: Center(
                   child: Text(
-                    list[index].name.toUpperCase(),
+                    list[index].NAME.toUpperCase(),
                     textAlign: TextAlign.center,
                     style: GoogleFonts.ubuntuCondensed(
                       color: list[index].selected

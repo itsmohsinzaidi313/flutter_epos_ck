@@ -318,7 +318,7 @@ class PaymentScreen extends StatelessWidget {
                   //   ),
                   // ),
                   title: Text(
-                    item.name.toUpperCase(),
+                    item.NAME.toUpperCase(),
                     style: GoogleFonts.ubuntuCondensed(
                       color: Colors.black87,
                       fontSize: 14,
@@ -335,8 +335,8 @@ class PaymentScreen extends StatelessWidget {
                         height: 8,
                       ),
                       Text(
-                        ' ${double.parse(item.price).toInt().toString()} x ${item.quantity} '
-                        '= ${(double.parse(item.price).toInt() * item.quantity).toString()}',
+                        ' ${double.parse(item.PRICE).toInt().toString()} x ${item.QUANTITY} '
+                        '= ${(double.parse(item.PRICE).toInt() * item.QUANTITY).toString()}',
                         style: TextStyle(
                           color: Colors.grey.shade800,
                           fontSize: 12,
@@ -352,11 +352,11 @@ class PaymentScreen extends StatelessWidget {
                             onPressed: () {
                               context
                                   .read<PaymentBloc>()
-                                  .add(ReduceItem(itemId: int.parse(item.id)));
+                                  .add(ReduceItem(itemId: int.parse(item.LOCAL_ID)));
                             },
                           ),
                           Text(
-                            item.quantity.toString(),
+                            item.QUANTITY.toString(),
                             style: TextStyle(
                               color: Colors.grey.shade900,
                               fontSize: 12,
@@ -370,7 +370,7 @@ class PaymentScreen extends StatelessWidget {
                             ),
                             onPressed: () => context
                                 .read<PaymentBloc>()
-                                .add(AddItem(itemId: int.parse(item.id))),
+                                .add(AddItem(itemId: int.parse(item.LOCAL_ID))),
                           ),
                         ],
                       ),
@@ -415,7 +415,7 @@ class PaymentScreen extends StatelessWidget {
                             );
                             item.comment = comments;
                             context.read<PaymentBloc>().add(AddComment(
-                                itemId: int.parse(item.id), comment: comments));
+                                itemId: int.parse(item.LOCAL_ID), comment: comments));
                           },
                         ),
                         IconButton(
@@ -426,7 +426,7 @@ class PaymentScreen extends StatelessWidget {
                           ),
                           onPressed: () => context
                               .read<PaymentBloc>()
-                              .add(RemoveItem(itemId: int.parse(item.id))),
+                              .add(RemoveItem(itemId: int.parse(item.LOCAL_ID))),
                         ),
                       ],
                     ),

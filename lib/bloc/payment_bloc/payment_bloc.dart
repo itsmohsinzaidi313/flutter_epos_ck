@@ -26,51 +26,51 @@ class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
     } else if (event is PaymentBuild) {
       yield CartItems(
           list: customerOrder.cartItems,
-          totalAmount: customerOrder.subTotal,
+          totalAmount: customerOrder.SUBTOTAL,
           totalTaxAmount: customerOrder.totalTaxedAmount);
       yield PaymentType(
           mode: PAYMENTMODE.CASH,
-          totalAmount: customerOrder.subTotal,
+          totalAmount: customerOrder.SUBTOTAL,
           totalTaxAmount: customerOrder.totalTaxedAmount);
     } else if (event is PaymentModeChanged) {
       customerOrder.paymentmode = event.mode;
       yield PaymentType(
           mode: event.mode,
-          totalAmount: customerOrder.subTotal,
+          totalAmount: customerOrder.SUBTOTAL,
           totalTaxAmount: customerOrder.totalTaxedAmount);
     } else if (event is AddItem) {
       customerOrder.addCartItem(customerOrder.items
-          .where((element) => element.id == '${event.itemId}')
+          .where((element) => element.LOCAL_ID == '${event.itemId}')
           .first);
       yield CartItems(
           list: customerOrder.cartItems,
-          totalAmount: customerOrder.subTotal,
+          totalAmount: customerOrder.SUBTOTAL,
           totalTaxAmount: customerOrder.totalTaxedAmount);
     } else if (event is ReduceItem) {
       customerOrder.reduceCartItem(event.itemId, removeZeroQuantity: false);
       yield CartItems(
           list: customerOrder.cartItems,
-          totalAmount: customerOrder.subTotal,
+          totalAmount: customerOrder.SUBTOTAL,
           totalTaxAmount: customerOrder.totalTaxedAmount);
     } else if (event is RemoveItem) {
       customerOrder.removeCartItem(event.itemId);
       yield CartItems(
           list: customerOrder.cartItems,
-          totalAmount: customerOrder.subTotal,
+          totalAmount: customerOrder.SUBTOTAL,
           totalTaxAmount: customerOrder.totalTaxedAmount);
     } else if (event is AddComment) {
       customerOrder.addItemComment(event.itemId, event.comment);
       yield CartItems(
           list: customerOrder.cartItems,
-          totalAmount: customerOrder.subTotal,
+          totalAmount: customerOrder.SUBTOTAL,
           totalTaxAmount: customerOrder.totalTaxedAmount);
     } else if (event is PaymentChanged) {
       double payment = double.tryParse(event.payment);
       if (payment != null) {
-        if (payment > double.parse(customerOrder.subTotal) || payment <= 0) {
+        if (payment > double.parse(customerOrder.SUBTOTAL) || payment <= 0) {
           yield InvalidPayment(
               message: invalidPaymentMessage,
-              totalAmount: customerOrder.subTotal,
+              totalAmount: customerOrder.SUBTOTAL,
               totalTaxAmount: customerOrder.totalTaxedAmount);
         } else {
           customerOrder.payment = event.payment;
@@ -78,26 +78,26 @@ class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
       } else {
         yield InvalidPayment(
             message: invalidPaymentMessage,
-            totalAmount: customerOrder.subTotal,
+            totalAmount: customerOrder.SUBTOTAL,
             totalTaxAmount: customerOrder.totalTaxedAmount);
       }
       yield AdjustPayment(
-          totalAmount: customerOrder.subTotal,
+          totalAmount: customerOrder.SUBTOTAL,
           totalTaxAmount: customerOrder.totalTaxedAmount);
     } else if (event is CardNumberChanged) {
       if (int.tryParse(event.cardNumber) == null) {
         yield InvalidCardNumber(
             message: invalidCardNumberMessage,
-            totalAmount: customerOrder.subTotal,
+            totalAmount: customerOrder.SUBTOTAL,
             totalTaxAmount: customerOrder.totalTaxedAmount);
       }
     } else if (event is DiscountChanged) {
       double discount = double.tryParse(event.discount);
       if (discount != null) {
-        if (double.parse(customerOrder.subTotal) - discount < 0) {
+        if (double.parse(customerOrder.SUBTOTAL) - discount < 0) {
           yield InvalidDiscount(
               message: invalidDiscountMessage,
-              totalAmount: customerOrder.subTotal,
+              totalAmount: customerOrder.SUBTOTAL,
               totalTaxAmount: customerOrder.totalTaxedAmount);
         } else {
           customerOrder.discountedAmount = event.discount;
@@ -105,7 +105,7 @@ class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
       } else {
         yield InvalidDiscount(
             message: invalidDiscountMessage,
-            totalAmount: customerOrder.subTotal,
+            totalAmount: customerOrder.SUBTOTAL,
             totalTaxAmount: customerOrder.totalTaxedAmount);
       }
     } else if (event is Submit) {
@@ -114,21 +114,21 @@ class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
       if (discount == null) {
         yield InvalidDiscount(
             message: invalidDiscountMessage,
-            totalAmount: customerOrder.subTotal,
+            totalAmount: customerOrder.SUBTOTAL,
             totalTaxAmount: customerOrder.totalTaxedAmount);
       }
       if (customerOrder.paymentmode == PAYMENTMODE.CASH) {
         if (payment == null) {
           yield InvalidPayment(
               message: invalidPaymentMessage,
-              totalAmount: customerOrder.subTotal,
+              totalAmount: customerOrder.SUBTOTAL,
               totalTaxAmount: customerOrder.totalTaxedAmount);
         }
         if (payment != null && discount != null) {
           if (payment - discount < 0) {
             yield InvalidDiscount(
                 message: invalidDiscountMessage,
-                totalAmount: customerOrder.subTotal,
+                totalAmount: customerOrder.SUBTOTAL,
                 totalTaxAmount: customerOrder.totalTaxedAmount);
           } else {
             yield ValidSubmission();
@@ -137,7 +137,7 @@ class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
           if (int.tryParse(customerOrder.cardNumber) == null) {
             yield InvalidCardNumber(
                 message: invalidCardNumberMessage,
-                totalAmount: customerOrder.subTotal,
+                totalAmount: customerOrder.SUBTOTAL,
                 totalTaxAmount: customerOrder.totalTaxedAmount);
           } else {
             yield ValidSubmission();

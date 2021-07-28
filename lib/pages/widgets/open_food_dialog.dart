@@ -107,13 +107,13 @@ Future<MenuItem> openFoodDialog(BuildContext context, String categoryId) async {
                                 _checkItemTax(taxCntrlr.text) == null) {
                               Navigator.of(context).pop(
                                 MenuItem(
-                                  id: Random.secure()
+                                  LOCAL_ID: Random.secure()
                                       .nextInt(1000000)
                                       .toString(),
-                                  code: MenuItem.OPENFOOD_CODE.toString(),
-                                  name: nameCntrlr.text,
-                                  price: priceCntrlr.text,
-                                  quantity: double.parse(qtyCntrlr.text),
+                                  CODE: MenuItem.OPENFOOD_CODE.toString(),
+                                  NAME: nameCntrlr.text,
+                                  PRICE: priceCntrlr.text,
+                                  QUANTITY: double.parse(qtyCntrlr.text),
                                   categoryId: categoryId,
                                   taxAmount: _taxAmount(
                                           priceCntrlr.text, taxCntrlr.text)

@@ -7,41 +7,41 @@ import 'package:sqflite_common/sqlite_api.dart';
 
 class CustomerTable extends SqlCommons{
 
-  static const String tableName = 'customers'; //7
+  static const String TABLE_NAME = 'customers'; //7
 
-  static const String localId = 'local_id';
-  static const String serverId = 'id';
-  static const String name = 'name';
-  static const String phone = 'phone';
-  static const String email = 'email';
-  static const String address = 'address';
-  static const String gstNumber = 'gst_number';
-  static const String areaId = 'area_id';
-  static const String userId = 'user_id';
-  static const String companyId = 'company_id';
-  static const String delStatus = 'del_status';
-  static const String dateOfBirth = 'date_of_birth';
-  static const String dateOfAnniversary = 'date_of_anniversary';
-  static const String isUpload = 'is_upload';
+  static const String LOCAL_ID = 'local_id';
+  static const String SERVER_ID = 'id';
+  static const String NAME = 'name';
+  static const String PHONE = 'phone';
+  static const String EMAIL = 'email';
+  static const String ADDRESS = 'address';
+  static const String GST_NUMBER = 'gst_number';
+  static const String AREA_ID = 'area_id';
+  static const String USER_ID = 'user_id';
+  static const String COMPANY_ID = 'company_id';
+  static const String DEL_STATUS = 'del_status';
+  static const String DATE_OF_BIRTH = 'date_of_birth';
+  static const String DATE_OF_ANNIVERSARY = 'date_of_anniversary';
+  static const String IS_UPLOADED = 'is_uploaded';
 
-  static const List<String> columnsName = [
-    localId,
-    serverId,
-    name,
-    phone,
-    email,
-    address,
-    gstNumber,
-    areaId,
-    userId,
-    companyId,
-    delStatus,
-    dateOfBirth,
-    dateOfAnniversary,
-    isUpload
+  static const List<String> COLUMN_NAMES = [
+    LOCAL_ID,
+    SERVER_ID,
+    NAME,
+    PHONE,
+    EMAIL,
+    ADDRESS,
+    GST_NUMBER,
+    AREA_ID,
+    USER_ID,
+    COMPANY_ID,
+    DEL_STATUS,
+    DATE_OF_BIRTH,
+    DATE_OF_ANNIVERSARY,
+    IS_UPLOADED
   ];
 
-  static const List<String> columnsType = [
+  static const List<String> COLUMN_TYPES = [
     SqlCommons.INT_PRIMARYKEY,
     SqlCommons.INTEGER,
     SqlCommons.TEXT,
@@ -59,5 +59,5 @@ class CustomerTable extends SqlCommons{
 
   ];
 
-  CustomerTable(String dbTableName, List<String> dbColumns, List<String> dbColumnsDataTypes, Database database, VerboseBloc bloc) : super(dbTableName, dbColumns, dbColumnsDataTypes, database, bloc);
+  CustomerTable(Database database, VerboseBloc bloc) : super(TABLE_NAME, COLUMN_NAMES, COLUMN_TYPES, database, bloc);
 }

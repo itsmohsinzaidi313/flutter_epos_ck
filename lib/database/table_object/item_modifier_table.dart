@@ -6,33 +6,33 @@ import 'package:sqflite_common/sqlite_api.dart';
 
 class ItemModifierTable extends SqlCommons {
 
-  static const String tableName = 'item_modifiers'; //9
+  static const String TABLE_NAME = 'item_modifiers'; //9
 
-  static const String localId = 'local_id';
-  static const String serverId = 'id';
-  static const String modifierId = 'modifier_id';
-  static const String foodMenuId = 'food_menu_id';
-  static const String userId = 'user_id';
-  static const String outletId = 'outlet_id';
-  static const String companyId = 'company_id';
-  static const String delStatus = 'name';
-  static const String name = 'price';
-  static const String price = 'del_status';
+  static const String LOCAL_ID = 'local_id';
+  static const String SERVER_ID = 'id';
+  static const String MODIFIED_ID = 'modifier_id';
+  static const String FOOD_MENU_ID = 'food_menu_id';
+  static const String USER_ID = 'user_id';
+  static const String OUTLET_ID = 'outlet_id';
+  static const String COMPANY_ID = 'company_id';
+  static const String DEL_STATUS = 'name';
+  static const String NAME = 'price';
+  static const String PRICE = 'del_status';
 
-  static const List<String> columnsName = [
-    localId,
-    serverId,
-    modifierId,
-    foodMenuId,
-    userId,
-    outletId,
-    companyId,
-    delStatus,
-    name,
-    price
+  static const List<String> COLUMN_NAMES = [
+    LOCAL_ID,
+    SERVER_ID,
+    MODIFIED_ID,
+    FOOD_MENU_ID,
+    USER_ID,
+    OUTLET_ID,
+    COMPANY_ID,
+    DEL_STATUS,
+    NAME,
+    PRICE
   ];
 
-  static const List<String> columnsType = [
+  static const List<String> COLUMN_TYPES = [
     SqlCommons.INT_PRIMARYKEY,
     SqlCommons.INTEGER,
     SqlCommons.INTEGER,
@@ -45,5 +45,5 @@ class ItemModifierTable extends SqlCommons {
     SqlCommons.REAL
   ];
 
-  ItemModifierTable(String dbTableName, List<String> dbColumns, List<String> dbColumnsDataTypes, Database database, VerboseBloc bloc) : super(dbTableName, dbColumns, dbColumnsDataTypes, database, bloc);
+  ItemModifierTable(Database database, VerboseBloc bloc) : super(TABLE_NAME, COLUMN_NAMES, COLUMN_TYPES, database, bloc);
 }

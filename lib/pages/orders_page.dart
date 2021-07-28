@@ -131,21 +131,21 @@ class _OrdersScreenState extends State<OrdersScreen>
     final widgetsBuffer = <Widget>[
       getOrdersList(
           order: ordersList.where((e) {
-        if (e.orderType == '1')
+        if (e.ORDER_TYPE == '1')
           return true;
         else
           return false;
       }).toList()),
       getOrdersList(
           order: ordersList.where((e) {
-        if (e.orderType == '2')
+        if (e.ORDER_TYPE == '2')
           return true;
         else
           return false;
       }).toList()),
       getOrdersList(
           order: ordersList.where((e) {
-        if (e.orderType == '3')
+        if (e.ORDER_TYPE == '3')
           return true;
         else
           return false;
@@ -204,18 +204,18 @@ class _OrdersScreenState extends State<OrdersScreen>
                   Divider(),
                   boxTile(title: 'TIME', description: '${order.time}'),
                   Divider(),
-                  order.orderType == '1'
-                      ? boxTile(title: 'TABLE', description: '${order.tableId}')
+                  order.ORDER_TYPE == '1'
+                      ? boxTile(title: 'TABLE', description: '${order.TABLE_ID}')
                       : Container(),
-                  order.orderType != '1'
+                  order.ORDER_TYPE != '1'
                       ? boxTile(title: 'NAME', description: '${order.customer}')
                       : Container(),
-                  order.orderType != '1' ? Divider() : Container(),
-                  order.orderType != '1'
+                  order.ORDER_TYPE != '1' ? Divider() : Container(),
+                  order.ORDER_TYPE != '1'
                       ? boxTile(
                           title: 'CONTACT', description: '${order.contact}')
                       : Container(),
-                  order.orderType != '1' ? Divider() : Container(),
+                  order.ORDER_TYPE != '1' ? Divider() : Container(),
                 ],
               ),
             ),
@@ -283,9 +283,9 @@ class _OrdersScreenState extends State<OrdersScreen>
     return InkWell(
         child: ListTile(
           leading: Text(order.orderNo.toString()),
-          title: order.orderType == '1'
+          title: order.ORDER_TYPE == '1'
               ? Text(
-                  'ORDER#: ${order.orderNo} | TIME: ${order.time} | TABLE: ${order.tableId}',
+                  'ORDER#: ${order.orderNo} | TIME: ${order.time} | TABLE: ${order.TABLE_ID}',
                   style:
                       TextStyle(letterSpacing: 2, fontWeight: FontWeight.bold),
                 )
@@ -300,9 +300,9 @@ class _OrdersScreenState extends State<OrdersScreen>
 
   Widget getListItemExpansion({@required Order order}) {
     return ExpansionTile(
-      title: order.orderType == '1'
+      title: order.ORDER_TYPE == '1'
           ? Text(
-              'ORDER#: ${order.orderNo} | TIME: ${order.time} | TABLE: ${order.tableId}',
+              'ORDER#: ${order.orderNo} | TIME: ${order.time} | TABLE: ${order.TABLE_ID}',
               style: TextStyle(letterSpacing: 2, fontWeight: FontWeight.bold),
             )
           : Text(

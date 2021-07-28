@@ -9,18 +9,22 @@ class Config {
   static const allowDineIn = true;
   static const allowTakeAway = true;
   static const allowDelivery = false;
-  // APIS
+
   static Future<String> get deviceKey async {
     final pref = await SharedPreferences.getInstance();
     return pref.getString('deviceKey') ?? '0';
   }
 
-  static set deviceKey(Future<String> fServerIp) =>
-      SharedPreferences.getInstance().then((pref) =>
-          fServerIp.then((serverIp) => pref.setString('ipAddress', serverIp)));
+  static set deviceKey(Future<String> fdeviceKey) =>
+      SharedPreferences.getInstance().then((pref) => fdeviceKey
+          .then((deviceKey) => pref.setString('deviceKey', deviceKey)));
 
   static User user;
   static String activeStatus = '';
+
+  static const String DATABASE_NAME = 'CloudKitchen.db';
+  static const int DATABASE_VERSION = 1;
+  static const int APP_VERSION = 1;
   static const String URL_PREFIX = 'https://';
   static const String DOMIN = 'clients.devaj.technology/demos';
   static const String URL_COMMONS = '/cloud-kitchen/api';

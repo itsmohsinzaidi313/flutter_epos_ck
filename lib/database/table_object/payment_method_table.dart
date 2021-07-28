@@ -5,27 +5,27 @@ import 'package:sqflite_common/sqlite_api.dart';
 
 class PaymentMethodTable extends SqlCommons{
 
-  static const String tableName = 'payment_methods'; //12
+  static const String TABLE_NAME = 'payment_methods'; //12
 
-  static const String localId = 'local_id';
-  static const String serverId = 'id';
-  static const String name = 'name';
-  static const String description = 'description';
-  static const String userId = 'user_id';
-  static const String companyId = 'company_id';
-  static const String delStatus = 'del_status';
+  static const String LOCAL_ID = 'local_id';
+  static const String SERVER_ID = 'id';
+  static const String NAME = 'name';
+  static const String DESCRIPTION = 'description';
+  static const String USER_ID = 'user_id';
+  static const String COMPANY_ID = 'company_id';
+  static const String DEL_STATUS = 'del_status';
 
-  static const List<String> columnsName = [
-    localId,
-    serverId,
-    name,
-    description,
-    userId,
-    companyId,
-    delStatus
+  static const List<String> COLUMN_NAMES = [
+    LOCAL_ID,
+    SERVER_ID,
+    NAME,
+    DESCRIPTION,
+    USER_ID,
+    COMPANY_ID,
+    DEL_STATUS
   ];
 
-  static const List<String> columnsType = [
+  static const List<String> COLUMN_TYPES = [
     SqlCommons.INT_PRIMARYKEY,
     SqlCommons.INTEGER,
     SqlCommons.TEXT,
@@ -35,5 +35,5 @@ class PaymentMethodTable extends SqlCommons{
     SqlCommons.TEXT,
   ];
 
-  PaymentMethodTable(String dbTableName, List<String> dbColumns, List<String> dbColumnsDataTypes, Database database, VerboseBloc bloc) : super(dbTableName, dbColumns, dbColumnsDataTypes, database, bloc);
+  PaymentMethodTable(Database database, VerboseBloc bloc) : super(TABLE_NAME, COLUMN_NAMES, COLUMN_TYPES, database, bloc);
 }

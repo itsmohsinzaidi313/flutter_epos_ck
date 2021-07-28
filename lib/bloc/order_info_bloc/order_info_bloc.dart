@@ -28,8 +28,8 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
         customerOrder = Order();
         final waiterResponse = await WaiterRepo.repo.waiters;
         final tablesResponse = await TablesRepo.repo.tables;
-        customerOrder.userId = Config.user.id;
-        customerOrder.orderType = (ORDERTYPE.DINE_IN.index + 1).toString();
+        customerOrder.USER_ID = Config.user.LOCAL_ID;
+        customerOrder.ORDER_TYPE = (ORDERTYPE.DINE_IN.index + 1).toString();
         listWaiters = (waiterResponse.data as List<dynamic>)
             .map((e) => Waiter.fromJson(e))
             .toList();
@@ -44,13 +44,13 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
         case ORDERTYPE.DINE_IN:
           final dineIn = ORDERTYPE.DINE_IN;
           if (event is OrderTypeChanged) {
-            customerOrder.orderType = (dineIn.index + 1).toString();
+            customerOrder.ORDER_TYPE = (dineIn.index + 1).toString();
             yield OrderTypeState(type: dineIn);
             yield WaitersState(waiters: listWaiters, type: dineIn);
           } else if (event is WaiterChanged) {
-            customerOrder.waiterId = event.waiter.id;
+            customerOrder.WAITER_ID = event.waiter.LOCAL_ID;
             listWaiters.forEach((e) {
-              if (e.id == event.waiter.id) {
+              if (e.LOCAL_ID == event.waiter.LOCAL_ID) {
                 e.selected = true;
               } else {
                 e.selected = false;
@@ -59,9 +59,9 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
             yield TablesState(tables: listTables, type: dineIn);
           } else if (event is TableChanged) {
             if (!event.table.reserved) {
-              customerOrder.tableId = event.table.id;
+              customerOrder.TABLE_ID = event.table.LOCAL_ID;
               listTables.forEach((e) {
-                if (e.id == event.table.id) {
+                if (e.LOCAL_ID == event.table.LOCAL_ID) {
                   e.selected = true;
                 } else {
                   e.selected = false;
@@ -75,15 +75,15 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
           } else if (event is CoversChanged) {
             customerOrder.covers = event.covers.toString();
           } else if (event is Submit) {
-            if (customerOrder.waiterId == null || customerOrder.waiterId.isEmpty) {
+            if (customerOrder.WAITER_ID == null || customerOrder.WAITER_ID.isEmpty) {
               yield InvalidWaiter(
                   message: 'Please select waiter.', type: dineIn);
             } else if (customerOrder.covers == null ||
                 customerOrder.covers.isEmpty) {
               yield InvalidCovers(
                   message: 'Please enter covers.', type: dineIn);
-            } else if (customerOrder.tableId == null ||
-                customerOrder.tableId.isEmpty) {
+            } else if (customerOrder.TABLE_ID == null ||
+                customerOrder.TABLE_ID.isEmpty) {
               yield InvalidTables(
                   message: 'Please select table.', type: dineIn);
             } else {
@@ -94,7 +94,7 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
         case ORDERTYPE.TAKE_AWAY:
           final takeAway = ORDERTYPE.TAKE_AWAY;
           if (event is OrderTypeChanged) {
-            customerOrder.orderType = (takeAway.index + 1).toString();
+            customerOrder.ORDER_TYPE = (takeAway.index + 1).toString();
             yield OrderTypeState(type: takeAway);
           } else if (event is CustomerChanged) {
             customerOrder.customer = event.customerName;
@@ -120,7 +120,7 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
             } else {
               final response = await CustomerRepo.repo
                   .customer(contact: customerOrder.contact);
-              if (response.status) {
+              if (response.STATUS) {
                 List<Customer> list = (response.data as List<dynamic>)
                     .map((e) => Customer.fromMap(e))
                     .toList();
@@ -144,14 +144,14 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
         case ORDERTYPE.DELIVERY:
           final delivery = ORDERTYPE.DELIVERY;
           if (event is OrderTypeChanged) {
-            customerOrder.orderType = (delivery.index + 1).toString();
+            customerOrder.ORDER_TYPE = (delivery.index + 1).toString();
             yield OrderTypeState(type: delivery);
           } else if (event is CustomerChanged) {
             customerOrder.customer = event.customerName;
           } else if (event is ContactChanged) {
             customerOrder.contact = event.contact;
           } else if (event is AddressChanged) {
-            customerOrder.address = event.address;
+            customerOrder.ADDRESS = event.address;
           } else if (event is SearchCustomer) {
             if (customerOrder.contact == null &&
                 customerOrder.contact.isEmpty) {
@@ -160,7 +160,7 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
             } else {
               final response = await CustomerRepo.repo
                   .customer(contact: customerOrder.contact);
-              if (response.status) {
+              if (response.STATUS) {
                 List<Customer> list = (response.data as List<dynamic>)
                     .map((e) => Customer.fromMap(e))
                     .toList();
@@ -168,7 +168,7 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
                   Customer customer = list.first;
                   customerOrder.customer = customer.name;
                   customerOrder.contact = customer.contact;
-                  customerOrder.address = customer.address;
+                  customerOrder.ADDRESS = customer.address;
                   yield CustomerFound(
                       type: delivery,
                       customer: customer,
@@ -188,8 +188,8 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
                 customerOrder.contact.isEmpty) {
               yield InvalidContact(
                   message: 'Please enter contact number.', type: delivery);
-            } else if (customerOrder.address == null ||
-                customerOrder.address.isEmpty) {
+            } else if (customerOrder.ADDRESS == null ||
+                customerOrder.ADDRESS.isEmpty) {
               yield InvalidAddress(
                   message: 'Please enter address', type: delivery);
             } else {

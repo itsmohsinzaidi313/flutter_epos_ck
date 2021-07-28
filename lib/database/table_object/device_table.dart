@@ -6,31 +6,31 @@ import 'package:sqflite_common/sqlite_api.dart';
 
 class DeviceTable extends SqlCommons{
 
-  static const String tableName = 'devices'; //15
+  static const String TABLE_NAME = 'devices'; //15
 
-  static const String localId = 'local_id';
-  static const String serverId = 'id';
-  static const String outletId = 'outlet_id';
-  static const String companyId = 'company_id';
-  static const String deviceKey = 'device_key';
-  static const String delStatus = 'del_status';
-  static const String isInstalled = 'is_installed';
-  static const String dateAdded = 'date_added';
-  static const String dateModified = 'date_modified';
+  static const String LOCAL_ID = 'local_id';
+  static const String SERVER_ID = 'id';
+  static const String OUTLET_ID = 'outlet_id';
+  static const String COMPANY_ID = 'company_id';
+  static const String DEVICE_KEY = 'device_key';
+  static const String DEL_STATUS = 'del_status';
+  static const String IS_INSTALLED = 'is_installed';
+  static const String DATE_ADDED = 'date_added';
+  static const String DATE_MODIFIED = 'date_modified';
 
-  static const List<String> columnsName = [
-    localId,
-    serverId,
-    outletId,
-    companyId,
-    deviceKey,
-    delStatus,
-    isInstalled,
-    dateAdded,
-    dateModified
+  static const List<String> COLUMN_NAMES = [
+    LOCAL_ID,
+    SERVER_ID,
+    OUTLET_ID,
+    COMPANY_ID,
+    DEVICE_KEY,
+    DEL_STATUS,
+    IS_INSTALLED,
+    DATE_ADDED,
+    DATE_MODIFIED
   ];
 
-  static const List<String> columnsType = [
+  static const List<String> COLUMN_TYPES = [
     SqlCommons.INT_PRIMARYKEY,
     SqlCommons.INTEGER,
     SqlCommons.INTEGER,
@@ -42,5 +42,5 @@ class DeviceTable extends SqlCommons{
     SqlCommons.TEXT
   ];
 
-  DeviceTable(String dbTableName, List<String> dbColumns, List<String> dbColumnsDataTypes, Database database, VerboseBloc bloc) : super(dbTableName, dbColumns, dbColumnsDataTypes, database, bloc);
+  DeviceTable(Database database, VerboseBloc bloc) : super(TABLE_NAME, COLUMN_NAMES, COLUMN_TYPES, database, bloc);
 }

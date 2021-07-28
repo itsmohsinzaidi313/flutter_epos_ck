@@ -61,7 +61,7 @@ Widget itemButton1(BuildContext context, MenuItem item) => Stack(
                     Expanded(
                       flex: 2,
                       child: Text(
-                        item.name.toUpperCase(),
+                        item.NAME.toUpperCase(),
                         textAlign: TextAlign.left,
                         style: GoogleFonts.ubuntuCondensed(
                           color: Colors.grey.shade800,
@@ -76,7 +76,7 @@ Widget itemButton1(BuildContext context, MenuItem item) => Stack(
                       // mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         Text(
-                          'PKR ${double.parse(item.price).toInt().toString()}',
+                          'PKR ${double.parse(item.PRICE).toInt().toString()}',
                           style: GoogleFonts.ubuntuCondensed(
                             color: Colors.red.shade500,
                             fontSize: 12,
@@ -121,7 +121,7 @@ Widget itemButton2(BuildContext context, MenuItem item) => Padding(
           Expanded(
             flex: 2,
             child: Text(
-              item.name.toUpperCase(),
+              item.NAME.toUpperCase(),
               textAlign: TextAlign.center,
               style: GoogleFonts.ubuntuCondensed(
                 color: Colors.grey.shade800,
@@ -137,7 +137,7 @@ Widget itemButton2(BuildContext context, MenuItem item) => Padding(
           ),
           Expanded(
             child: Text(
-              'PKR ${double.parse(item.price).toInt().toString()}',
+              'PKR ${double.parse(item.PRICE).toInt().toString()}',
               style: GoogleFonts.ubuntuCondensed(
                 color: Colors.red.shade500,
                 fontSize: 18,

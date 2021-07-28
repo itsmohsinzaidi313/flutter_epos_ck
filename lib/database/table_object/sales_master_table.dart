@@ -6,93 +6,93 @@ import 'package:sqflite_common/sqlite_api.dart';
 
 class SalesMasterTable extends SqlCommons{
 
-  static const String tableName = 'sales_master';
+  static const String TABLE_NAME = 'sales_master';
 
-  static const String localId = 'local_id';
-  static const String customerId = 'customer_id';
-  static const String saleNo = 'sale_no';
-  static const String totalItems = 'total_items';
-  static const String subTotal = 'sub_total';
-  static const String paidAmount = 'paid_amount';
-  static const String dueAmount = 'due_amount';
-  static const String disc = 'disc';
-  static const String discActual = 'disc_actual';
-  static const String vat = 'vat';
-  static const String totalPayable = 'total_payable';
-  static const String paymentMethodId = 'payment_method_id';
-  static const String closeTime = 'close_time';
-  static const String tableId = 'table_id';
-  static const String totalItemDiscountAmount = 'total_item_discount_amount';
-  static const String subTotalWithDiscount = 'sub_total_with_discount';
-  static const String subTotalDiscountAmount = 'sub_total_discount_amount';
-  static const String totalDiscountAmount = 'total_discount_amount';
-  static const String deliveryCharge = 'delivery_charge';
-  static const String subTotalDiscountValue = 'sub_total_discount_value';
-  static const String subTotalDiscountType = 'sub_total_discount_type';
-  static const String saleDate = 'sale_date';
-  static const String dateTime = 'date_time';
-  static const String orderTime = 'order_time';
-  static const String cookingStartTime = 'cooking_start_time';
-  static const String cookingDoneTime = 'cooking_done_time';
-  static const String modified = 'modified';
-  static const String userId = 'user_id';
-  static const String waiterId = 'waiter_id';
-  static const String outletId = 'outlet_id';
-  static const String orderStatus = 'order_status';
-  static const String orderType = 'order_type';
-  static const String delStatus = 'del_status';
-  static const String saleVatObjects = 'sale_vat_objects';
-  static const String deviceKey = 'device_key';
-  static const String serverId = 'id';
-  static const String companyId = 'company_id';
-  static const String isDelete = 'is_delete';
-  static const String isUpload = 'is_upload';
-  static const String shift = 'shift';
+  static const String LOCAL_ID = 'local_id';
+  static const String CUSTOMER_ID = 'customer_id';
+  static const String SALE_NO = 'sale_no';
+  static const String TOTAL_ITEMS = 'total_items';
+  static const String SUBTOTAL = 'sub_total';
+  static const String PAID_AMOUNT = 'paid_amount';
+  static const String DUE_AMOUNT = 'due_amount';
+  static const String DESCRIPTION = 'disc';
+  static const String DISC_ACTUAL = 'disc_actual';
+  static const String VAT = 'vat';
+  static const String TOTAL_PAYABLE = 'total_payable';
+  static const String PAYMENT_METHOD_ID = 'payment_method_id';
+  static const String CLOSE_TIME = 'close_time';
+  static const String TABLE_ID = 'table_id';
+  static const String TOTAL_ITEM_DISCOUNT_AMOUNT = 'total_item_discount_amount';
+  static const String SUBTOTAL_WITH_DISCOUNT = 'sub_total_with_discount';
+  static const String SUBTOTAL_DISCOUNT_AMOUNT = 'sub_total_discount_amount';
+  static const String TOTAL_DISCOUNT_AMOUNT = 'total_discount_amount';
+  static const String DELIVERY_CHARGE = 'delivery_charge';
+  static const String SUBTOTAL_DISCOUNT_VALUE = 'sub_total_discount_value';
+  static const String SUBTOTAL_DISCOUNT_TYPE = 'sub_total_discount_type';
+  static const String SALE_DATE = 'sale_date';
+  static const String DATETIME = 'date_time';
+  static const String ORDER_TIME = 'order_time';
+  static const String COOKING_START_TIME = 'cooking_start_time';
+  static const String COOKING_DONE_TIME = 'cooking_done_time';
+  static const String MODIFIED = 'modified';
+  static const String USER_ID = 'user_id';
+  static const String WAITER_ID = 'waiter_id';
+  static const String OUTLET_ID = 'outlet_id';
+  static const String ORDER_STATUS = 'order_status';
+  static const String ORDER_TYPE = 'order_type';
+  static const String DEL_STATUS = 'del_status';
+  static const String SALE_VAT_OBJECTS = 'sale_vat_objects';
+  static const String DEVICE_KEY = 'device_key';
+  static const String SERVER_ID = 'id';
+  static const String COMPANY_ID = 'company_id';
+  static const String IS_DELETED = 'is_delete';
+  static const String IS_UPLOADED = 'is_uploaded';
+  static const String SHIFT = 'shift';
 
-  static const List<String> columnsName = [
-    localId,
-    customerId,
-    saleNo,
-    totalItems,
-    subTotal,
-    paidAmount,
-    dueAmount,
-    disc,
-    discActual,
-    vat,
-    totalPayable,
-    paymentMethodId,
-    closeTime,
-    tableId,
-    totalItemDiscountAmount,
-    subTotalWithDiscount,
-    subTotalDiscountAmount,
-    totalDiscountAmount,
-    deliveryCharge,
-    subTotalDiscountValue,
-    subTotalDiscountType,
-    saleDate,
-    dateTime,
-    orderTime,
-    cookingStartTime,
-    cookingDoneTime,
-    modified,
-    userId,
-    waiterId,
-    outletId,
-    orderStatus,
-    orderType,
-    delStatus,
-    saleVatObjects,
-    deviceKey,
-    serverId,
-    companyId,
-    isDelete,
-    isUpload,
-    shift
+  static const List<String> COLUMN_NAMES = [
+    LOCAL_ID,
+    CUSTOMER_ID,
+    SALE_NO,
+    TOTAL_ITEMS,
+    SUBTOTAL,
+    PAID_AMOUNT,
+    DUE_AMOUNT,
+    DESCRIPTION,
+    DISC_ACTUAL,
+    VAT,
+    TOTAL_PAYABLE,
+    PAYMENT_METHOD_ID,
+    CLOSE_TIME,
+    TABLE_ID,
+    TOTAL_ITEM_DISCOUNT_AMOUNT,
+    SUBTOTAL_WITH_DISCOUNT,
+    SUBTOTAL_DISCOUNT_AMOUNT,
+    TOTAL_DISCOUNT_AMOUNT,
+    DELIVERY_CHARGE,
+    SUBTOTAL_DISCOUNT_VALUE,
+    SUBTOTAL_DISCOUNT_TYPE,
+    SALE_DATE,
+    DATETIME,
+    ORDER_TIME,
+    COOKING_START_TIME,
+    COOKING_DONE_TIME,
+    MODIFIED,
+    USER_ID,
+    WAITER_ID,
+    OUTLET_ID,
+    ORDER_STATUS,
+    ORDER_TYPE,
+    DEL_STATUS,
+    SALE_VAT_OBJECTS,
+    DEVICE_KEY,
+    SERVER_ID,
+    COMPANY_ID,
+    IS_DELETED,
+    IS_UPLOADED,
+    SHIFT
   ];
 
-    static const List<String> columnsType = [
+    static const List<String> COLUMN_TYPES = [
       SqlCommons.INT_PRIMARYKEY,
       SqlCommons.INTEGER,
       SqlCommons.INTEGER,
@@ -135,5 +135,5 @@ class SalesMasterTable extends SqlCommons{
       SqlCommons.TEXT
     ];
 
-  SalesMasterTable(String dbTableName, List<String> dbColumns, List<String> dbColumnsDataTypes, Database database, VerboseBloc bloc) : super(dbTableName, dbColumns, dbColumnsDataTypes, database, bloc);
+  SalesMasterTable(Database database, VerboseBloc bloc) : super(TABLE_NAME, COLUMN_NAMES, COLUMN_TYPES, database, bloc);
 }

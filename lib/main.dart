@@ -1,19 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:pos_app/bloc/verbose_bloc/verbose_bloc.dart';
 import 'package:pos_app/routes/app_routes.dart';
 import 'pages/splash_page.dart';
 import './shared/config.dart';
 
-
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   //Screen orientation set to landscape
-  SystemChrome.setPreferredOrientations(
-          [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight])
-      .then((_) {
-    runApp(App(appRoutes: AppRoutes(),));
-  });
+  await SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
+  runApp(App(
+    appRoutes: AppRoutes(verboseBloc: VerboseBloc()),
+  ));
 }
 
 class App extends StatefulWidget {

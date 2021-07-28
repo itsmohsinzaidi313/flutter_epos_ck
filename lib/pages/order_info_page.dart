@@ -252,7 +252,7 @@ class DineInLayout extends StatelessWidget {
                     bottom: 2,
                     left: 2,
                     child: Text(
-                      listWaiters[index].name.toUpperCase(),
+                      listWaiters[index].NAME.toUpperCase(),
                       style: GoogleFonts.ubuntuCondensed(
                         color: listWaiters[index].selected
                             ? Colors.black
@@ -308,7 +308,7 @@ class DineInLayout extends StatelessWidget {
                   top: 2,
                   left: 2,
                   child: Text(
-                    listTables[index].tableName,
+                    listTables[index].TABLE_NAME,
                     style: GoogleFonts.ubuntuCondensed(
                       color: Colors.grey.shade900,
                       fontSize: 16,

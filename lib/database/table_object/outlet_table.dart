@@ -6,41 +6,41 @@ import 'package:sqflite_common/sqlite_api.dart';
 
 class OutletTable extends SqlCommons{
 
-  static const String tableName = 'outlet'; //11
+  static const String TABLE_NAME = 'outlet'; //11
 
-  static const String localId = 'local_id';
-  static const String serverId = 'id';
-  static const String outletName = 'outlet_name';
-  static const String outletCode = 'outlet_code';
-  static const String address = 'address';
-  static const String phone = 'phone';
-  static const String invoicePrint = 'invoice_print';
-  static const String startingDate = 'starting_date';
-  static const String invoiceFooter = 'invoice_footer';
-  static const String collectTax = 'collect_tax';
-  static const String preOrPostOrder = 'pre_or_post_payment';
-  static const String userId = 'user_id';
-  static const String companyId = 'company_id';
-  static const String delStatus = 'del_status';
+  static const String LOCAL_ID = 'local_id';
+  static const String SERVER_ID = 'id';
+  static const String OUTLET_NAME = 'outlet_name';
+  static const String OUTLET_CODE = 'outlet_code';
+  static const String ADDRESS = 'address';
+  static const String PHONE = 'phone';
+  static const String INVOICE_PRINT = 'invoice_print';
+  static const String STARTING_DATE = 'starting_date';
+  static const String INVOICE_FOOTER = 'invoice_footer';
+  static const String COLLECT_TAX = 'collect_tax';
+  static const String PRE_OR_POST_ORDER = 'pre_or_post_payment';
+  static const String USER_ID = 'user_id';
+  static const String COMPANY_ID = 'company_id';
+  static const String DEL_STATUS = 'del_status';
 
-  static const List<String> columnsName = [
-    localId,
-    serverId,
-    outletName,
-    outletCode,
-    address,
-    phone,
-    invoicePrint,
-    startingDate,
-    invoiceFooter,
-    collectTax,
-    preOrPostOrder,
-    userId,
-    companyId,
-    delStatus
+  static const List<String> COLUMN_NAMES = [
+    LOCAL_ID,
+    SERVER_ID,
+    OUTLET_NAME,
+    OUTLET_CODE,
+    ADDRESS,
+    PHONE,
+    INVOICE_PRINT,
+    STARTING_DATE,
+    INVOICE_FOOTER,
+    COLLECT_TAX,
+    PRE_OR_POST_ORDER,
+    USER_ID,
+    COMPANY_ID,
+    DEL_STATUS
   ];
 
-  static const List<String> columnsType = [
+  static const List<String> COLUMN_TYPES = [
     SqlCommons.INT_PRIMARYKEY,
     SqlCommons.INTEGER,
     SqlCommons.TEXT,
@@ -59,5 +59,5 @@ class OutletTable extends SqlCommons{
 
   ];
 
-  OutletTable(String dbTableName, List<String> dbColumns, List<String> dbColumnsDataTypes, Database database, VerboseBloc bloc) : super(dbTableName, dbColumns, dbColumnsDataTypes, database, bloc);
+  OutletTable(Database database, VerboseBloc bloc) : super(TABLE_NAME, COLUMN_NAMES, COLUMN_TYPES, database, bloc);
 }

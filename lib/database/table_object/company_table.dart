@@ -6,43 +6,43 @@ import 'package:sqflite_common/sqlite_api.dart';
 
 class CompanyTable extends SqlCommons{
 
-  static const String tableName = 'company'; //6
+  static const String TABLE_NAME = 'company'; //6
 
-  static const String localId = 'local_id';
-  static const String serverId = 'id';
-  static const String currency = 'currency';
-  static const String timezone = 'timezone';
-  static const String dateFormat = 'date_format';
-  static const String outletId = 'outlet_id';
-  static const String name = 'name';
-  static const String email = 'email';
-  static const String phone1 = 'phone_1';
-  static const String phone2 = 'phone_2';
-  static const String address = 'address';
-  static const String status = 'status';
-  static const String dateAdded = 'date_added';
-  static const String expiryDate = 'expiry_date';
-  static const String token = 'token';
+  static const String LOCAL_ID = 'local_id';
+  static const String SERVER_ID = 'id';
+  static const String CURRENCY = 'currency';
+  static const String TIMEZONE = 'timezone';
+  static const String DATEFORMAT = 'date_format';
+  static const String OUTLET_ID = 'outlet_id';
+  static const String NAME = 'name';
+  static const String EMAIL = 'email';
+  static const String PHONE1 = 'phone_1';
+  static const String PHONE2 = 'phone_2';
+  static const String ADDRESS = 'address';
+  static const String STATUS = 'status';
+  static const String DATE_ADDED = 'date_added';
+  static const String EXPIRY_DATE = 'expiry_date';
+  static const String TOKEN = 'token';
 
-  static const List<String> columnsName = [
-    localId,
-    serverId,
-    currency,
-    timezone,
-    dateFormat,
-    outletId,
-    name,
-    email,
-    phone1,
-    phone2,
-    address,
-    status,
-    dateAdded,
-    expiryDate,
-    token
+  static const List<String> COLUMN_NAMES = [
+    LOCAL_ID,
+    SERVER_ID,
+    CURRENCY,
+    TIMEZONE,
+    DATEFORMAT,
+    OUTLET_ID,
+    NAME,
+    EMAIL,
+    PHONE1,
+    PHONE2,
+    ADDRESS,
+    STATUS,
+    DATE_ADDED,
+    EXPIRY_DATE,
+    TOKEN
   ];
 
-  static const List<String> columnsType = [
+  static const List<String> COLUMN_TYPES = [
     SqlCommons.INT_PRIMARYKEY,
     SqlCommons.INTEGER,
     SqlCommons.TEXT,
@@ -60,5 +60,5 @@ class CompanyTable extends SqlCommons{
     SqlCommons.TEXT,
   ];
 
-  CompanyTable(String dbTableName, List<String> dbColumns, List<String> dbColumnsDataTypes, Database database, VerboseBloc bloc) : super(dbTableName, dbColumns, dbColumnsDataTypes, database, bloc);
+  CompanyTable(Database database, VerboseBloc bloc) : super(TABLE_NAME, COLUMN_NAMES, COLUMN_TYPES, database, bloc);
 }
