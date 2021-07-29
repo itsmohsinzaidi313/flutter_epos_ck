@@ -539,14 +539,6 @@ class PosScreen extends StatelessWidget {
         return Card(
           elevation: 4,
           child: ListTile(
-            // leading: CircleAvatar(
-            //   backgroundColor: Colors.yellow.shade700,
-            //   radius: 16,
-            //   child: CircleAvatar(
-            //     radius: 14,
-            //     backgroundImage: AssetImage('assets/no_image1.jpg'),
-            //   ),
-            // ),
             title: Text(
               item.name.toUpperCase(),
               style: GoogleFonts.ubuntuCondensed(
@@ -585,14 +577,6 @@ class PosScreen extends StatelessWidget {
                               code: int.parse(item.code),
                               itemId: int.parse(item.id))),
                     ),
-                    // Text(
-                    //   item.quantity.toString(),
-                    //   style: TextStyle(
-                    //     color: Colors.grey.shade900,
-                    //     fontSize: 12,
-                    //     fontWeight: FontWeight.bold,
-                    //   ),
-                    // ),
                     Container(
                       width: Config.getDeviceWidth(context) * 0.05,
                       child: Row(
@@ -705,13 +689,7 @@ class PosScreen extends StatelessWidget {
       suggestionsCallback: (pattern) async {
         List<MenuItem> list = [];
         if (pattern != '') {
-          final serverResponse =
-              await MenuItemRepo.repo.searchItems(phrase: pattern);
-          if (serverResponse.status) {
-            for (var item in (serverResponse.data as List)) {
-              list.add(MenuItem.fromJson(item));
-            }
-          }
+          list = (await MenuItemRepo.repo.searchItems(phrase: pattern)) ?? [];
         }
         return list;
       },

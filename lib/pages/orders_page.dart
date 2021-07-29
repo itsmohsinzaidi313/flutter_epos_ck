@@ -9,7 +9,7 @@ import 'package:pos_app/shared/app_theme.dart';
 import 'package:pos_app/shared/config.dart';
 
 class OrdersScreen extends StatefulWidget {
-  final List<Order> ordersList;
+  List<Order> ordersList;
   OrdersScreen({@required this.ordersList});
 
   final enablePayment = false;
@@ -97,8 +97,7 @@ class _OrdersScreenState extends State<OrdersScreen>
       body: Container(
         child: TabBarView(
           controller: tabController,
-          children:
-              getTabWidgets(),
+          children: getTabWidgets(),
           //     [
           //   getOrdersList(
           //       order: ordersList.where((e) {

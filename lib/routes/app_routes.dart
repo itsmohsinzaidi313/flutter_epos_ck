@@ -7,7 +7,6 @@ import 'package:pos_app/bloc/payment_bloc/payment_bloc.dart';
 import 'package:pos_app/bloc/pos_bloc/pos_bloc.dart';
 import 'package:pos_app/bloc/report_bloc/report_bloc.dart';
 import 'package:pos_app/models/customer_order.dart';
-import 'package:pos_app/pages/feedback_page.dart';
 import 'package:pos_app/pages/login_page.dart';
 import 'package:pos_app/pages/menu_pages/menu_page.dart';
 import 'package:pos_app/pages/order_info_page.dart';
@@ -86,14 +85,7 @@ class AppRoutes {
       case '/orders':
         return MaterialPageRoute(
           builder: (context) =>
-              OrdersScreen(ordersList: routeSettings.arguments),
-        );
-        break;
-      case '/feedback':
-        return MaterialPageRoute(
-          builder: (context) => FeedbackScreen(
-            order: routeSettings.arguments,
-          ),
+              OrdersScreen(),
         );
         break;
       case '/reports':

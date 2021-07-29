@@ -29,16 +29,16 @@ class MenuPageButtons {
             try {
               AppTheme.snackbar(
                   context, 'Loading pending orders please wait...');
-              OrderRepo.repo.getOrders(type: '0').then((response) {
-                if (response.status) {
-                  List<Order> ordersList = (response.data as List<dynamic>)
-                      .map((e) => Order.fromJson(e))
-                      .toList();
+              // OrderRepo.repo.getOrders(type: '0').then((response) {
+              //   if (response.status) {
+              //     List<Order> ordersList = (response.data as List<dynamic>)
+              //         .map((e) => Order.fromJson(e))
+              //         .toList();
                   Navigator.of(context)
-                      .pushNamed('/orders', arguments: ordersList);
-                } else {
-                  AppTheme.snackbar(context, response.message);
-                }
+                      .pushNamed('/orders');
+                // } else {
+                //   AppTheme.snackbar(context, response.message);
+                // }
               }).catchError((e) => AppTheme.snackbar(context, e.toString(),
                   textColor: Colors.red));
             } catch (e) {
