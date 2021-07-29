@@ -12,8 +12,8 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   String username;
   String password;
-  String ipAddress;
-  TextEditingController ipController;
+  String deviceKey;
+  TextEditingController dKeyController;
 
   bool _obscureText = true;
   bool isLoading = false;
@@ -33,7 +33,7 @@ class _LoginScreenState extends State<LoginScreen> {
   void initState() {
     super.initState();
     context.read<LoginBloc>().add(LoginInit());
-    ipController = TextEditingController();
+    dKeyController = TextEditingController();
   }
 
   @override
@@ -43,9 +43,9 @@ class _LoginScreenState extends State<LoginScreen> {
       body: BlocListener<LoginBloc, LoginState>(
         listener: (context, state) async {
           if (state is LoginBlocInitial) {
-            Config.serverIp = Future.value(state.ipAddress);
-            ipController.text = (await Config.serverIp) ?? '';
-            ipAddress = ipController.text;
+            Config.deviceKey = Future.value(state.deviceKey);
+            dKeyController.text = (await Config.deviceKey) ?? '';
+            deviceKey = dKeyController.text;
             AppTheme.snackbar(context, state.message);
           } else if (state is ValidSubmission) {
             AppTheme.snackbar(context, state.message);
@@ -57,9 +57,9 @@ class _LoginScreenState extends State<LoginScreen> {
             AppTheme.snackbar(context, state.message, textColor: Colors.red);
           } else if (state is InvalidSubmission) {
             AppTheme.snackbar(context, state.message);
-          } else if (state is ValidIpAddress) {
+          } else if (state is ValidDevicekey) {
             AppTheme.snackbar(context, state.message);
-          } else if (state is InvalidIpAddress) {
+          } else if (state is InvalidDeviceKey) {
             AppTheme.snackbar(context, state.message);
           }
         },
@@ -160,17 +160,17 @@ class _LoginScreenState extends State<LoginScreen> {
                                                 ),
                                               ),
                                               child: TextField(
-                                                controller: ipController,
+                                                controller: dKeyController,
                                                 enabled: true,
                                                 decoration: InputDecoration(
                                                   icon: Icon(Icons.computer),
                                                   border: InputBorder.none,
-                                                  labelText: 'Ip Address',
+                                                  labelText: 'Device Key',
                                                   labelStyle: TextStyle(
                                                     color: Colors.grey[400],
                                                   ),
                                                   errorText:
-                                                      state is InvalidIpAddress
+                                                      state is InvalidDeviceKey
                                                           ? 'Required'
                                                           : null,
                                                 ),
@@ -178,7 +178,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                                     TextInputAction.next,
                                                 keyboardType: TextInputType.url,
                                                 onChanged: (value) =>
-                                                    ipAddress = value,
+                                                    deviceKey = value,
                                               ),
                                             ),
                                           ),
@@ -186,8 +186,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                             child: Text('SUBMIT'),
                                             onPressed: () => context
                                                 .read<LoginBloc>()
-                                                .add(IpAddressChanged(
-                                                    ipaddress: ipAddress)),
+                                                .add(DeviceKeyChanged(
+                                                    deviceKey: deviceKey)),
                                           )
                                         ],
                                       ),
@@ -292,7 +292,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                       onTap: () {
                                         context.read<LoginBloc>().add(
                                             LoginPressed(
-                                                ipaddress: ipAddress ?? '',
+                                                deviceKey: deviceKey ?? '',
                                                 username: username ?? '',
                                                 password: password ?? ''));
                                       },

@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'package:meta/meta.dart';
 import 'package:bloc/bloc.dart';
-import 'package:pos_app/models/objects/customer_order.dart';
-import 'package:pos_app/models/objects/menu_item.dart';
+import 'package:pos_app/objects/customer_order.dart';
+import 'package:pos_app/objects/menu_item.dart';
 
 part 'payment_event.dart';
 part 'payment_state.dart';

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pos_app/bloc/order_info_bloc/order_info_bloc.dart';
-import 'package:pos_app/models/objects/waiter.dart';
+import 'package:pos_app/objects/waiter.dart';
 import '../shared/app_theme.dart';
 import '../shared/config.dart';
-import '../models/objects/customer_table.dart' as t;
+import '../objects/customer_table.dart' as t;
 import 'package:google_fonts/google_fonts.dart';
 
 import 'widgets/app_widgets.dart';

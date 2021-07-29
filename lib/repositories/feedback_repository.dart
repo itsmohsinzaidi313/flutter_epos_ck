@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:http/http.dart';
-import 'package:pos_app/models/objects/feedback.dart';
-import 'package:pos_app/models/objects/server_response.dart';
+import 'package:pos_app/objects/feedback.dart';
+import 'package:pos_app/objects/server_response.dart';
 import 'package:pos_app/shared/config.dart';
 
 class FeedbackRepo {

@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:pos_app/shared/config.dart';
 import 'package:http/http.dart';
-import 'package:pos_app/models/objects/server_response.dart';
+import 'package:pos_app/objects/server_response.dart';
 
 class WaiterRepo {
   static WaiterRepo repo = WaiterRepo._internal();

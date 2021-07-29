@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:pos_app/models/objects/menu_item.dart';
+import 'package:pos_app/objects/menu_item.dart';
 import 'package:pos_app/shared/config.dart';
 
 Widget itemButton1(BuildContext context, MenuItem item) => Stack(

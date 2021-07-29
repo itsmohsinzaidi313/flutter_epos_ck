@@ -1,7 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:pos_app/models/objects/menu_item.dart';
+import 'package:pos_app/objects/menu_item.dart';
 import 'package:pos_app/shared/config.dart';
 
 const double _WIDTH_FACTOR = 0.6;

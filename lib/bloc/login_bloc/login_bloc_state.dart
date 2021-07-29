@@ -4,19 +4,19 @@ part of 'login_bloc.dart';
 abstract class LoginState {}
 
 class LoginBlocInitial extends LoginState {
-  final String ipAddress;
+  final String deviceKey;
   final String message;
-  LoginBlocInitial({this.ipAddress, this.message});
+  LoginBlocInitial({this.deviceKey, this.message});
 }
 
-class ValidIpAddress extends LoginState {
+class ValidDevicekey extends LoginState {
   final String message;
-  ValidIpAddress({@required this.message});
+  ValidDevicekey({@required this.message});
 }
 
-class InvalidIpAddress extends LoginState {
+class InvalidDeviceKey extends LoginState {
   final String message;
-  InvalidIpAddress({@required this.message});
+  InvalidDeviceKey({@required this.message});
 }
 
 class ValidUsername extends LoginState {}

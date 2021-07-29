@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:pos_app/models/objects/user.dart';
+import 'package:pos_app/objects/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Config {
@@ -9,45 +9,45 @@ class Config {
   static const allowDineIn = true;
   static const allowTakeAway = true;
   static const allowDelivery = false;
-  // APIS
-  static Future<String> get serverIp async {
+
+  static Future<String> get deviceKey async {
     final pref = await SharedPreferences.getInstance();
-    return pref.getString('ipAddress') ?? '';
+    return pref.getString('deviceKey') ?? '0';
   }
 
-  static set serverIp(Future<String> fServerIp) =>
-      SharedPreferences.getInstance().then((pref) =>
-          fServerIp.then((serverIp) => pref.setString('ipAddress', serverIp)));
+  static set deviceKey(Future<String> fdeviceKey) =>
+      SharedPreferences.getInstance().then((pref) => fdeviceKey
+          .then((deviceKey) => pref.setString('deviceKey', deviceKey)));
 
   static User user;
-  static Future<String> get _apiCommon async =>
-      'http://${await serverIp}/api/pos';
+  static String activeStatus = '';
 
-  static Future<String> get getLoginApi async => '${await _apiCommon}/Login';
-  static Future<String> get getCategoryApi async =>
-      '${await _apiCommon}/Category';
-  static Future<String> get getItemsApi async => '${await _apiCommon}/Item';
-  static Future<String> get getTablesApi async => '${await _apiCommon}/Table';
-  static Future<String> get getWaitersApi async =>
-      '${await _apiCommon}/Waiters';
-  static Future<String> get getOrdersApi async => '${await _apiCommon}/Order';
-  static Future<String> get getCustomerApi async =>
-      '${await _apiCommon}/Customer';
-  static Future<String> get getUsersApi async => '${await _apiCommon}/User';
-  static Future<String> get postFeedbackApi async =>
-      '${await _apiCommon}/Feedback';
-  static Future<String> get checkServerApi async =>
-      '${await _apiCommon}/Status';
+  static const String DATABASE_NAME = 'CloudKitchen.db';
+  static const int DATABASE_VERSION = 1;
+  static const int APP_VERSION = 1;
+  static const String URL_PREFIX = 'https://';
+  static const String DOMIN = 'clients.devaj.technology/demos';
+  static const String URL_COMMONS = '/cloud-kitchen/api';
 
-  static String _authToken;
-  static set authToken(String value) => _authToken = value;
-  static String get authToken => _authToken;
-  static String activeStatus = 'Online';
-  static const int SCREEN_START_TIME = 3;
-  static const int SNACKBAR_TIMEOUT = 1;
-  static const int SERVER_TIMEOUT = 30;
+  static String _authToken = '';
+  static set authToken(String value) => _authToken = '?auth=$value';
 
-  static const int serviceCycleDelay = 5; //SECONDS
+  static String installApi =
+      '$URL_PREFIX$DOMIN$URL_COMMONS/install$_authToken&sale_limit=20&expense_limit=20';
+  static String addUpdateOrderApi =
+      '$URL_PREFIX$DOMIN$URL_COMMONS/order$_authToken';
+  static String customerUploadApi =
+      '$URL_PREFIX$DOMIN$URL_COMMONS/customer$_authToken';
+  static String openRegisterApi =
+      '$URL_PREFIX$DOMIN$URL_COMMONS/openRegister$_authToken';
+  static String closeRegisterApi =
+      '$URL_PREFIX$DOMIN$URL_COMMONS/closeRegister$_authToken';
+  static String shiftApi = '$URL_PREFIX$DOMIN$URL_COMMONS/shift$_authToken';
+
+  static const int SPLASH_DURATION = 3; //SECONDS
+  static const int SNACKBAR_TIMEOUT = 1; //SECONDS
+  static const int SERVER_TIMEOUT = 30; //SECONDS
+  static const int SERVICE_CYCLE_DELAY = 5; //SECONDS
 
   static double getDeviceWidth(BuildContext context) =>
       MediaQuery.of(context).size.width;

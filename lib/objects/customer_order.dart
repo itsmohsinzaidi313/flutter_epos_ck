@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 import 'package:pos_app/bloc/payment_bloc/payment_bloc.dart';
-import 'package:pos_app/models/objects/menu_item.dart';
+import 'package:pos_app/objects/menu_item.dart';
 
 class Order {
   static const _OrderIdKey = 'Id';

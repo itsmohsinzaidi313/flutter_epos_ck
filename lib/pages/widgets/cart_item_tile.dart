@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pos_app/bloc/pos_bloc/pos_bloc.dart';
-import 'package:pos_app/models/objects/menu_item.dart';
+import 'package:pos_app/objects/menu_item.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 Widget cartMenuItem(BuildContext context, List<MenuItem> items, int index, Animation<double> animation) => Card(

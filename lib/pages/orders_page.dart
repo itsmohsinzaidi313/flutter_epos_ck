@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:pos_app/models/objects/customer_order.dart';
-import 'package:pos_app/models/objects/server_response.dart';
+import 'package:pos_app/objects/customer_order.dart';
+import 'package:pos_app/objects/server_response.dart';
 import 'package:pos_app/repositories/order_repository.dart';
 import 'package:pos_app/shared/app_theme.dart';
 import 'package:pos_app/shared/config.dart';
