@@ -8,6 +8,5 @@ class CategoryRepo {
 
   CategoryRepo._internal();
 
-  Future<ServerResponse> get rawCategories async =>
-      ServerResponse(response: await get(await Config.getCategoryApi).timeout(Duration(seconds: Config.SERVER_TIMEOUT), onTimeout: () => null));
+  Future<List<Category>> rawCategories() async => [];
 }

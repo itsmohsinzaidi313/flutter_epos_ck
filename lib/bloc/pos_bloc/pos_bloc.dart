@@ -30,15 +30,9 @@ class POSBloc extends Bloc<POSEvents, POSState> {
         if (customerOrder == null) {
           customerOrder = Order();
         }
-        final cateResponse = await CategoryRepo.repo.rawCategories;
-        final itemResponse = await MenuItemRepo.repo.allItems();
         try {
-          listCategories = (cateResponse.data as List<dynamic>)
-              .map((e) => Category.fromJson(e))
-              .toList();
-          listItems = (itemResponse.data as List<dynamic>)
-              .map((e) => MenuItem.fromJson(e))
-              .toList();
+        listCategories = await CategoryRepo.repo.rawCategories();
+        listItems = await MenuItemRepo.repo.allItems();
         } catch (e) {
           yield POSError(message: e.toString());
         }
