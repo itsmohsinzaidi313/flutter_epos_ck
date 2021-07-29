@@ -10,23 +10,26 @@ import 'package:pos_app/shared/config.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:pos_app/database/table_object/database_tables.dart';
 
+/// Provides interface for database operations
+/// Execute [initialize] once to initialize local database
+/// Use [getDatabase] to get database instance for database operations after executing [initialize] once
 class LocalDatabase {
-  /// EXECUTE [initialize] FIRST
   static LocalDatabase database = LocalDatabase._internal();
   LocalDatabase._internal();
 
   Database _database;
   VerboseBloc _bloc;
 
-  /// USE AFTER USING [initialize] ONCE
-  /// OTHERWISE PROVIDE [VerboseBloc] INSTANCE
-  /// THIS WILL FIRST EXECUTE [initialize] THEN PROVIDE A DATABASE INSTANCE
+  /// Use after using [initialize] once
+  /// Otherwise provide [VerboseBloc] instance
+  /// This will first execute [initialize] then provide a database instance
   Future<Database> getDatabase({VerboseBloc bloc}) async =>
       await initialize(verboseBloc: bloc);
 
-  /// CREATES/UPDATES DATABASE AND PROVIDES A DATABASE INSTANCE
-  /// RECOMMENDED TO BE USED ONLY ONCE
-  /// USE [getDatabase] THROUGHOUT THE APP TO GET AN INSTANCE FOR DATABASE OPERATIONS
+  /// Creates/Updates database and provides a database instance
+  /// It is recommended to be used only once
+  /// Use [getDatabase] throughout the App
+  /// To get an instance for database operations
   Future<Database> initialize({@required VerboseBloc verboseBloc}) async {
     _bloc ??= verboseBloc;
 
@@ -41,6 +44,11 @@ class LocalDatabase {
     } else {
       throw Exception('Storage access permission is required.');
     }
+  }
+
+  
+  Future<void> reinstall() async {
+
   }
 
   Future<Database> _openDb() async =>
@@ -77,30 +85,51 @@ class LocalDatabase {
         VatAmountTable(db, bloc),
       ];
 
-  FutureOr<void> _onCreate(Database db, int version) {
-    if (version == 0) {
-      log('DATABASE CREATED. VERSION: $version', name: 'onCreate');
-      for (var table in _tables(db, _bloc)) {
-        table.create();
-      }
+  Future<void> _createTables(Database db) async {
+    for (var table in _tables(db, _bloc)) {
+      await table.create();
     }
   }
 
-  FutureOr<void> _onUpgrade(Database db, int oldVersion, int newVersion) {
+  Future<void> _deleteTables(Database db) async {
+    for (var table in _tables(db, _bloc)) {
+      await table.deleteTable();
+    }
+  }
+
+  Future<void> _dropTables(Database db) async {
+    for (var table in _tables(db, _bloc)) {
+      await table.drop();
+    }
+  }
+
+  FutureOr<void> _onCreate(Database db, int version) async {
+    if (version == 0) {
+      log('DATABASE CREATED. VERSION: $version', name: 'onCreate');
+      await _createTables(db);
+    }
+  }
+
+  Future<FutureOr<void>> _onUpgrade(
+      Database db, int oldVersion, int newVersion) async {
     if (oldVersion < newVersion) {
       log('DATABASE UPGRADED. VERSION: $oldVersion => $newVersion',
           name: 'onUpgrade');
+      await _dropTables(db);
+      await _createTables(db);
     }
   }
 
-  FutureOr<void> _onDowngrade(Database db, int oldVersion, int newVersion) {
+  Future<FutureOr<void>> _onDowngrade(
+      Database db, int oldVersion, int newVersion) async {
     if (oldVersion > newVersion) {
       log('DATABASE DOWNGRADED. VERSION: $oldVersion => $newVersion',
           name: 'onDownGrade');
+      await _dropTables(db);
+      await _createTables(db);
     }
   }
 
-  FutureOr<void> _onOpen(Database db) {
-    db.getVersion().then((version) => log('Database Version: $version'));
-  }
+  FutureOr<void> _onOpen(Database db) async =>
+      log('Database Version: ${await db.getVersion()}');
 }
