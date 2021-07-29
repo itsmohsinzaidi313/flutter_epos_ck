@@ -2,9 +2,9 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:pos_app/objects/customer_order.dart';
-import 'package:pos_app/objects/feedback.dart';
-import 'package:pos_app/objects/server_response.dart';
+import 'package:pos_app/models/customer_order.dart';
+import 'package:pos_app/models/feedback.dart';
+import 'package:pos_app/models/server_response.dart';
 import 'package:pos_app/shared/app_theme.dart';
 import 'package:pos_app/shared/config.dart';
 import 'package:pos_app/repositories/feedback_repository.dart';

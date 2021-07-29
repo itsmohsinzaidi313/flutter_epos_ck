@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:pos_app/database/local_database.dart';
 import 'package:pos_app/database/tables/database_tables.dart';
-import 'package:pos_app/objects/server_response.dart';
+import 'package:pos_app/models/server_response.dart';
 import 'package:pos_app/repositories/general_repository.dart';
 import 'package:sqflite/sqflite.dart';
 

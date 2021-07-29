@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pos_app/shared/config.dart';
 import 'package:http/http.dart';
-import 'package:pos_app/objects/server_response.dart';
+import 'package:pos_app/models/server_response.dart';
 
 class MenuItemRepo {
   static MenuItemRepo repo = MenuItemRepo._internal();

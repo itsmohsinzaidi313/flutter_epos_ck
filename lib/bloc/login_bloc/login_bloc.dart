@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
-import 'package:pos_app/objects/user.dart';
+import 'package:pos_app/models/user.dart';
 import 'package:pos_app/repositories/login_repository.dart';
 import 'package:pos_app/shared/config.dart';
 import 'package:shared_preferences/shared_preferences.dart';

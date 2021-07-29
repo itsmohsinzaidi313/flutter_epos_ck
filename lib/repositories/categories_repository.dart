@@ -1,6 +1,6 @@
 import 'package:http/http.dart';
-import 'package:pos_app/objects/items_category.dart';
-import 'package:pos_app/objects/server_response.dart';
+import 'package:pos_app/models/items_category.dart';
+import 'package:pos_app/models/server_response.dart';
 import 'package:pos_app/shared/config.dart';
 
 class CategoryRepo {

@@ -1,8 +1,8 @@
 import 'package:meta/meta.dart';
 import 'package:http/http.dart';
-import 'package:pos_app/objects/server_response.dart';
+import 'package:pos_app/models/server_response.dart';
 import 'package:pos_app/shared/config.dart';
-import 'package:pos_app/objects/customer.dart';
+import 'package:pos_app/models/customer.dart';
 
 class CustomerRepo {
   static CustomerRepo repo = CustomerRepo._internal();
