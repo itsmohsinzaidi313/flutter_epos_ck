@@ -1,11 +1,11 @@
 import 'dart:async';
-import 'dart:developer';
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 import 'package:pos_app/models/user.dart';
-import 'package:pos_app/repositories/login_repository.dart';
+import 'package:pos_app/repositories/users_repository.dart';
 import 'package:pos_app/shared/config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite/sqflite.dart';
 part 'login_bloc_event.dart';
 part 'login_bloc_state.dart';
 
@@ -38,43 +38,24 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   ) async* {
     try {
       if (event is LoginInit) {
+        deleteDatabase(Config.DATABASE_NAME);
+        if (!(await databaseExists(Config.DATABASE_NAME))) {
+          yield DatabaseMissing();
+        }
         yield LoginBlocInitial(
             deviceKey: await Config.deviceKey, message: 'Welcome.');
         if (await _loginStatus) {
           yield* attemptLogin(
               username: await _username, password: await _password);
         }
-        // final response = await UsersRepo.repo.users;
-        // if (response.status) {
-        //   yield UsersLoaded(
-        //       list: (response.data as List<dynamic>)
-        //           .map((e) => User.fromJson(e))
-        //           .toList());
-        // } else {}
       } else if (event is DeviceKeyChanged) {
         if (event.deviceKey == '') {
-          yield InvalidDeviceKey(message: 'Ipaddress is required.');
+          yield InvalidDeviceKey(message: 'DeviceKey is required.');
         } else {
           Config.deviceKey = Future.value(event.deviceKey);
-          yield ValidDevicekey(message: 'Server IP saved.');
+          yield ValidDevicekey(message: 'DeviceKey saved.');
         }
-      }
-      //else if (event is UsernameChanged) {
-      //   if (event.username == '') {
-      //     yield InvalidUsername(message: 'Username is required.');
-      //   } else {
-      //     _username = Future.value(event.username);
-      //     yield ValidUsername();
-      //   }
-      // } else if (event is PasswordChanged) {
-      //   if (event.password == '') {
-      //     yield InvalidPassword(message: 'Password is required.');
-      //   } else {
-      //     _password = Future.value(event.password);
-      //     yield ValidPassword();
-      //   }
-      // }
-      else if (event is LoginPressed) {
+      } else if (event is LoginPressed) {
         if (event.username == '' ||
             event.password == '' ||
             event.deviceKey == '') {
@@ -100,13 +81,15 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   Stream<LoginState> attemptLogin({String username, String password}) async* {
     try {
       final status =
-          await LoginRepo.repo.login(email: username, password: password);
+          await UsersRepo.repo.login(email: username, password: password);
       if (status) {
         this._username = Future.value(username);
         this._password = Future.value(password);
         yield LoginSuccessful(message: 'Login successful.');
       } else {
-        yield LoginFailed(message: 'Login failed. Either email/password is invalid or user does not exist.');
+        yield LoginFailed(
+            message:
+                'Login failed. Either email/password is invalid or user does not exist.');
       }
     } catch (e) {
       yield LoginFailed(message: e.toString());

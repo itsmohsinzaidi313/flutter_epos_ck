@@ -1,9 +1,7 @@
 import 'package:pos_app/database/tables/database_tables.dart';
 
 class User {
-  final String id;
-  final String name;
-  final String outletId;
+  String id, name, outletId;
   User({this.id, this.name, this.outletId});
 
   User.fromMap(Map<String, dynamic> map)

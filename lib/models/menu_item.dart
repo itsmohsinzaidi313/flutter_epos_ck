@@ -28,7 +28,7 @@ class MenuItem {
       this.image});
 
   MenuItem.fromMap(Map<String, dynamic> map)
-      : id = map[ItemTable.SERVER_ID],
+      : id = map[ItemTable.SERVER_ID].toString(),
         code = map[ItemTable.CODE],
         categoryId = map[ItemTable.CATEGORY_NAME],
         name = map[ItemTable.NAME],

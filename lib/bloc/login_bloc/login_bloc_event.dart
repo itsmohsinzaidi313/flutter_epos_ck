@@ -9,8 +9,8 @@ class DeviceKeyChanged extends LoginEvent {
 }
 
 class UsernameChanged extends LoginEvent {
-  final String username;
-  UsernameChanged({@required this.username});
+  final String email;
+  UsernameChanged({@required this.email});
 }
 
 class LoginInit extends LoginEvent {
@@ -22,8 +22,8 @@ class PasswordChanged extends LoginEvent {
 }
 
 class SubmitPressed extends LoginEvent {
-  final String ipaddress;
-  SubmitPressed({@required this.ipaddress});
+  final String deviceKey;
+  SubmitPressed({@required this.deviceKey});
 }
 
 class LoginPressed extends LoginEvent {

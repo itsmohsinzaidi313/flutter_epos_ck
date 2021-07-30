@@ -8,8 +8,7 @@ class TablesTable extends SqlCommons{
 
   static const String TABLE_NAME = 'tables';
 
-  static const String RESERVED = 'Reserved';
-  static const String FREE = 'Free';
+  // static const String RESERVED = 'Reserved', FREE = 'Free';
 
   static const String LOCAL_ID = 'local_id';
   static const String SERVER_ID = 'id';
@@ -21,6 +20,7 @@ class TablesTable extends SqlCommons{
   static const String OUTLET_ID = 'outlet_id';
   static const String COMPANY_ID = 'company_id';
   static const String DEL_STATUS = 'del_status';
+  static const String OCCUPIED = 'occupied';
 
   static const List<String> COLUMN_NAMES = [
     LOCAL_ID,
@@ -32,7 +32,8 @@ class TablesTable extends SqlCommons{
     USER_ID,
     OUTLET_ID,
     COMPANY_ID,
-    DEL_STATUS
+    DEL_STATUS,
+    OCCUPIED
   ];
 
   static const List<String> COLUMN_TYPES = [
@@ -45,7 +46,8 @@ class TablesTable extends SqlCommons{
     SqlCommons.INTEGER,
     SqlCommons.INTEGER,
     SqlCommons.INTEGER,
-    SqlCommons.TEXT
+    SqlCommons.TEXT,
+    SqlCommons.INTEGER,
   ];
 
   TablesTable(Database database, VerboseBloc bloc) : super(TABLE_NAME, COLUMN_NAMES, COLUMN_TYPES, database, bloc);

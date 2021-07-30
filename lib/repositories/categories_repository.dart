@@ -1,3 +1,5 @@
+import 'package:pos_app/database/local_database.dart';
+import 'package:pos_app/database/tables/category_table.dart';
 import 'package:pos_app/models/items_category.dart';
 
 class CategoryRepo {
@@ -6,6 +8,9 @@ class CategoryRepo {
   CategoryRepo._internal();
 
   Future<List<Category>> rawCategories() async {
-    return [];
+    final db = await LocalDatabase.database.getDatabase();
+    final list = await db.query(CategoryTable.TABLE_NAME);
+    final categories = list.map((e) => Category.fromMap(e)).toList();
+    return categories;
   }
 }

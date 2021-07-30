@@ -40,23 +40,7 @@ class OrderRepo {
     return list;
   }
 
-  Future<ServerResponse> newOrder({@required Order customerOrder}) async =>
-      ServerResponse(
-        response: await post(await Config.getOrdersApi,
-                headers: {'Content-type': 'application/json'},
-                body:
-                    '"${jsonEncode(customerOrder.toJson).replaceAll('"', '\\"').toString()}"')
-            .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
-                onTimeout: () => null),
-      );
+  Future<bool> newOrder({@required Order customerOrder}) async => true;
 
-  Future<ServerResponse> updateOrder({@required Order customerOrder}) async {
-    log(await Config.getOrdersApi);
-    log('"${jsonEncode(customerOrder.toJson).replaceAll('"', '\\"').toString()}"');
-    return ServerResponse(
-        response: await put(await Config.getOrdersApi,
-            headers: {'Content-type': 'application/json'},
-            body:
-                '"${jsonEncode(customerOrder.toJson).replaceAll('"', '\\"').toString()}"'));
-  }
+  Future<bool> updateOrder({@required Order customerOrder}) async => true;
 }

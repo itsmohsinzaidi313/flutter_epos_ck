@@ -10,6 +10,7 @@ import 'package:pos_app/models/server_response.dart';
 import 'package:pos_app/repositories/categories_repository.dart';
 import 'package:pos_app/repositories/menu_items_repository.dart';
 import 'package:pos_app/repositories/order_repository.dart';
+import 'package:pos_app/repositories/users_repository.dart';
 import 'package:pos_app/shared/config.dart';
 part 'pos_event.dart';
 part 'pos_state.dart';
@@ -31,8 +32,9 @@ class POSBloc extends Bloc<POSEvents, POSState> {
           customerOrder = Order();
         }
         try {
-        listCategories = await CategoryRepo.repo.rawCategories();
-        listItems = await MenuItemRepo.repo.allItems();
+          listCategories = await CategoryRepo.repo.rawCategories();
+          listItems = await MenuItemRepo.repo.allItems();
+          for (var item in listItems) {}
         } catch (e) {
           yield POSError(message: e.toString());
         }
@@ -153,30 +155,32 @@ class POSBloc extends Bloc<POSEvents, POSState> {
         );
       } else if (event is PostOrder) {
         yield POSLoading(message: 'Submitting order please wait...');
-        customerOrder.outletId = Config.user.outletId;
+        customerOrder.outletId =
+            (await UsersRepo.repo.getCurrentUser()).outletId;
         if (isOrderValid(customerOrder)) {
-          ServerResponse response;
+          bool orderStatus = false;
           if (!requestSubmitted) {
             requestSubmitted = true;
             if (customerOrder.editOrder) {
-              response = await OrderRepo.repo
-                  .updateOrder(customerOrder: customerOrder);
+              // TODO:
+              // response = await OrderRepo.repo
+              //     .updateOrder(customerOrder: customerOrder);
             } else {
-              response =
-                  await OrderRepo.repo.newOrder(customerOrder: customerOrder);
+              // response =
+              //     await OrderRepo.repo.newOrder(customerOrder: customerOrder);
             }
             requestSubmitted = false;
           } else {
             yield POSLoading(message: 'Submitting order please wait...');
           }
-          if (response.status) {
+          if (orderStatus) {
             if (customerOrder.editOrder) {
               yield OrderUpdated(message: 'Order Updated');
             } else {
               yield OrderPosted(message: 'Order Saved');
             }
           } else {
-            yield OrderPostFailed(message: response.message);
+            yield OrderPostFailed(message: 'Order cannot be saved.');
           }
         } else {
           yield SubmissionInvalid(

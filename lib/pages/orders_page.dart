@@ -3,30 +3,26 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:pos_app/models/customer_order.dart';
-import 'package:pos_app/models/server_response.dart';
 import 'package:pos_app/repositories/order_repository.dart';
 import 'package:pos_app/shared/app_theme.dart';
 import 'package:pos_app/shared/config.dart';
 
 class OrdersScreen extends StatefulWidget {
-  List<Order> ordersList;
-  OrdersScreen({@required this.ordersList});
-
+  final List<Order> ordersList = [];
   final enablePayment = false;
   final enableOrderDelete = false;
 
   @override
-  _OrdersScreenState createState() =>
-      _OrdersScreenState(ordersList: ordersList);
+  _OrdersScreenState createState() => _OrdersScreenState();
 }
 
 class _OrdersScreenState extends State<OrdersScreen>
     with SingleTickerProviderStateMixin {
-  List<Order> ordersList = [];
   List<Tab> tabs;
   TabController tabController;
 
-  _OrdersScreenState({@required this.ordersList}) {
+  _OrdersScreenState() {
+    widget.ordersList.clear();
     tabs = [];
     Tab dineInTab = Tab(
       child: Text('DINE IN'),
@@ -49,9 +45,11 @@ class _OrdersScreenState extends State<OrdersScreen>
   void updateOrders() async {
     try {
       AppTheme.snackbar(context, 'Refreshing orders...');
-
-      ordersList = await OrderRepo.repo
-          .getOrders( orderType: '0');
+      List<Order> temp = await OrderRepo.repo.getOrders(orderType: '0');
+      widget.ordersList.clear();
+      for (var item in temp) {
+        widget.ordersList.add(item);
+      }
       setState(() {});
     } catch (e) {
       AppTheme.snackbar(context, e.toString(), textColor: Colors.red);
@@ -123,21 +121,21 @@ class _OrdersScreenState extends State<OrdersScreen>
   List<Widget> getTabWidgets() {
     final widgetsBuffer = <Widget>[
       getOrdersList(
-          order: ordersList.where((e) {
+          order: widget.ordersList.where((e) {
         if (e.orderType == '1')
           return true;
         else
           return false;
       }).toList()),
       getOrdersList(
-          order: ordersList.where((e) {
+          order: widget.ordersList.where((e) {
         if (e.orderType == '2')
           return true;
         else
           return false;
       }).toList()),
       getOrdersList(
-          order: ordersList.where((e) {
+          order: widget.ordersList.where((e) {
         if (e.orderType == '3')
           return true;
         else
@@ -206,7 +204,8 @@ class _OrdersScreenState extends State<OrdersScreen>
                   order.orderType != '1' ? Divider() : Container(),
                   order.orderType != '1'
                       ? boxTile(
-                          title: 'CONTACT', description: '${order.customer.contact}')
+                          title: 'CONTACT',
+                          description: '${order.customer.contact}')
                       : Container(),
                   order.orderType != '1' ? Divider() : Container(),
                 ],

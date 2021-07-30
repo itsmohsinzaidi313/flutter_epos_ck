@@ -7,8 +7,8 @@ import 'package:pos_app/models/customer_table.dart';
 import 'package:pos_app/models/waiter.dart';
 import 'package:pos_app/repositories/customer_repository.dart';
 import 'package:pos_app/models/customer.dart';
-import 'package:pos_app/repositories/login_repository.dart';
 import 'package:pos_app/repositories/tables_repository.dart';
+import 'package:pos_app/repositories/users_repository.dart';
 import 'package:pos_app/repositories/waiters_repository.dart';
 
 part 'order_info_event.dart';
@@ -29,7 +29,7 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
         listWaiters = await WaiterRepo.repo.waiters();
         listTables = await TablesRepo.repo.tables();
         customerOrder.userId =
-            (await LoginRepo.repo.getCurrentUserId()).toString();
+            (await UsersRepo.repo.getCurrentUser()).id;
         customerOrder.orderType = (ORDERTYPE.DINE_IN.index + 1).toString();
         yield OrderTypeState(type: ORDERTYPE.DINE_IN);
         yield WaitersState(waiters: listWaiters, type: ORDERTYPE.DINE_IN);

@@ -9,7 +9,7 @@ class GeneralRepo {
   static GeneralRepo repo = GeneralRepo._internal();
   GeneralRepo._internal();
   Future<ServerResponse> getInstallationData() async => ServerResponse(
-      response: await get(Config.installApi).timeout(
+      response: await get(await Config.installApi).timeout(
           Duration(seconds: Config.SERVER_TIMEOUT),
           onTimeout: () => Lib.timeout));
 }

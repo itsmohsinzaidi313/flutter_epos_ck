@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pos_app/bloc/verbose_bloc/verbose_bloc.dart';
 import 'package:pos_app/routes/app_routes.dart';
 import 'pages/splash_page.dart';
 import './shared/config.dart';
@@ -12,7 +14,8 @@ void main() {
   SystemChrome.setPreferredOrientations(
           [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight])
       .then((_) {
-    runApp(App(appRoutes: AppRoutes(),));
+        final bloc = VerboseBloc();
+    runApp(BlocProvider.value(value:bloc, child: App(appRoutes: AppRoutes(verboseBloc: bloc),),));
   });
 }
 

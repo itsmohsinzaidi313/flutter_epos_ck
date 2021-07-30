@@ -7,15 +7,8 @@ class TablesRepo {
   TablesRepo._internal();
   Future<List<Tables>> tables() async {
     final db = await LocalDatabase.database.getDatabase();
-    final userId = (await db.query(UserTable.TABLE_NAME,
-            columns: [UserTable.SERVER_ID],
-            where: '${UserTable.LOGIN_STATUS} = ?',
-            whereArgs: [1])) ??
-        [];
-    final map = (await db.query(TablesTable.TABLE_NAME,
-            where: '${TablesTable.USER_ID} = ?',
-            whereArgs: [userId[0][UserTable.SERVER_ID]])) ??
-        [];
+
+    final map = (await db.query(TablesTable.TABLE_NAME)) ?? [];
     final list = map.map((e) => Tables.fromMap(e)).toList();
     return list;
   }

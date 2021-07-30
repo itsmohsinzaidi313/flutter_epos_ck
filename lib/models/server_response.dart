@@ -10,7 +10,8 @@ class ServerResponse {
 
   final Response response;
   Map<String, dynamic> _map;
-  bool get status => _map[_StatusKey] == true && response.statusCode == 200 ? true : false;
+  bool get status =>
+      _map[_StatusKey] == true && response.statusCode == 200 ? true : false;
   String get message => _map[_MessageKey];
   dynamic get data => _map[_DataKey];
   int get statusCode => response.statusCode;
