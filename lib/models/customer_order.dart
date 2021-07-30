@@ -44,7 +44,7 @@ class Order {
         orderNo = map[SalesMasterTable.SALE_NO].toString(),
         time = map[SalesMasterTable.ORDER_TIME],
         date = map[SalesMasterTable.SALE_DATE],
-        customer = Customer.fromJson(customerMap),
+        customer = Customer.fromMap(customerMap),
         items = itemsList.map((e) => MenuItem.fromMap(e)).toList();
 
   List<MenuItem> get cartItems => items ?? [];

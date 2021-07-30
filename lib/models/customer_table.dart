@@ -8,8 +8,8 @@ class Tables {
 
   Tables({this.id, this.tableName, this.reserved, this.selected});
   Tables.fromMap(Map<String, dynamic> map)
-      : id = map[TablesTable.LOCAL_ID],
+      : id = map[TablesTable.SERVER_ID],
         tableName = map[TablesTable.NAME],
-        reserved = map[TablesTable.FREE],
+        reserved = map[TablesTable.RESERVED],
         selected = false;
 }
