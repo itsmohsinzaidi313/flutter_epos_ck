@@ -6,7 +6,7 @@ class Customer {
   static const String ContactKey = 'Contact';
   static const String AddressKey = 'Address';
 
-  final String id, name, contact, address;
+  String id, name, contact, address;
   Customer({this.id, this.name, this.contact, this.address});
   
   Customer.empty()

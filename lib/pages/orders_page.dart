@@ -22,7 +22,7 @@ class OrdersScreen extends StatefulWidget {
 
 class _OrdersScreenState extends State<OrdersScreen>
     with SingleTickerProviderStateMixin {
-  List<Order> ordersList;
+  List<Order> ordersList = [];
   List<Tab> tabs;
   TabController tabController;
 
@@ -49,16 +49,10 @@ class _OrdersScreenState extends State<OrdersScreen>
   void updateOrders() async {
     try {
       AppTheme.snackbar(context, 'Refreshing orders...');
-      ServerResponse response =
-          await OrderRepo.repo.getOrders(tiltId: Config.user.tiltId, type: '0');
-      if (response.status) {
-        final list = (response.data as List<dynamic>) ?? [];
-        setState(() {
-          ordersList = list.map((e) => Order.fromJson(e)).toList();
-        });
-      } else {
-        AppTheme.snackbar(context, response.message);
-      }
+
+      ordersList = await OrderRepo.repo
+          .getOrders( orderType: '0');
+      setState(() {});
     } catch (e) {
       AppTheme.snackbar(context, e.toString(), textColor: Colors.red);
     }
@@ -212,7 +206,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                   order.orderType != '1' ? Divider() : Container(),
                   order.orderType != '1'
                       ? boxTile(
-                          title: 'CONTACT', description: '${order.contact}')
+                          title: 'CONTACT', description: '${order.customer.contact}')
                       : Container(),
                   order.orderType != '1' ? Divider() : Container(),
                 ],

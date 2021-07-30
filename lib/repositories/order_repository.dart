@@ -2,6 +2,10 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:http/http.dart';
 import 'package:meta/meta.dart';
+import 'package:pos_app/database/local_database.dart';
+import 'package:pos_app/database/models/sales_detail.dart';
+import 'package:pos_app/database/models/sales_master.dart';
+import 'package:pos_app/database/tables/database_tables.dart';
 import 'package:pos_app/models/customer_order.dart';
 import 'package:pos_app/models/server_response.dart';
 import 'package:pos_app/shared/config.dart';
@@ -10,25 +14,41 @@ class OrderRepo {
   static OrderRepo repo = OrderRepo._internal();
   OrderRepo._internal();
 
-  /// Gets order from server
-  /// To get all orders posted from this device pass [tiltId] and set [type] to [0]
-  /// To get single order pass [tiltId], [orderNo] and [orderDate] and set [type] to [1]
-  Future<ServerResponse> getOrders(
-      {String tiltId, String type = '', String orderNo = ''}) async => ServerResponse(
-      response: await get(Uri.parse(
-              '${await Config.getOrdersApi}?tiltId=${tiltId ?? Config.user.tiltId}&type=$type&orderNo=$orderNo'))
-          .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
-              onTimeout: () => null),
-    );
+  /// If no parameters are given list of all orders is returned.
+  /// Provide [orderNo] for a specific order.
+  /// And passing [orderType] only returs type specific orders
+  /// [orderType] for type specific list of orders.
+  /// * 1-Dine-In
+  /// * 2-Take Away
+  /// * 3-Delivery
+  /// If both [orderNo] and [orderType] are given [orderType] is ignored
+  Future<List<Order>> getOrders(
+      {String orderType = '', String orderNo = ''}) async {
+    List<Order> list = [];
+    List<SalesMaster> masters = [];
+    List<SalesDetails> details = [];
+    List<Map<String, dynamic>> listMSDa = [];
+    final db = await LocalDatabase.database.getDatabase();
 
-  Future<ServerResponse> newOrder({@required Order customerOrder}) async => ServerResponse(
-      response: await post(await Config.getOrdersApi,
-              headers: {'Content-type': 'application/json'},
-              body:
-                  '"${jsonEncode(customerOrder.toJson).replaceAll('"', '\\"').toString()}"')
-          .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
-              onTimeout: () => null),
-    );
+    if (orderType != '' && orderNo == '') {
+      listMSDa = (await db
+              .query(SalesMasterTable.TABLE_NAME, where: '', whereArgs: [])) ??
+          [];
+    } else if (orderType == '' && orderNo != '') {
+    } else if (orderType == '' && orderNo == '') {
+    } else if (orderType != '' && orderNo != '') {}
+    return list;
+  }
+
+  Future<ServerResponse> newOrder({@required Order customerOrder}) async =>
+      ServerResponse(
+        response: await post(await Config.getOrdersApi,
+                headers: {'Content-type': 'application/json'},
+                body:
+                    '"${jsonEncode(customerOrder.toJson).replaceAll('"', '\\"').toString()}"')
+            .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
+                onTimeout: () => null),
+      );
 
   Future<ServerResponse> updateOrder({@required Order customerOrder}) async {
     log(await Config.getOrdersApi);

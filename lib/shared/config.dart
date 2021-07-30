@@ -19,7 +19,6 @@ class Config {
       SharedPreferences.getInstance().then((pref) => fdeviceKey
           .then((deviceKey) => pref.setString('deviceKey', deviceKey)));
 
-  static User user;
   static String activeStatus = '';
 
   static const String DATABASE_NAME = 'CloudKitchen.db';

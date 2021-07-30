@@ -25,7 +25,7 @@ class MenuItem {
       this.quantity,
       this.image});
 
-  MenuItem.fromJson(Map<String, dynamic> map)
+  MenuItem.fromMap(Map<String, dynamic> map)
       : id = map[IdKey],
         code = map[CodeKey],
         categoryId = map[CatIdKey],

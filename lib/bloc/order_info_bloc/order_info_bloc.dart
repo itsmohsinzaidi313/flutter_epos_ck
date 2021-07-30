@@ -7,9 +7,9 @@ import 'package:pos_app/models/customer_table.dart';
 import 'package:pos_app/models/waiter.dart';
 import 'package:pos_app/repositories/customer_repository.dart';
 import 'package:pos_app/models/customer.dart';
+import 'package:pos_app/repositories/login_repository.dart';
 import 'package:pos_app/repositories/tables_repository.dart';
 import 'package:pos_app/repositories/waiters_repository.dart';
-import 'package:pos_app/shared/config.dart';
 
 part 'order_info_event.dart';
 part 'order_info_state.dart';
@@ -26,16 +26,11 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
     try {
       if (event is OrderInfoBuild) {
         customerOrder = Order();
-        final waiterResponse = await WaiterRepo.repo.waiters;
-        final tablesResponse = await TablesRepo.repo.tables;
-        customerOrder.userId = Config.user.id;
+        listWaiters = await WaiterRepo.repo.waiters();
+        listTables = await TablesRepo.repo.tables();
+        customerOrder.userId =
+            (await LoginRepo.repo.getCurrentUserId()).toString();
         customerOrder.orderType = (ORDERTYPE.DINE_IN.index + 1).toString();
-        listWaiters = (waiterResponse.data as List<dynamic>)
-            .map((e) => Waiter.fromJson(e))
-            .toList();
-        listTables = (tablesResponse.data as List<dynamic>)
-            .map((e) => Tables.fromJson(e))
-            .toList();
         yield OrderTypeState(type: ORDERTYPE.DINE_IN);
         yield WaitersState(waiters: listWaiters, type: ORDERTYPE.DINE_IN);
       }
@@ -75,7 +70,8 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
           } else if (event is CoversChanged) {
             customerOrder.covers = event.covers.toString();
           } else if (event is Submit) {
-            if (customerOrder.waiterId == null || customerOrder.waiterId.isEmpty) {
+            if (customerOrder.waiterId == null ||
+                customerOrder.waiterId.isEmpty) {
               yield InvalidWaiter(
                   message: 'Please select waiter.', type: dineIn);
             } else if (customerOrder.covers == null ||
@@ -97,16 +93,16 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
             customerOrder.orderType = (takeAway.index + 1).toString();
             yield OrderTypeState(type: takeAway);
           } else if (event is CustomerChanged) {
-            customerOrder.customer = event.customerName;
+            customerOrder.customer.name = event.customerName;
           } else if (event is ContactChanged) {
-            customerOrder.contact = event.contact;
+            customerOrder.customer.contact = event.contact;
           } else if (event is Submit) {
             if (customerOrder.customer == null ||
-                customerOrder.customer.isEmpty) {
+                customerOrder.customer.name.isEmpty) {
               yield InvalidCustomer(
                   message: 'Please enter customer name.', type: takeAway);
-            } else if (customerOrder.contact == null ||
-                customerOrder.contact.isEmpty) {
+            } else if (customerOrder.customer.contact == null ||
+                customerOrder.customer.contact.isEmpty) {
               yield InvalidContact(
                   message: 'Please enter contact number.', type: takeAway);
             } else {
@@ -114,25 +110,25 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
                   customerOrder: customerOrder, type: takeAway);
             }
           } else if (event is SearchCustomer) {
-            if (customerOrder.contact.isEmpty) {
+            if (customerOrder.customer.contact.isEmpty) {
               yield InvalidContact(
                   type: takeAway, message: 'Please enter contact number');
             } else {
-                List<Customer> list = await CustomerRepo.repo
-                  .searchCustomer(contact: customerOrder.contact);
+              List<Customer> list = await CustomerRepo.repo
+                  .searchCustomer(contact: customerOrder.customer.contact);
 
-                if (list.isNotEmpty) {
-                  Customer customer = list.first;
-                  customerOrder.customer = customer.name;
-                  customerOrder.contact = customer.contact;
-                  yield CustomerFound(
-                      type: takeAway,
-                      customer: customer,
-                      message: 'Customer found.');
-                } else {
-                  yield CustomerNotFound(
-                      type: takeAway, message: 'Customer not found');
-                }
+              if (list.isNotEmpty) {
+                Customer customer = list.first;
+                customerOrder.customer.name = customer.name;
+                customerOrder.customer.contact = customer.contact;
+                yield CustomerFound(
+                    type: takeAway,
+                    customer: customer,
+                    message: 'Customer found.');
+              } else {
+                yield CustomerNotFound(
+                    type: takeAway, message: 'Customer not found');
+              }
             }
           } else {}
           break;
@@ -142,44 +138,42 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
             customerOrder.orderType = (delivery.index + 1).toString();
             yield OrderTypeState(type: delivery);
           } else if (event is CustomerChanged) {
-            customerOrder.customer = event.customerName;
+            customerOrder.customer.name = event.customerName;
           } else if (event is ContactChanged) {
-            customerOrder.contact = event.contact;
+            customerOrder.customer.contact = event.contact;
           } else if (event is AddressChanged) {
-            customerOrder.address = event.address;
+            customerOrder.customer.address = event.address;
           } else if (event is SearchCustomer) {
-            if (customerOrder.contact == null &&
-                customerOrder.contact.isEmpty) {
+            if (customerOrder.customer.contact == null &&
+                customerOrder.customer.contact.isEmpty) {
               yield InvalidContact(
                   type: delivery, message: 'Please enter contact number');
             } else {
-                List<Customer> list = await CustomerRepo.repo
-                  .searchCustomer(contact: customerOrder.contact);
-                if (list.isNotEmpty) {
-                  Customer customer = list.first;
-                  customerOrder.customer = customer.name;
-                  customerOrder.contact = customer.contact;
-                  customerOrder.address = customer.address;
-                  yield CustomerFound(
-                      type: delivery,
-                      customer: customer,
-                      message: 'Customer found.');
-                } else {
-                  yield CustomerNotFound(
-                      type: delivery, message: 'Customer not found');
-                }
+              List<Customer> list = await CustomerRepo.repo
+                  .searchCustomer(contact: customerOrder.customer.contact);
+              if (list.isNotEmpty) {
+                Customer customer = list.first;
+                if (customer != null) customerOrder.customer = customer;
+                yield CustomerFound(
+                    type: delivery,
+                    customer: customer,
+                    message: 'Customer found.');
+              } else {
+                yield CustomerNotFound(
+                    type: delivery, message: 'Customer not found');
+              }
             }
           } else if (event is Submit) {
             if (customerOrder.customer == null ||
-                customerOrder.customer.isEmpty) {
+                customerOrder.customer.name.isEmpty) {
               yield InvalidCustomer(
                   message: 'Please enter customer name.', type: delivery);
-            } else if (customerOrder.contact == null ||
-                customerOrder.contact.isEmpty) {
+            } else if (customerOrder.customer.contact == null ||
+                customerOrder.customer.contact.isEmpty) {
               yield InvalidContact(
                   message: 'Please enter contact number.', type: delivery);
-            } else if (customerOrder.address == null ||
-                customerOrder.address.isEmpty) {
+            } else if (customerOrder.customer.address == null ||
+                customerOrder.customer.address.isEmpty) {
               yield InvalidAddress(
                   message: 'Please enter address', type: delivery);
             } else {

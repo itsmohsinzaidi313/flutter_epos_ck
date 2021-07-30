@@ -153,7 +153,7 @@ class POSBloc extends Bloc<POSEvents, POSState> {
         );
       } else if (event is PostOrder) {
         yield POSLoading(message: 'Submitting order please wait...');
-        customerOrder.tiltId = Config.user.tiltId;
+        customerOrder.outletId = Config.user.outletId;
         if (isOrderValid(customerOrder)) {
           ServerResponse response;
           if (!requestSubmitted) {

@@ -23,9 +23,10 @@ class MenuScreen extends StatelessWidget {
           elevation: 0.0,
           title: Row(
             children: [
-              Text(
-                'User: ${Config.user.name}'.toUpperCase(),
-              ),
+              // TODO: PROVICE USER's NAME
+              // Text(
+              //   'User: ${Config.user.name}'.toUpperCase(),
+              // ),
               Expanded(
                 child: SizedBox(),
               ),

@@ -1,12 +1,22 @@
-import 'package:pos_app/shared/config.dart';
-import 'package:http/http.dart';
-import 'package:pos_app/models/server_response.dart';
+import 'package:pos_app/database/local_database.dart';
+import 'package:pos_app/database/tables/database_tables.dart';
+import 'package:pos_app/models/customer_table.dart';
 
 class TablesRepo {
   static TablesRepo repo = TablesRepo._internal();
   TablesRepo._internal();
-  Future<ServerResponse> get tables async => ServerResponse(
-      response: await get(await Config.getTablesApi).timeout(
-          Duration(seconds: Config.SERVER_TIMEOUT),
-          onTimeout: () => null));
+  Future<List<Tables>> tables() async {
+    final db = await LocalDatabase.database.getDatabase();
+    final userId = (await db.query(UserTable.TABLE_NAME,
+            columns: [UserTable.SERVER_ID],
+            where: '${UserTable.LOGIN_STATUS} = ?',
+            whereArgs: [1])) ??
+        [];
+    final map = (await db.query(TablesTable.TABLE_NAME,
+            where: '${TablesTable.USER_ID} = ?',
+            whereArgs: [userId[0][UserTable.SERVER_ID]])) ??
+        [];
+    final list = map.map((e) => Tables.fromMap(e)).toList();
+    return list;
+  }
 }

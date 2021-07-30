@@ -99,16 +99,14 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
   Stream<LoginState> attemptLogin({String username, String password}) async* {
     try {
-      final response =
-          await LoginRepo.repo.login(username: username, password: password);
-      if (response.status) {
-        Config.user = User.fromJson(response.data);
-        _loginStatus = Future.value(true);
+      final status =
+          await LoginRepo.repo.login(email: username, password: password);
+      if (status) {
         this._username = Future.value(username);
         this._password = Future.value(password);
         yield LoginSuccessful(message: 'Login successful.');
       } else {
-        yield LoginFailed(message: response.message);
+        yield LoginFailed(message: 'Login failed. Either email/password is invalid or user does not exist.');
       }
     } catch (e) {
       yield LoginFailed(message: e.toString());

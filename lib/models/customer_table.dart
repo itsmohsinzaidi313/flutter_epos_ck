@@ -1,16 +1,15 @@
-class Tables {
-  static const String IdKey = 'id';
-  static const String TableNameKey = 'tableName';
-  static const String ReservedKey = 'reserved';
+import 'package:pos_app/database/tables/database_tables.dart';
 
+class Tables {
   String id;
   String tableName;
   bool reserved;
   bool selected;
+
   Tables({this.id, this.tableName, this.reserved, this.selected});
-  Tables.fromJson(Map<String, dynamic> map)
-      : id = map[IdKey],
-        tableName = map[TableNameKey],
-        reserved = map[ReservedKey],
+  Tables.fromMap(Map<String, dynamic> map)
+      : id = map[TablesTable.LOCAL_ID],
+        tableName = map[TablesTable.NAME],
+        reserved = map[TablesTable.FREE],
         selected = false;
 }
