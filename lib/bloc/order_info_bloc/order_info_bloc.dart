@@ -31,10 +31,10 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
         customerOrder.userId = Config.user.id;
         customerOrder.orderType = (ORDERTYPE.DINE_IN.index + 1).toString();
         listWaiters = (waiterResponse.data as List<dynamic>)
-            .map((e) => Waiter.fromMap(e))
+            .map((e) => Waiter.fromJson(e))
             .toList();
         listTables = (tablesResponse.data as List<dynamic>)
-            .map((e) => Tables.fromMap(e))
+            .map((e) => Tables.fromJson(e))
             .toList();
         yield OrderTypeState(type: ORDERTYPE.DINE_IN);
         yield WaitersState(waiters: listWaiters, type: ORDERTYPE.DINE_IN);
@@ -118,12 +118,8 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
               yield InvalidContact(
                   type: takeAway, message: 'Please enter contact number');
             } else {
-              final response = await CustomerRepo.repo
-                  .customer(contact: customerOrder.contact);
-              if (response.status) {
-                List<Customer> list = (response.data as List<dynamic>)
-                    .map((e) => Customer.fromMap(e))
-                    .toList();
+                List<Customer> list = await CustomerRepo.repo
+                  .searchCustomer(contact: customerOrder.contact);
 
                 if (list.isNotEmpty) {
                   Customer customer = list.first;
@@ -137,7 +133,6 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
                   yield CustomerNotFound(
                       type: takeAway, message: 'Customer not found');
                 }
-              } else {}
             }
           } else {}
           break;
@@ -158,12 +153,8 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
               yield InvalidContact(
                   type: delivery, message: 'Please enter contact number');
             } else {
-              final response = await CustomerRepo.repo
-                  .customer(contact: customerOrder.contact);
-              if (response.status) {
-                List<Customer> list = (response.data as List<dynamic>)
-                    .map((e) => Customer.fromMap(e))
-                    .toList();
+                List<Customer> list = await CustomerRepo.repo
+                  .searchCustomer(contact: customerOrder.contact);
                 if (list.isNotEmpty) {
                   Customer customer = list.first;
                   customerOrder.customer = customer.name;
@@ -177,7 +168,6 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
                   yield CustomerNotFound(
                       type: delivery, message: 'Customer not found');
                 }
-              } else {}
             }
           } else if (event is Submit) {
             if (customerOrder.customer == null ||
