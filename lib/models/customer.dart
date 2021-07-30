@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:pos_app/database/tables/database_tables.dart';
+
 class Customer {
   static const String IdKey = 'Id';
   static const String NameKey = 'Name';
@@ -15,11 +17,11 @@ class Customer {
         contact = '',
         address = '';
 
-  Customer.fromJson(Map<String, dynamic> map)
-      : id = map[IdKey],
-        name = map[NameKey],
-        contact = map[ContactKey],
-        address = map[AddressKey];
+  Customer.fromMap(Map<String, dynamic> map)
+      : id = map[CustomerTable.SERVER_ID],
+        name = map[CustomerTable.NAME],
+        contact = map[CustomerTable.PHONE],
+        address = map[CustomerTable.ADDRESS];
 
   String get toJson => {
         jsonEncode(NameKey): jsonEncode(name),

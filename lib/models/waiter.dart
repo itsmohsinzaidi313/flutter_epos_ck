@@ -1,3 +1,5 @@
+import 'package:pos_app/database/tables/database_tables.dart';
+
 class Waiter {
   static const IdKey = 'id';
   static const NameKey = 'name';
@@ -5,8 +7,8 @@ class Waiter {
   String name;
   bool selected;
   Waiter({this.id, this.name});
-  Waiter.fromJson(Map<String, dynamic> map)
-      : id = map[IdKey],
-        name = map[NameKey],
+  Waiter.fromMap(Map<String, dynamic> map)
+      : id = map[UserTable.SERVER_ID],
+        name = map[UserTable.FULL_NAME],
         selected = false;
 }

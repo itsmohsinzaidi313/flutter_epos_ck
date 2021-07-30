@@ -66,7 +66,7 @@ class Order {
         time = map[_OrderTimeKey],
         date = map[_OrderDateKey],
         items = (map[_ItemsKey] as List<dynamic>)
-            .map((e) => MenuItem.fromJson(e))
+            .map((e) => MenuItem.fromMap(e))
             .toList();
 
   Map<String, dynamic> get toJson => {

@@ -31,10 +31,10 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
         customerOrder.userId = Config.user.id;
         customerOrder.orderType = (ORDERTYPE.DINE_IN.index + 1).toString();
         listWaiters = (waiterResponse.data as List<dynamic>)
-            .map((e) => Waiter.fromJson(e))
+            .map((e) => Waiter.fromMap(e))
             .toList();
         listTables = (tablesResponse.data as List<dynamic>)
-            .map((e) => Tables.fromJson(e))
+            .map((e) => Tables.fromMap(e))
             .toList();
         yield OrderTypeState(type: ORDERTYPE.DINE_IN);
         yield WaitersState(waiters: listWaiters, type: ORDERTYPE.DINE_IN);
@@ -122,7 +122,7 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
                   .customer(contact: customerOrder.contact);
               if (response.status) {
                 List<Customer> list = (response.data as List<dynamic>)
-                    .map((e) => Customer.fromJson(e))
+                    .map((e) => Customer.fromMap(e))
                     .toList();
 
                 if (list.isNotEmpty) {
@@ -162,7 +162,7 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
                   .customer(contact: customerOrder.contact);
               if (response.status) {
                 List<Customer> list = (response.data as List<dynamic>)
-                    .map((e) => Customer.fromJson(e))
+                    .map((e) => Customer.fromMap(e))
                     .toList();
                 if (list.isNotEmpty) {
                   Customer customer = list.first;

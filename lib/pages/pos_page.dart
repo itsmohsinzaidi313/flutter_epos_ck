@@ -709,7 +709,7 @@ class PosScreen extends StatelessWidget {
               await MenuItemRepo.repo.searchItems(phrase: pattern);
           if (serverResponse.status) {
             for (var item in (serverResponse.data as List)) {
-              list.add(MenuItem.fromJson(item));
+              list.add(MenuItem.fromMap(item));
             }
           }
         }

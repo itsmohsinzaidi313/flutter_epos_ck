@@ -1,3 +1,5 @@
+import 'package:pos_app/database/tables/database_tables.dart';
+
 class MenuItem {
   static const String IdKey = 'Id';
   static const String CodeKey = 'Code';
@@ -25,15 +27,15 @@ class MenuItem {
       this.quantity,
       this.image});
 
-  MenuItem.fromJson(Map<String, dynamic> map)
-      : id = map[IdKey],
-        code = map[CodeKey],
-        categoryId = map[CatIdKey],
-        name = map[NameKey],
-        price = map[PriceKey],
-        taxAmount = map[TaxAmountKey],
-        quantity = double.parse(map[QuantityKey]),
-        image = map[ImageKey];
+  MenuItem.fromMap(Map<String, dynamic> map)
+      : id = map[ItemTable.SERVER_ID],
+        code = map[ItemTable.CODE],
+        categoryId = map[ItemTable.CATEGORY_NAME],
+        name = map[ItemTable.NAME],
+        price = map[ItemTable.SALE_PRICE],
+        taxAmount = map[''],
+        quantity = double.parse(map[ItemTable.QUANTITY]),
+        image = map[ItemTable.PHOTO];
 
   MenuItem.fromItem(MenuItem item)
       : id = item.id,

@@ -102,7 +102,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       final response =
           await LoginRepo.repo.login(username: username, password: password);
       if (response.status) {
-        Config.user = User.fromJson(response.data);
+        Config.user = User.fromMap(response.data);
         _loginStatus = Future.value(true);
         this._username = Future.value(username);
         this._password = Future.value(password);
