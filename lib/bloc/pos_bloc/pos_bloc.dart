@@ -1,17 +1,12 @@
 import 'dart:async';
-import 'dart:convert';
-import 'dart:developer';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:pos_app/models/customer_order.dart';
 import 'package:pos_app/models/items_category.dart';
 import 'package:pos_app/models/menu_item.dart';
-import 'package:pos_app/models/server_response.dart';
 import 'package:pos_app/repositories/categories_repository.dart';
 import 'package:pos_app/repositories/menu_items_repository.dart';
-import 'package:pos_app/repositories/order_repository.dart';
 import 'package:pos_app/repositories/users_repository.dart';
-import 'package:pos_app/shared/config.dart';
 part 'pos_event.dart';
 part 'pos_state.dart';
 
@@ -34,7 +29,6 @@ class POSBloc extends Bloc<POSEvents, POSState> {
         try {
           listCategories = await CategoryRepo.repo.rawCategories();
           listItems = await MenuItemRepo.repo.allItems();
-          for (var item in listItems) {}
         } catch (e) {
           yield POSError(message: e.toString());
         }
@@ -70,18 +64,9 @@ class POSBloc extends Bloc<POSEvents, POSState> {
                 .where((e) => e.categoryId == event.categoryId)
                 .toList());
       } else if (event is AddItem) {
-        if (event.code == MenuItem.OPENFOOD_CODE) {
-          customerOrder.addCartItem(
-            MenuItem(
-              code: event.code.toString(),
-              id: event.itemId.toString(),
-            ),
-          );
-        } else {
           customerOrder.addCartItem(listItems
-              .where((element) => element.code == '${event.code}')
+              .where((element) => element.id == '${event.itemId}')
               .first);
-        }
         yield CartItems(
           list: customerOrder.cartItems,
           subTotal: customerOrder.subTotal,
@@ -131,14 +116,6 @@ class POSBloc extends Bloc<POSEvents, POSState> {
         } else {
           customerOrder.removeCartItem(event.itemId);
         }
-        yield CartItems(
-          list: customerOrder.cartItems,
-          subTotal: customerOrder.subTotal,
-          totalAmount: customerOrder.totalTaxedAmount,
-          taxAmount: customerOrder.totalTax,
-        );
-      } else if (event is AddOpenItem) {
-        customerOrder.addCartItem(event.openItem);
         yield CartItems(
           list: customerOrder.cartItems,
           subTotal: customerOrder.subTotal,

@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:pos_app/database/local_database.dart';
 import 'package:pos_app/database/tables/database_tables.dart';
@@ -8,7 +10,7 @@ class MenuItemRepo {
   MenuItemRepo._internal();
   Future<List<MenuItem>> allItems() async {
     final db = await LocalDatabase.database.getDatabase();
-    final list = await db.query(ItemTable.TABLE_NAME);
+    final list = (await db.query(ItemTable.TABLE_NAME)) ?? [];
     final items = list.map((e) => MenuItem.fromMap(e)).toList();
     return items;
   }

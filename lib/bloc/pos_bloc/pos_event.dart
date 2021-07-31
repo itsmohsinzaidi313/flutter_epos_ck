@@ -24,7 +24,7 @@ class CategoryChanged extends POSEvents {
 }
 
 class AddItem extends POSEvents {
-  final int code;
+  final String code;
   final int itemId;
   AddItem({@required this.code, @required this.itemId});
   // @override
@@ -32,7 +32,7 @@ class AddItem extends POSEvents {
 }
 
 class RemoveItem extends POSEvents {
-  final int code;
+  final String code;
   final int itemId;
   RemoveItem({@required this.code, @required this.itemId});
   // @override
@@ -40,7 +40,7 @@ class RemoveItem extends POSEvents {
 }
 
 class ReduceItem extends POSEvents {
-  final int code;
+  final String code;
   final int itemId;
   ReduceItem({@required this.code, @required this.itemId});
   // @override
@@ -48,7 +48,7 @@ class ReduceItem extends POSEvents {
 }
 
 class AddComment extends POSEvents {
-  final int code;
+  final String code;
   final int itemId;
   final String comment;
   AddComment({@required this.code, @required this.itemId, @required this.comment});
@@ -66,13 +66,8 @@ class LoadPOSOrder extends POSEvents {
 }
 
 class ItemQuantityChanged extends POSEvents {
-  final int code;
+  final String code;
   final int itemId;
   final double quantity;
   ItemQuantityChanged({this.code, @required this.itemId, this.quantity});
-}
-
-class AddOpenItem extends POSEvents {
-  final MenuItem openItem;
-  AddOpenItem({this.openItem});
 }

@@ -37,7 +37,7 @@ class Item {
         name = map[ItemTable.NAME],
         salePrice = map[ItemTable.SALE_PRICE],
         photo = map[ItemTable.PHOTO],
-        categoryName = map[ItemTable.CATEGORY_NAME],
+        categoryName = map[ItemTable.CATEGORY_ID],
         quantity = map[ItemTable.QUANTITY],
         percentage = map[ItemTable.PERCENTAGE];
 }

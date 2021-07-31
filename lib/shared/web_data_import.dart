@@ -320,9 +320,8 @@ class ImportData {
         ItemTable.NAME: item[ItemTable.NAME],
         ItemTable.SALE_PRICE: item[ItemTable.SALE_PRICE],
         ItemTable.PHOTO: item[ItemTable.PHOTO],
-        ItemTable.CATEGORY_NAME: item[ItemTable.CATEGORY_NAME],
+        ItemTable.CATEGORY_ID: item[ItemTable.CATEGORY_ID],
         ItemTable.PERCENTAGE: item[ItemTable.PERCENTAGE],
-        ItemTable.QUANTITY: item[ItemTable.QUANTITY],
       });
       showMessage('Importing',
           'Getting ${ItemTable.TABLE_NAME} ... $count/${i.length} ');

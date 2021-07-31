@@ -27,8 +27,6 @@ class PosScreen extends StatelessWidget {
   final TextStyle textStyle = TextStyle(
     color: Colors.black,
   );
-  final _listKey = GlobalKey<AnimatedListState>();
-  final _cartKey = GlobalKey<AnimatedListState>();
   @override
   Widget build(BuildContext context) {
     passEvent(context, POSBuild());
@@ -76,12 +74,6 @@ class PosScreen extends StatelessWidget {
               onBackPressed: () => Navigator.pop(context),
             ),
           ),
-          // AppTheme.appBarNormal(
-          //   context: context,
-          //   appBarTitle: 'Menu',
-          //   appBarElevation: 0.0,
-          //   appBarBgColor: AppTheme.appBarColor,
-          // ),
           body: Stack(
             children: [
               Container(
@@ -173,39 +165,7 @@ class PosScreen extends StatelessWidget {
                                       }
                                     },
                                     builder: (context, state) {
-                                      List<Category> list = [];
-                                      Future f = Future(() {});
                                       if (state is CategoriesLoaded) {
-                                        //   state.list.forEach((element) {
-                                        //     f = f.then((value) => Future.delayed(
-                                        //             Duration(milliseconds: 50),
-                                        //             () {
-                                        //           list.add(element);
-                                        //           _listKey.currentState
-                                        //               .insertItem(
-                                        //                   list.length - 1);
-                                        //         }));
-                                        //   });
-                                        // }
-                                        // Tween<Offset> _offset = Tween(
-                                        //     begin: Offset(0, -1),
-                                        //     end: Offset(0, 0));
-                                        // return AnimatedList(
-                                        //   key: _listKey,
-                                        //   scrollDirection: Axis.horizontal,
-                                        //   initialItemCount: list.length,
-                                        //   itemBuilder:
-                                        //       (context, index, animation) =>
-                                        //           SlideTransition(
-                                        //     position: animation.drive(_offset),
-                                        //     child: categoryButton(
-                                        //       context,
-                                        //       list,
-                                        //       index,
-                                        //     ),
-                                        //   ),
-                                        // );
-
                                         return ListView(
                                           scrollDirection: Axis.horizontal,
                                           children: getCategoryWidgets(
@@ -233,7 +193,6 @@ class PosScreen extends StatelessWidget {
                                   flex: 2,
                                   child: Container(
                                       padding: EdgeInsets.only(top: 5),
-                                      // decoration: BoxDecoration(border: Border.all(width: 2)),
                                       child: BlocBuilder<POSBloc, POSState>(
                                         buildWhen: (previous, current) {
                                           if (current is ItemsLoaded) {
@@ -504,23 +463,13 @@ class PosScreen extends StatelessWidget {
               elevation: 3,
               // color: Colors.redAccent,
               child: InkWell(
-                  onTap: () {
-                    if (item.code == MenuItem.OPENFOOD_CODE.toString()) {
-                      openFoodDialog(context, item.categoryId).then((openItem) {
-                        if (openItem != null) {
-                          passEvent(context, AddOpenItem(openItem: openItem));
-                        }
-                      });
-                    } else {
-                      passEvent(
+                  onTap: () => passEvent(
                         context,
                         AddItem(
-                          code: int.parse(item.code),
+                          code: item.code,
                           itemId: int.parse(item.id),
                         ),
-                      );
-                    }
-                  },
+                      ),
                   child: itemButton2(context, item)),
             ),
           )
@@ -574,7 +523,7 @@ class PosScreen extends StatelessWidget {
                       onPressed: () => passEvent(
                           context,
                           ReduceItem(
-                              code: int.parse(item.code),
+                              code: item.code,
                               itemId: int.parse(item.id))),
                     ),
                     Container(
@@ -587,7 +536,7 @@ class PosScreen extends StatelessWidget {
                                   .read<POSBloc>()
                                   .add(
                                     ItemQuantityChanged(
-                                      code: int.tryParse(item.code),
+                                      code: item.code,
                                       itemId: int.parse(item.id),
                                       quantity: double.tryParse(value) ?? 0.0,
                                     ),
@@ -614,7 +563,7 @@ class PosScreen extends StatelessWidget {
                       onPressed: () => passEvent(
                         context,
                         AddItem(
-                          code: int.parse(item.code),
+                          code: item.code,
                           itemId: int.parse(item.id),
                         ),
                       ),
@@ -640,7 +589,7 @@ class PosScreen extends StatelessWidget {
                       passEvent(
                           context,
                           AddComment(
-                              code: int.parse(item.code),
+                              code: item.code,
                               itemId: int.parse(item.id),
                               comment: comments));
                     },
@@ -654,7 +603,7 @@ class PosScreen extends StatelessWidget {
                     onPressed: () => passEvent(
                       context,
                       RemoveItem(
-                        code: int.parse(item.code),
+                        code: item.code,
                         itemId: int.parse(item.id),
                       ),
                     ),
@@ -704,7 +653,7 @@ class PosScreen extends StatelessWidget {
       onSuggestionSelected: (suggestion) => passEvent(
         context,
         AddItem(
-          code: int.parse((suggestion as MenuItem).code),
+          code: (suggestion as MenuItem).code,
           itemId: int.parse((suggestion as MenuItem).id),
         ),
       ),

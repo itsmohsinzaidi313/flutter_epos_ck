@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:pos_app/database/local_database.dart';
 import 'package:pos_app/models/user.dart';
 import 'package:pos_app/database/tables/database_tables.dart';
+import 'package:pos_app/models/waiter.dart';
 import 'package:pos_app/shared/config.dart';
 
 class UsersRepo {
@@ -32,5 +33,17 @@ class UsersRepo {
       user = User.fromMap(list[0]);
     }
     return user;
+  }
+
+  Future<List<Waiter>> getWaiters() async {
+    final db = await LocalDatabase.database.getDatabase();
+    final list = (await db.query(UserTable.TABLE_NAME,
+            columns: [UserTable.SERVER_ID],
+            where:
+                '${UserTable.DESIGNATION} = ? AND ${UserTable.WILL_LOGIN} = ? AND ${UserTable.ACTIVE_STATUS} = ?',
+            whereArgs: ['Waiter', 'Yes', 'Active'])) ??
+        [];
+    final waiters = list.map((e) => Waiter.fromMap(e)).toList();
+    return waiters;
   }
 }
