@@ -30,6 +30,7 @@ dependencies:
   cupertino_icons: ^1.0.3
   sqflite: ^2.0.0+3
   permission_handler: ^5.1.0+2
+  animated_text_kit: ^4.2.1
 
 dev_dependencies:
   flutter_test:

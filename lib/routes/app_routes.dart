@@ -10,7 +10,7 @@ import 'package:pos_app/models/customer_order.dart';
 import 'package:pos_app/pages/login_page.dart';
 import 'package:pos_app/pages/menu_pages/menu_page.dart';
 import 'package:pos_app/pages/order_info_page.dart';
-import 'package:pos_app/pages/payment_page%20copy.dart';
+import 'package:pos_app/pages/payment_page.dart';
 import 'package:pos_app/pages/pos_page.dart';
 import 'package:pos_app/pages/report_pages/reports_page.dart';
 import 'package:pos_app/pages/splash_page.dart';

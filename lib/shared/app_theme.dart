@@ -157,10 +157,10 @@ class AppTheme {
             content: text(text: message),
             actions: [
               TextButton(
-                  child: text(text: 'Yes', color: Colors.blue),
+                  child: text(text: 'Yes', color: Colors.red),
                   onPressed: onYes),
               TextButton(
-                  child: text(text: 'No', color: Colors.blue), onPressed: onNo)
+                  child: text(text: 'No', color: Colors.red), onPressed: onNo)
             ],
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8))));
@@ -176,10 +176,10 @@ class AppTheme {
             content: text(text: message),
             actions: [
               TextButton(
-                  child: text(text: 'Yes', color: Colors.blue),
+                  child: text(text: 'Yes', color: Colors.red),
                   onPressed: () => Navigator.of(context).pop<bool>(true)),
               TextButton(
-                  child: text(text: 'No', color: Colors.blue),
+                  child: text(text: 'No', color: Colors.red),
                   onPressed: () => Navigator.of(context).pop<bool>(false))
             ],
             shape: RoundedRectangleBorder(

@@ -28,7 +28,7 @@ class Order {
       discountedAmount = '0.0',
       payment,
       cardNumber;
-  PAYMENTMODE paymentmode;
+  PAYMENTMODE paymentMode;
   bool editOrder = false;
 
   Order(
@@ -71,7 +71,7 @@ class Order {
                 : master[SalesMasterTable.TOTAL_DISCOUNT_AMOUNT].toString(),
         payment = master[SalesMasterTable.PAID_AMOUNT].toString() ?? '0.0',
         cardNumber = '0',
-        items = details.map((e) => MenuItem.fromMap(e)).toList();
+        items = details.map((e) => MenuItem.fromDB(e)).toList();
 
   List<MenuItem> get cartItems => items ?? [];
 

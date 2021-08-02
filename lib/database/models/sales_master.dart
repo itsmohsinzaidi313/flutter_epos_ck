@@ -1,3 +1,4 @@
+import 'package:pos_app/bloc/payment_bloc/payment_bloc.dart';
 import 'package:pos_app/database/tables/database_tables.dart';
 import 'package:pos_app/models/customer_order.dart';
 import 'package:pos_app/shared/app_library.dart';
@@ -141,7 +142,7 @@ class SalesMaster {
         SalesMasterTable.DUE_AMOUNT: dueAmount ?? 0.0,
         SalesMasterTable.VAT: '0.0',
         SalesMasterTable.TOTAL_PAYABLE: subTotal,
-        SalesMasterTable.PAYMENT_METHOD_ID: 0,
+        SalesMasterTable.PAYMENT_METHOD_ID: paymentMethodId,
         SalesMasterTable.CLOSE_TIME: closeTime,
         SalesMasterTable.TABLE_ID: tableId,
         SalesMasterTable.TOTAL_ITEM_DISCOUNT_AMOUNT: totalItemDiscountAmount,
@@ -173,15 +174,15 @@ class SalesMaster {
         saleNo = customerOrder.orderNo,
         totalItems = customerOrder.items.length,
         subTotal = double.parse(customerOrder.subTotal ?? '0.0'),
-        paidAmount = 0.0,
+        paidAmount = double.parse(customerOrder.payment ?? '0.0'),
         dueAmount = double.parse(customerOrder.subTotal ?? '0.0'),
         vat = '0.0',
         totalPayable = double.parse(customerOrder.subTotal ?? '0.0'),
-        paymentMethodId = int.parse(customerOrder.orderType),
+        paymentMethodId = customerOrder.paymentMode == PAYMENTMODE.CASH ? 1 : 2,
         closeTime = Lib.getCurrentTime24Format(),
         tableId = int.parse(customerOrder.tableId ?? '0'),
-        totalItemDiscountAmount = double.parse(
-            customerOrder.discountedAmount ?? '0.0'),
+        totalItemDiscountAmount =
+            double.parse(customerOrder.discountedAmount ?? '0.0'),
         subTotalWithDiscount = double.parse(customerOrder.subTotal ?? '0.0') +
             double.parse(customerOrder.discountedAmount ?? '0.0'),
         subTotalDiscountAmount =

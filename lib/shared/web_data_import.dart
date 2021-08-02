@@ -411,7 +411,7 @@ class ImportData {
   Future<void> _getSalesList(List<dynamic> i) async {
     int count = 1;
     for (var item in i) {
-      await database.insert(SalesMasterTable.TABLE_NAME, {
+      final masterId = await database.insert(SalesMasterTable.TABLE_NAME, {
         SalesMasterTable.CUSTOMER_ID: item[SalesMasterTable.CUSTOMER_ID],
         SalesMasterTable.SALE_NO: item[SalesMasterTable.SALE_NO],
         SalesMasterTable.TOTAL_ITEMS: item[SalesMasterTable.TOTAL_ITEMS],
@@ -459,17 +459,18 @@ class ImportData {
         SalesMasterTable.DEVICE_KEY: item[SalesMasterTable.DEVICE_KEY],
         SalesMasterTable.SERVER_ID: item[SalesMasterTable.SERVER_ID],
         SalesMasterTable.COMPANY_ID: item[SalesMasterTable.COMPANY_ID],
-        SalesMasterTable.IS_DELETED: item[SalesMasterTable.IS_DELETED],
-        SalesMasterTable.IS_UPLOADED: item[SalesMasterTable.IS_UPLOADED],
+        SalesMasterTable.IS_DELETED: item[SalesMasterTable.IS_DELETED] ?? 0,
+        SalesMasterTable.IS_UPLOADED: item[SalesMasterTable.IS_UPLOADED] ?? 1,
         SalesMasterTable.SHIFT: item[SalesMasterTable.SHIFT],
       });
+      await getSalesDetailsList(item['details'], masterId);
       showMessage('Importing',
           'Getting ${SalesMasterTable.TABLE_NAME} ... $count/${i.length} ');
       count++;
     }
   }
 
-  Future<void> getSalesDetailsList(List<dynamic> i) async {
+  Future<void> getSalesDetailsList(List<dynamic> i, int masterId) async {
     int count = 1;
     for (var item in i) {
       await database.insert(SalesDetailTable.TABLE_NAME, {
@@ -499,8 +500,7 @@ class ImportData {
         SalesDetailTable.COOKING_DONE_TIME:
             item[SalesDetailTable.COOKING_DONE_TIME],
         SalesDetailTable.PREVIOUS_ID: item[SalesDetailTable.PREVIOUS_ID],
-        SalesDetailTable.SALES_MASTER_ID:
-            item[SalesDetailTable.SALES_MASTER_ID],
+        SalesDetailTable.SALES_MASTER_ID: masterId,
         SalesDetailTable.ORDER_STATUS: item[SalesDetailTable.ORDER_STATUS],
         SalesDetailTable.USER_ID: item[SalesDetailTable.USER_ID],
         SalesDetailTable.OUTLET_ID: item[SalesDetailTable.OUTLET_ID],

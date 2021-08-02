@@ -29,13 +29,13 @@ class MenuItem {
         image = map[ItemTable.PHOTO];
 
   MenuItem.fromDB(Map<String, dynamic> map)
-      : id = map[ItemTable.LOCAL_ID].toString(),
+      : id = map[ItemTable.SERVER_ID].toString(),
         code = map[ItemTable.CODE].toString(),
         categoryId = map[ItemTable.CATEGORY_ID].toString(),
         name = map[ItemTable.NAME],
         price = map[ItemTable.SALE_PRICE].toString(),
         taxAmount = map[ItemTable.SALE_PRICE].toString(),
-        quantity = map[ItemTable.QUANTITY],
+        quantity = map[SalesDetailTable.QUANTITY],
         image = map[ItemTable.PHOTO];
 
   MenuItem.fromItem(MenuItem item)

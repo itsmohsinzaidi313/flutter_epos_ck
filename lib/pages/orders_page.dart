@@ -5,8 +5,8 @@ import 'package:pos_app/shared/app_theme.dart';
 import 'package:pos_app/shared/config.dart';
 
 class OrdersScreen extends StatefulWidget {
-  final enablePayment = false;
-  final enableOrderDelete = false;
+  final enablePayment = true;
+  final enableOrderDelete = true;
 
   @override
   _OrdersScreenState createState() => _OrdersScreenState();
@@ -39,7 +39,7 @@ class _OrdersScreenState extends State<OrdersScreen>
     tabController = TabController(length: tabs.length, vsync: this);
   }
 
-  void updateOrders() async {
+  Future<void> updateOrders() async {
     try {
       AppTheme.snackbar(context, 'Refreshing orders...');
       List<Order> temp = (await OrderRepo.repo.getOrders()) ?? [];
@@ -87,29 +87,6 @@ class _OrdersScreenState extends State<OrdersScreen>
         child: TabBarView(
           controller: tabController,
           children: getTabWidgets(),
-          //     [
-          //   getOrdersList(
-          //       order: ordersList.where((e) {
-          //     if (e.orderType == '1')
-          //       return true;
-          //     else
-          //       return false;
-          //   }).toList()),
-          //   getOrdersList(
-          //       order: ordersList.where((e) {
-          //     if (e.orderType == '2')
-          //       return true;
-          //     else
-          //       return false;
-          //   }).toList()),
-          //   getOrdersList(
-          //       order: ordersList.where((e) {
-          //     if (e.orderType == '3')
-          //       return true;
-          //     else
-          //       return false;
-          //   }).toList()),
-          // ],
         ),
       ),
     );
@@ -201,8 +178,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                   order.orderType != '1' ? Divider() : Container(),
                   order.orderType != '1'
                       ? boxTile(
-                          title: 'CONTACT',
-                          description: order.customer.contact)
+                          title: 'CONTACT', description: order.customer.contact)
                       : Container(),
                   order.orderType != '1' ? Divider() : Container(),
                 ],
@@ -222,7 +198,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                       order.editOrder = true;
                       await Navigator.of(context)
                           .pushNamed('/pos', arguments: order);
-                      updateOrders();
+                      await updateOrders();
                     },
                   ),
                   widget.enablePayment
@@ -236,10 +212,11 @@ class _OrdersScreenState extends State<OrdersScreen>
                                 title: 'Order Payment',
                                 message: 'Are You Sure?',
                                 onNo: () => Navigator.pop(context),
-                                onYes: () {
-                                  Navigator.pop(context);
-                                  Navigator.of(context)
+                                onYes: () async {
+                                  await Navigator.of(context)
                                       .pushNamed('/payment', arguments: order);
+                                  await updateOrders();
+                                  Navigator.pop(context);
                                 });
                           },
                         )
@@ -255,7 +232,12 @@ class _OrdersScreenState extends State<OrdersScreen>
                                 title: 'Delete Order',
                                 message: 'Are You Sure?',
                                 onNo: () => Navigator.pop(context),
-                                onYes: () => Navigator.pop(context));
+                                onYes: () async {
+                                  await OrderRepo.repo.updateOrder(
+                                      customerOrder: order, delete: true, uploaded: true);
+                                  await updateOrders();
+                                  Navigator.pop(context);
+                                });
                           },
                         )
                       : Container(),

@@ -6,6 +6,7 @@ import 'package:pos_app/database/models/sales_detail.dart';
 import 'package:pos_app/database/models/sales_master.dart';
 import 'package:pos_app/database/tables/database_tables.dart';
 import 'package:pos_app/models/customer_order.dart';
+import 'package:pos_app/shared/app_library.dart';
 
 class OrderRepo {
   static OrderRepo repo = OrderRepo._internal();
@@ -29,21 +30,21 @@ class OrderRepo {
     if (orderType != '' && orderNo == '') {
       listMSDa = (await db.query(SalesMasterTable.TABLE_NAME,
               where:
-                  '${SalesMasterTable.IS_DELETED} = ? AND ${SalesMasterTable.ORDER_TYPE} = ?',
+                  '${SalesMasterTable.IS_DELETED} = ? AND ${SalesMasterTable.ORDER_TYPE} = ? AND ${SalesMasterTable.PAID_AMOUNT} != ${SalesMasterTable.DUE_AMOUNT}',
               whereArgs: [0, orderType])) ??
           [];
-
-      return list;
     } else if ((orderType == '' && orderNo != '') ||
         (orderType != '' && orderNo != '')) {
       listMSDa = (await db.query(SalesMasterTable.TABLE_NAME,
               where:
-                  '${SalesMasterTable.IS_DELETED} = ? AND ${SalesMasterTable.SALE_NO} = ?',
+                  '${SalesMasterTable.IS_DELETED} = ? AND ${SalesMasterTable.SALE_NO} = ? AND ${SalesMasterTable.PAID_AMOUNT} != ${SalesMasterTable.DUE_AMOUNT}',
               whereArgs: [0, orderNo])) ??
           [];
     } else if (orderType == '' && orderNo == '') {
       listMSDa = (await db.query(SalesMasterTable.TABLE_NAME,
-              where: '${SalesMasterTable.IS_DELETED} = ?', whereArgs: [0])) ??
+              where:
+                  '${SalesMasterTable.IS_DELETED} = ? AND ${SalesMasterTable.PAID_AMOUNT} != ${SalesMasterTable.DUE_AMOUNT}',
+              whereArgs: [0])) ??
           [];
     }
 
@@ -60,17 +61,31 @@ class OrderRepo {
   Future<bool> newOrder({@required Order customerOrder}) async {
     try {
       final db = await LocalDatabase.database.getDatabase();
+      await db
+          .query(SalesMasterTable.TABLE_NAME)
+          .then((value) => log(value.toString()));
+
       return await db.transaction<bool>((txn) async {
         try {
+          if (customerOrder.orderType == '2' ||
+              customerOrder.orderType == '3') {
+            customerOrder.customer.id =
+                (await txn.insert(CustomerTable.TABLE_NAME, {
+              CustomerTable.NAME: customerOrder.customer.name,
+              CustomerTable.PHONE: customerOrder.customer.contact,
+              CustomerTable.ADDRESS: customerOrder.customer.address,
+            }))
+                    .toString();
+          }
           final listOrderNo = await txn.query(SalesMasterTable.TABLE_NAME,
               columns: [
                 '(IFNULL(COUNT(${SalesMasterTable.LOCAL_ID}),0) + 1) count'
               ]);
-          customerOrder.orderNo = listOrderNo.first['count'].toString();
+          customerOrder.orderNo =
+              await Lib.codeGenerator('ORD', listOrderNo.first['count']);
           final salesMaster = SalesMaster.fromOrder(customerOrder);
           final masterId = await txn.insert(
               SalesMasterTable.TABLE_NAME, salesMaster.getMap());
-
           List<SalesDetails> details = customerOrder.items
               .map((e) => SalesDetails.fromItem(
                   masterId,
@@ -89,17 +104,15 @@ class OrderRepo {
               OrdersTable.TABLE_ID: customerOrder.tableId,
               OrdersTable.DEL_STATUS: 'Live'
             });
-            final batch = txn.batch();
 
             for (var item in details) {
-              batch.insert(
+              txn.insert(
                 SalesDetailTable.TABLE_NAME,
                 item.getMapInsert(),
                 nullColumnHack: '0',
               );
             }
 
-            batch.commit();
             return true;
           } else {
             throw Exception('Insertion failed');
@@ -114,12 +127,17 @@ class OrderRepo {
     }
   }
 
-  Future<bool> updateOrder({@required Order customerOrder}) async {
+  Future<bool> updateOrder(
+      {@required Order customerOrder,
+      bool delete = false,
+      bool uploaded = false}) async {
     try {
       final db = await LocalDatabase.database.getDatabase();
       return await db.transaction<bool>((txn) async {
         try {
           final salesMaster = SalesMaster.fromOrder(customerOrder);
+          salesMaster.isDelete = delete ? 1 : 0;
+          salesMaster.isUpload = uploaded ? 1 : 0;
           int rowsAffected = await txn.update(
               SalesMasterTable.TABLE_NAME, salesMaster.getMap(),
               where: '${SalesMasterTable.LOCAL_ID} = ?',

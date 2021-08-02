@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:http/http.dart';
 import 'package:pos_app/database/local_database.dart';
+import 'package:pos_app/database/models/customer.dart';
 import 'package:pos_app/database/models/device.dart';
 import 'package:pos_app/database/models/register.dart';
 import 'package:pos_app/database/tables/database_tables.dart';
@@ -36,5 +37,34 @@ class GeneralRepo {
         whereArgs: [await Config.deviceKey]));
     final device = list.map((e) => Device.fromMap(e)).first;
     return device;
+  }
+
+  Future<Customer> getCustomer(
+      {int localId = 0, int serverId = 0, String name = ''}) async {
+    final db = await LocalDatabase.database.getDatabase();
+    
+    Customer customer = Customer();
+    List<Map<String, dynamic>> list = [];
+
+    if (localId != 0 && serverId == 0 && name == '') {
+      list = (await db.query(CustomerTable.TABLE_NAME,
+              where: '${CustomerTable.LOCAL_ID} = ?', whereArgs: [localId])) ??
+          [];
+    } else if (localId == 0 && serverId != 0 && name == '') {
+      list = (await db.query(CustomerTable.TABLE_NAME,
+              where: '${CustomerTable.SERVER_ID} = ?',
+              whereArgs: [serverId])) ??
+          [];
+    } else if (localId == 0 && serverId == 0 && name != '') {
+      list = (await db.query(CustomerTable.TABLE_NAME,
+              where: '${CustomerTable.NAME} = ?', whereArgs: [name])) ??
+          [];
+    }
+
+    for (var map in list) {
+      customer = Customer.fromMap(map);
+    }
+
+    return customer;
   }
 }
