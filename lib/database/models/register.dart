@@ -1,3 +1,5 @@
+import 'package:pos_app/database/tables/database_tables.dart';
+
 class Register {
   int localId;
   int serverId;
@@ -8,7 +10,7 @@ class Register {
   double salePaidAmount;
   double customerDueReceive;
   String paymentMethodsSale;
-  String registerStatus;
+  int registerStatus;
   int userId;
   int outletId;
   int companyId;
@@ -35,22 +37,20 @@ class Register {
       this.isUpload});
 
   Register.fromMap(Map<String, dynamic> map)
-      : this.localId = map[''],
-        this.openingBalance = map[''],
-        this.closingBalance = map[''],
-        this.openingBalanceDateTime =
-            map[''],
-        this.closingBalanceDateTime =
-            map[''],
-        this.salePaidAmount = map[''],
-        this.customerDueReceive = map[''],
-        this.paymentMethodsSale = map[''],
-        this.registerStatus = map[''],
-        this.userId = map[''],
-        this.outletId = map[''],
-        this.companyId = map[''],
-        this.registerNo = map[''],
-        this.deviceKey = map[''],
-        this.serverId = map[''],
-        this.isUpload = map[''];
+      : localId = map[RegisterTable.LOCAL_ID],
+        openingBalance = map[RegisterTable.OPENING_BALANCE],
+        closingBalance = map[RegisterTable.CLOSING_BALANCE],
+        openingBalanceDateTime = map[RegisterTable.OPENING_BALANCE_DATE_TIME],
+        closingBalanceDateTime = map[RegisterTable.CLOSING_BALANCE_DATE_TIME],
+        salePaidAmount = map[RegisterTable.SALE_PAID_AMOUNT],
+        customerDueReceive = map[RegisterTable.CUSTOMER_DUE_RECEIVE],
+        paymentMethodsSale = map[RegisterTable.PAYMENT_METHODS_SALE],
+        registerStatus = map[RegisterTable.REGISTER_STATUS],
+        userId = map[RegisterTable.USER_ID],
+        outletId = map[RegisterTable.OUTLET_ID],
+        companyId = map[RegisterTable.COMPANY_ID],
+        registerNo = map[RegisterTable.REGISTER_NO],
+        deviceKey = map[RegisterTable.DEVICE_KEY],
+        serverId = map[RegisterTable.SERVER_ID],
+        isUpload = map[RegisterTable.IS_UPLOADED];
 }

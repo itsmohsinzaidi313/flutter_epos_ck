@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:pos_app/models/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Config {

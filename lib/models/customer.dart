@@ -3,11 +3,11 @@ import 'dart:convert';
 import 'package:pos_app/database/tables/database_tables.dart';
 
 class Customer {
-  String id, name, contact, address;
+  String id = '', name = '', contact = '', address = '';
   Customer({this.id, this.name, this.contact, this.address});
-  
+
   Customer.empty()
-      : id = '',
+      : id = '0',
         name = '',
         contact = '',
         address = '';

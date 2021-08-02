@@ -139,13 +139,13 @@ class ImportData {
         return false;
       }
 
-      // try {
-      // getRegisterList(data['registers']);
-      //   log('DATA LIST registers Ready.');
-      // } catch (e) {
-      //   log('>>>ERROR ON getRegistersList', error: e);
-      //   return false;
-      // }
+      try {
+        await _getRegisterList(data['registers']);
+        log('DATA LIST registers Ready.');
+      } catch (e) {
+        log('>>>ERROR ON getRegistersList', error: e);
+        return false;
+      }
     } else {
       return false;
     }
@@ -418,7 +418,7 @@ class ImportData {
         SalesMasterTable.SUBTOTAL: item[SalesMasterTable.SUBTOTAL],
         SalesMasterTable.PAID_AMOUNT: item[SalesMasterTable.PAID_AMOUNT],
         SalesMasterTable.DUE_AMOUNT: item[SalesMasterTable.DUE_AMOUNT],
-        SalesMasterTable.DESCRIPTION: item[SalesMasterTable.DESCRIPTION],
+        SalesMasterTable.DISC: item[SalesMasterTable.DISC],
         SalesMasterTable.DISC_ACTUAL: item[SalesMasterTable.DISC_ACTUAL],
         SalesMasterTable.VAT: item[SalesMasterTable.VAT],
         SalesMasterTable.TOTAL_PAYABLE: item[SalesMasterTable.TOTAL_PAYABLE],
@@ -505,7 +505,6 @@ class ImportData {
         SalesDetailTable.USER_ID: item[SalesDetailTable.USER_ID],
         SalesDetailTable.OUTLET_ID: item[SalesDetailTable.OUTLET_ID],
         SalesDetailTable.DEL_STATUS: item[SalesDetailTable.DEL_STATUS],
-        SalesDetailTable.IS_UPLOADED: item[SalesDetailTable.IS_UPLOADED],
       });
       showMessage('Importing',
           'Getting ${SalesDetailTable.TABLE_NAME} ... $count/${i.length} ');
@@ -538,9 +537,32 @@ class ImportData {
     bloc.add(VerboseNewEvent(title: title, message: message));
   }
 
-  // void getRegisterList(List<dynamic> i) {
-  //   i.forEach((element) {
-  //     DataLists.instance.listRegisters.add(new Register.fromJson(element));
-  //   });
-  // }
+  Future<void> _getRegisterList(List<dynamic> i) async {
+    int count = 1;
+    for (var item in i) {
+      await database.insert(RegisterTable.TABLE_NAME, {
+        RegisterTable.SERVER_ID: item[RegisterTable.SERVER_ID],
+        RegisterTable.CLOSING_BALANCE: item[RegisterTable.CLOSING_BALANCE],
+        RegisterTable.CLOSING_BALANCE_DATE_TIME:
+            item[RegisterTable.CLOSING_BALANCE_DATE_TIME],
+        RegisterTable.COMPANY_ID: item[RegisterTable.COMPANY_ID],
+        RegisterTable.CUSTOMER_DUE_RECEIVE:
+            item[RegisterTable.CUSTOMER_DUE_RECEIVE],
+        RegisterTable.DEVICE_KEY: item[RegisterTable.DEVICE_KEY],
+        RegisterTable.OPENING_BALANCE: item[RegisterTable.OPENING_BALANCE],
+        RegisterTable.OPENING_BALANCE_DATE_TIME:
+            item[RegisterTable.OPENING_BALANCE_DATE_TIME],
+        RegisterTable.OUTLET_ID: item[RegisterTable.OUTLET_ID],
+        RegisterTable.PAYMENT_METHODS_SALE:
+            item[RegisterTable.PAYMENT_METHODS_SALE],
+        RegisterTable.REGISTER_NO: item[RegisterTable.REGISTER_NO],
+        RegisterTable.REGISTER_STATUS: item[RegisterTable.REGISTER_STATUS],
+        RegisterTable.SALE_PAID_AMOUNT: item[RegisterTable.SALE_PAID_AMOUNT],
+        RegisterTable.USER_ID: item[RegisterTable.USER_ID],
+      });
+      showMessage('Importing',
+          'Getting ${RegisterTable.TABLE_NAME} ... $count/${i.length} ');
+      count++;
+    }
+  }
 }

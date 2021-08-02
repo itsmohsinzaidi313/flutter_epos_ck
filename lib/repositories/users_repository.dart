@@ -5,21 +5,28 @@ import 'package:pos_app/database/local_database.dart';
 import 'package:pos_app/models/user.dart';
 import 'package:pos_app/database/tables/database_tables.dart';
 import 'package:pos_app/models/waiter.dart';
-import 'package:pos_app/shared/config.dart';
 
 class UsersRepo {
   static UsersRepo repo = UsersRepo._internal();
   UsersRepo._internal();
 
   Future<bool> login(
-      {@required String email, @required String password}) async {
+      {@required String email,
+      @required String password,
+      bool logout = false}) async {
     final db = await LocalDatabase.database.getDatabase();
     final list = (await db.query(UserTable.TABLE_NAME,
             columns: [UserTable.SERVER_ID],
             where:
                 '${UserTable.EMAIL} = ? AND ${UserTable.PASSWORD} = ? AND ${UserTable.WILL_LOGIN} = ? AND ${UserTable.ACTIVE_STATUS} = ?',
-            whereArgs: ['$email', '$password', 'Yes', 'Active'])) ??
+            whereArgs: [email, password, 'Yes', 'Active'])) ??
         [];
+    if (list.isNotEmpty) {
+      await db.update(
+          UserTable.TABLE_NAME, {UserTable.LOGIN_STATUS: logout ? 0 : 1},
+          where: '${UserTable.EMAIL} = ? AND ${UserTable.PASSWORD} = ?',
+          whereArgs: [email, password]);
+    }
     return list.isNotEmpty;
   }
 

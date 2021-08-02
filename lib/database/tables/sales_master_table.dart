@@ -15,7 +15,7 @@ class SalesMasterTable extends SqlCommons{
   static const String SUBTOTAL = 'sub_total';
   static const String PAID_AMOUNT = 'paid_amount';
   static const String DUE_AMOUNT = 'due_amount';
-  static const String DESCRIPTION = 'disc';
+  static const String DISC = 'disc';
   static const String DISC_ACTUAL = 'disc_actual';
   static const String VAT = 'vat';
   static const String TOTAL_PAYABLE = 'total_payable';
@@ -57,7 +57,7 @@ class SalesMasterTable extends SqlCommons{
     SUBTOTAL,
     PAID_AMOUNT,
     DUE_AMOUNT,
-    DESCRIPTION,
+    DISC,
     DISC_ACTUAL,
     VAT,
     TOTAL_PAYABLE,

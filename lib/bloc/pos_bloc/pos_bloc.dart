@@ -5,7 +5,9 @@ import 'package:pos_app/models/customer_order.dart';
 import 'package:pos_app/models/items_category.dart';
 import 'package:pos_app/models/menu_item.dart';
 import 'package:pos_app/repositories/categories_repository.dart';
+import 'package:pos_app/repositories/general_repository.dart';
 import 'package:pos_app/repositories/menu_items_repository.dart';
+import 'package:pos_app/repositories/order_repository.dart';
 import 'package:pos_app/repositories/users_repository.dart';
 part 'pos_event.dart';
 part 'pos_state.dart';
@@ -23,16 +25,7 @@ class POSBloc extends Bloc<POSEvents, POSState> {
   ) async* {
     try {
       if (event is POSBuild) {
-        if (customerOrder == null) {
-          customerOrder = Order();
-        }
-        try {
-          listCategories = await CategoryRepo.repo.rawCategories();
-          listItems = await MenuItemRepo.repo.allItems();
-        } catch (e) {
-          yield POSError(message: e.toString());
-        }
-        listCategories.first.selected = true;
+        await initializePOS();
         yield CategoriesLoaded(list: listCategories);
         yield ItemsLoaded(
             list: listItems
@@ -46,13 +39,13 @@ class POSBloc extends Bloc<POSEvents, POSState> {
           taxAmount: customerOrder.totalTax,
         );
       } else if (event is CategoryChanged) {
-        listCategories.forEach((e) {
-          if (e.id == event.categoryId) {
-            e.selected = true;
+        for (var item in listCategories) {
+          if (item.id == event.categoryId) {
+            item.selected = true;
           } else {
-            e.selected = false;
+            item.selected = false;
           }
-        });
+        }
         yield CategoriesLoaded(list: listCategories);
         yield ItemsLoaded(
             list: listItems
@@ -64,9 +57,9 @@ class POSBloc extends Bloc<POSEvents, POSState> {
                 .where((e) => e.categoryId == event.categoryId)
                 .toList());
       } else if (event is AddItem) {
-          customerOrder.addCartItem(listItems
-              .where((element) => element.id == '${event.itemId}')
-              .first);
+        customerOrder.addCartItem(listItems
+            .where((element) => element.id == '${event.itemId}')
+            .first);
         yield CartItems(
           list: customerOrder.cartItems,
           subTotal: customerOrder.subTotal,
@@ -76,7 +69,9 @@ class POSBloc extends Bloc<POSEvents, POSState> {
       } else if (event is ReduceItem) {
         if (customerOrder.editOrder) {
           double qty = 0;
-          customerOrder.cartItems.forEach((element) => qty += element.quantity);
+          for (var item in customerOrder.cartItems) {
+            qty += item.quantity;
+          }
           if (qty > 1) {
             customerOrder.reduceCartItem(event.itemId);
           } else {
@@ -132,8 +127,7 @@ class POSBloc extends Bloc<POSEvents, POSState> {
         );
       } else if (event is PostOrder) {
         yield POSLoading(message: 'Submitting order please wait...');
-        customerOrder.outletId =
-            (await UsersRepo.repo.getCurrentUser()).outletId;
+
         if (isOrderValid(customerOrder)) {
           bool orderStatus = false;
           if (!requestSubmitted) {
@@ -143,8 +137,8 @@ class POSBloc extends Bloc<POSEvents, POSState> {
               // response = await OrderRepo.repo
               //     .updateOrder(customerOrder: customerOrder);
             } else {
-              // response =
-              //     await OrderRepo.repo.newOrder(customerOrder: customerOrder);
+              orderStatus =
+                  await OrderRepo.repo.newOrder(customerOrder: customerOrder);
             }
             requestSubmitted = false;
           } else {
@@ -171,6 +165,15 @@ class POSBloc extends Bloc<POSEvents, POSState> {
     } catch (e) {
       yield POSError(message: e.toString());
     }
+  }
+
+  Future<void> initializePOS() async {
+    customerOrder ??= Order();
+    customerOrder.register = await GeneralRepo.repo.getCurrentRegister();
+    customerOrder.device = await GeneralRepo.repo.getCurrentDevice();
+    listCategories = await CategoryRepo.repo.rawCategories();
+    listItems = await MenuItemRepo.repo.allItems();
+    listCategories.first.selected = true;
   }
 
   bool isOrderValid(Order order) {

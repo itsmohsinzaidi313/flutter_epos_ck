@@ -15,5 +15,8 @@ class MenuItemRepo {
     return items;
   }
 
-  Future<List<MenuItem>> searchItems({@required String phrase}) async => [];
+  Future<List<MenuItem>> searchItems({@required String phrase}) async {
+    final items = await allItems();
+    return items.where((element) => element.name.contains(phrase)).toList();
+  }
 }

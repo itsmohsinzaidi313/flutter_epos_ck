@@ -66,6 +66,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
               username: event.username, password: event.password);
         }
       } else if (event is LogoutPressed) {
+        await UsersRepo.repo.login(email: await _username, password: await _password, logout: true);
         _loginStatus = Future.value(false);
         _username = Future.value('');
         _password = Future.value('');

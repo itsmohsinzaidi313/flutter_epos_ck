@@ -28,9 +28,12 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
         customerOrder = Order();
         listWaiters = await WaiterRepo.repo.waiters();
         listTables = await TablesRepo.repo.tables();
-        customerOrder.userId =
-            (await UsersRepo.repo.getCurrentUser()).id;
+        final user = await UsersRepo.repo.getCurrentUser();
+        customerOrder.userId = user.id;
+        customerOrder.outletId = user.outletId;
         customerOrder.orderType = (ORDERTYPE.DINE_IN.index + 1).toString();
+        customerOrder.customer = Customer.empty();
+
         yield OrderTypeState(type: ORDERTYPE.DINE_IN);
         yield WaitersState(waiters: listWaiters, type: ORDERTYPE.DINE_IN);
       }
@@ -39,29 +42,30 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
         case ORDERTYPE.DINE_IN:
           final dineIn = ORDERTYPE.DINE_IN;
           if (event is OrderTypeChanged) {
+            customerOrder.customer = Customer.empty();
             customerOrder.orderType = (dineIn.index + 1).toString();
             yield OrderTypeState(type: dineIn);
             yield WaitersState(waiters: listWaiters, type: dineIn);
           } else if (event is WaiterChanged) {
             customerOrder.waiterId = event.waiter.id;
-            listWaiters.forEach((e) {
-              if (e.id == event.waiter.id) {
-                e.selected = true;
+            for (var item in listWaiters) {
+              if (item.id == event.waiter.id) {
+                item.selected = true;
               } else {
-                e.selected = false;
+                item.selected = false;
               }
-            });
+            }
             yield TablesState(tables: listTables, type: dineIn);
           } else if (event is TableChanged) {
             if (!event.table.reserved) {
               customerOrder.tableId = event.table.id;
-              listTables.forEach((e) {
-                if (e.id == event.table.id) {
-                  e.selected = true;
+              for (var item in listTables) {
+                if (item.id == event.table.id) {
+                  item.selected = true;
                 } else {
-                  e.selected = false;
+                  item.selected = false;
                 }
-              });
+              }
               yield WaitersState(waiters: listWaiters, type: dineIn);
             } else {
               yield InvalidTables(

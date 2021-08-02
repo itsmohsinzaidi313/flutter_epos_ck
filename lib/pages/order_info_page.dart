@@ -105,6 +105,7 @@ class OrderInfoScreen extends StatelessWidget {
                                           type: deliveryOrderType)),
                                   delivery)
                               : Container(),
+                              
                         ],
                       ),
                     ),

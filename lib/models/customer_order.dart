@@ -1,13 +1,21 @@
-import 'dart:developer';
-
 import 'package:pos_app/bloc/payment_bloc/payment_bloc.dart';
+import 'package:pos_app/database/models/device.dart';
+import 'package:pos_app/database/models/register.dart';
+import 'package:pos_app/database/models/sales_detail.dart';
+import 'package:pos_app/database/models/sales_master.dart';
 import 'package:pos_app/database/tables/database_tables.dart';
 import 'package:pos_app/models/customer.dart';
 import 'package:pos_app/models/menu_item.dart';
 
 class Order {
+  static const String DINEIN = '1';
+  static const String TAKEAWAY = '2';
+  static const String DELIVERY = '3';
   List<MenuItem> items = [];
-  Customer customer;
+  Register register = Register();
+  Customer customer = Customer();
+  Device device = Device();
+
   String id,
       waiterId,
       tableId,
@@ -34,7 +42,8 @@ class Order {
       this.orderType,
       this.orderNo});
 
-  Order.fromMap(Map<String, dynamic> map, Map<String, dynamic> customerMap, List<Map<String, dynamic>> itemsList)
+  Order.fromMap(Map<String, dynamic> map, Map<String, dynamic> customerMap,
+      List<Map<String, dynamic>> itemsList)
       : id = map[SalesMasterTable.SERVER_ID].toString(),
         waiterId = map[SalesMasterTable.WAITER_ID],
         tableId = map[SalesMasterTable.TABLE_ID],
@@ -47,10 +56,24 @@ class Order {
         customer = Customer.fromMap(customerMap),
         items = itemsList.map((e) => MenuItem.fromMap(e)).toList();
 
+  Order.fromDB(Map<String, dynamic> master, List<Map<String, dynamic>> details)
+      : id = master[SalesMasterTable.LOCAL_ID],
+        waiterId = master[SalesMasterTable.WAITER_ID],
+        userId = master[SalesMasterTable.USER_ID],
+        orderType = master[SalesMasterTable.ORDER_TYPE],
+        orderNo = master[SalesMasterTable.SALE_NO],
+        time = master[SalesMasterTable.ORDER_TIME],
+        date = master[SalesMasterTable.ORDER_TIME],
+        tax = master[SalesMasterTable.SUBTOTAL],
+        outletId = master[SalesMasterTable.OUTLET_ID],
+        discountedAmount = master[SalesMasterTable.TOTAL_DISCOUNT_AMOUNT],
+        payment = master[SalesMasterTable.PAID_AMOUNT],
+        cardNumber = '0';
+
   List<MenuItem> get cartItems => items ?? [];
 
   void addCartItem(MenuItem item) {
-    if (items == null) items = [];
+    items ??= [];
     bool itemExists = false;
     for (var i = 0; i < items.length; i++) {
       if (items[i].id == item.id) {
@@ -65,7 +88,7 @@ class Order {
   }
 
   void reduceCartItem(int itemId, {bool removeZeroQuantity = true}) {
-    if (items == null) items = [];
+    items ??= [];
     for (var i = 0; i < items.length; i++) {
       if (items[i].id == '$itemId') {
         if (items[i].quantity > 0) {

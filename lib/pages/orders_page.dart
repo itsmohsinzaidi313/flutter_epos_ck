@@ -8,7 +8,6 @@ import 'package:pos_app/shared/app_theme.dart';
 import 'package:pos_app/shared/config.dart';
 
 class OrdersScreen extends StatefulWidget {
-  final List<Order> ordersList = [];
   final enablePayment = false;
   final enableOrderDelete = false;
 
@@ -19,10 +18,11 @@ class OrdersScreen extends StatefulWidget {
 class _OrdersScreenState extends State<OrdersScreen>
     with SingleTickerProviderStateMixin {
   List<Tab> tabs;
+  List<Order> ordersList = [];
   TabController tabController;
 
   _OrdersScreenState() {
-    widget.ordersList.clear();
+    ordersList.clear();
     tabs = [];
     Tab dineInTab = Tab(
       child: Text('DINE IN'),
@@ -45,10 +45,10 @@ class _OrdersScreenState extends State<OrdersScreen>
   void updateOrders() async {
     try {
       AppTheme.snackbar(context, 'Refreshing orders...');
-      List<Order> temp = await OrderRepo.repo.getOrders(orderType: '0');
-      widget.ordersList.clear();
+      List<Order> temp = (await OrderRepo.repo.getOrders()) ?? [];
+      ordersList.clear();
       for (var item in temp) {
-        widget.ordersList.add(item);
+        ordersList.add(item);
       }
       setState(() {});
     } catch (e) {
@@ -121,21 +121,21 @@ class _OrdersScreenState extends State<OrdersScreen>
   List<Widget> getTabWidgets() {
     final widgetsBuffer = <Widget>[
       getOrdersList(
-          order: widget.ordersList.where((e) {
+          order: ordersList.where((e) {
         if (e.orderType == '1')
           return true;
         else
           return false;
       }).toList()),
       getOrdersList(
-          order: widget.ordersList.where((e) {
+          order: ordersList.where((e) {
         if (e.orderType == '2')
           return true;
         else
           return false;
       }).toList()),
       getOrdersList(
-          order: widget.ordersList.where((e) {
+          order: ordersList.where((e) {
         if (e.orderType == '3')
           return true;
         else

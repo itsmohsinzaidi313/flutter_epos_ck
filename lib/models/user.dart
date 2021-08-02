@@ -5,7 +5,7 @@ class User {
   User({this.id, this.name, this.outletId});
 
   User.fromMap(Map<String, dynamic> map)
-      : id = map[UserTable.LOCAL_ID],
+      : id = map[UserTable.LOCAL_ID].toString(),
         name = map[UserTable.FULL_NAME],
-        outletId = map[UserTable.OUTLET_ID];
+        outletId = map[UserTable.OUTLET_ID].toString();
 }
