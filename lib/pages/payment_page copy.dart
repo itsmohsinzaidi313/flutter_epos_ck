@@ -1,5 +1,6 @@
-import 'package:flutter/material.dart';
+
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/material.dart';
 import 'package:pos_app/bloc/payment_bloc/payment_bloc.dart';
 import 'package:pos_app/models/menu_item.dart';
 import 'package:pos_app/shared/config.dart';
@@ -245,7 +246,7 @@ class PaymentScreen extends StatelessWidget {
                   },
                   builder: (context, state) {
                     if (state is CartItems) {
-                      if (state.list.length < 1) {
+                      if (state.list.isEmpty) {
                         return Container(
                           alignment: Alignment.bottomCenter,
                           decoration: BoxDecoration(

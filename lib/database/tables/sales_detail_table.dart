@@ -9,7 +9,7 @@ class SalesDetailTable extends SqlCommons {
   static const String SERVER_ID = 'id';
   static const String FOOD_MENU_ID = 'food_menu_id';
   static const String MENU_NAME = 'menu_name';
-  static const String QUANTITY = 'qty';
+  static const String QUANTITY = 'quantity';
   static const String MENU_PRICE_WITHOUT_DISCOUNT =
       'menu_price_without_discount';
   static const String MENU_PRICE_WITH_DISCOUNT = 'menu_price_with_discount';

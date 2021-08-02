@@ -6,8 +6,6 @@ import 'package:pos_app/bloc/order_info_bloc/order_info_bloc.dart';
 import 'package:pos_app/bloc/payment_bloc/payment_bloc.dart';
 import 'package:pos_app/bloc/pos_bloc/pos_bloc.dart';
 import 'package:pos_app/bloc/report_bloc/report_bloc.dart';
-import 'package:pos_app/bloc/verbose_bloc/verbose_bloc.dart';
-import 'package:pos_app/database/local_database.dart';
 import 'package:pos_app/models/customer_order.dart';
 import 'package:pos_app/pages/login_page.dart';
 import 'package:pos_app/pages/menu_pages/menu_page.dart';
@@ -24,16 +22,13 @@ class AppRoutes {
   POSBloc _posBloc;
   PaymentBloc _paymentBloc;
   ReportBloc _reportBloc;
-  VerboseBloc _verboseBloc;
 
-  AppRoutes({@required VerboseBloc verboseBloc}) {
+  AppRoutes() {
     _loginBloc = LoginBloc();
     _orderInfoBloc = OrderInfoBloc();
     _posBloc = POSBloc();
     _paymentBloc = PaymentBloc();
     _reportBloc = ReportBloc();
-    _verboseBloc = verboseBloc;
-    
   }
 
   Route onGeneratedRoute(RouteSettings routeSettings) {

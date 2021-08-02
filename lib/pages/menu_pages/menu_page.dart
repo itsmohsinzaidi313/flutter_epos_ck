@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pos_app/pages/menu_pages/menu_page_buttons.dart';
 import 'package:pos_app/shared/app_theme.dart';
-import 'package:pos_app/shared/config.dart';
 
 class MenuScreen extends StatelessWidget {
   final closingAmount = TextEditingController();

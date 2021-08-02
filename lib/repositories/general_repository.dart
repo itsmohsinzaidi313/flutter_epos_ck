@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer';
 
 import 'package:http/http.dart';
 import 'package:pos_app/database/local_database.dart';

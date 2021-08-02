@@ -48,9 +48,9 @@ class OrderRepo {
     }
 
     for (var item in listMSDa) {
-      listDSDa = (await db.query(SalesDetailTable.TABLE_NAME,
-              where: '${SalesMasterTable.LOCAL_ID} = ?',
-              whereArgs: [item[SalesMasterTable.LOCAL_ID]])) ??
+      listDSDa = (await db.rawQuery(
+              'SELECT B.${ItemTable.SERVER_ID}, B.${ItemTable.CODE}, B.${ItemTable.CATEGORY_ID}, B.${ItemTable.NAME}, B.${ItemTable.SALE_PRICE}, A.${SalesDetailTable.QUANTITY}, B.${ItemTable.PHOTO} FROM ${SalesDetailTable.TABLE_NAME} A JOIN ${ItemTable.TABLE_NAME} B ON B.${ItemTable.SERVER_ID} = ${SalesDetailTable.FOOD_MENU_ID} WHERE A.${SalesDetailTable.SALES_MASTER_ID} = ?',
+              [item[SalesMasterTable.LOCAL_ID]])) ??
           [];
       list.add(Order.fromDB(item, listDSDa));
     }
@@ -62,9 +62,14 @@ class OrderRepo {
       final db = await LocalDatabase.database.getDatabase();
       return await db.transaction<bool>((txn) async {
         try {
+          final listOrderNo = await txn.query(SalesMasterTable.TABLE_NAME,
+              columns: [
+                '(IFNULL(COUNT(${SalesMasterTable.LOCAL_ID}),0) + 1) count'
+              ]);
+          customerOrder.orderNo = listOrderNo.first['count'].toString();
           final salesMaster = SalesMaster.fromOrder(customerOrder);
           final masterId = await txn.insert(
-              SalesMasterTable.TABLE_NAME, salesMaster.getMapForNewOrder());
+              SalesMasterTable.TABLE_NAME, salesMaster.getMap());
 
           List<SalesDetails> details = customerOrder.items
               .map((e) => SalesDetails.fromItem(
@@ -109,8 +114,47 @@ class OrderRepo {
     }
   }
 
-  Future<bool> updateOrder({@required Order customerOrder}) async => true;
+  Future<bool> updateOrder({@required Order customerOrder}) async {
+    try {
+      final db = await LocalDatabase.database.getDatabase();
+      return await db.transaction<bool>((txn) async {
+        try {
+          final salesMaster = SalesMaster.fromOrder(customerOrder);
+          int rowsAffected = await txn.update(
+              SalesMasterTable.TABLE_NAME, salesMaster.getMap(),
+              where: '${SalesMasterTable.LOCAL_ID} = ?',
+              whereArgs: [customerOrder.id]);
+          if (rowsAffected > 0) {
+            await txn.delete(SalesDetailTable.TABLE_NAME,
+                where: '${SalesDetailTable.SALES_MASTER_ID}  = ?',
+                whereArgs: [customerOrder.id]);
+            final batch = txn.batch();
+            List<SalesDetails> details = customerOrder.items
+                .map((e) => SalesDetails.fromItem(
+                    int.parse(customerOrder.id),
+                    int.parse(customerOrder.userId),
+                    int.parse(customerOrder.outletId),
+                    e))
+                .toList();
+            for (var item in details) {
+              batch.insert(
+                SalesDetailTable.TABLE_NAME,
+                item.getMapInsert(),
+                nullColumnHack: '0',
+              );
+            }
 
-  Future<Order> objectify(
-      SalesMaster master, List<SalesDetails> details) async {}
+            batch.commit();
+            return true;
+          }
+          return false;
+        } catch (e) {
+          log('error', error: e);
+          rethrow;
+        }
+      });
+    } catch (e) {
+      return false;
+    }
+  }
 }

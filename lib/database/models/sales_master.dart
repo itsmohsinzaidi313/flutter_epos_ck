@@ -132,8 +132,9 @@ class SalesMaster {
         isUpload = map[''],
         shift = map[''];
 
-  Map<String, dynamic> getMapForNewOrder() => {
+  Map<String, dynamic> getMap() => {
         SalesMasterTable.CUSTOMER_ID: customerId ?? '0',
+        SalesMasterTable.SALE_NO: saleNo,
         SalesMasterTable.TOTAL_ITEMS: totalItems ?? 0,
         SalesMasterTable.SUBTOTAL: subTotal ?? 0.0,
         SalesMasterTable.PAID_AMOUNT: paidAmount ?? 0.0,
@@ -169,6 +170,7 @@ class SalesMaster {
 
   SalesMaster.fromOrder(Order customerOrder)
       : customerId = int.parse(customerOrder.customer.id ?? '0'),
+        saleNo = customerOrder.orderNo,
         totalItems = customerOrder.items.length,
         subTotal = double.parse(customerOrder.subTotal ?? '0.0'),
         paidAmount = 0.0,
@@ -178,8 +180,8 @@ class SalesMaster {
         paymentMethodId = int.parse(customerOrder.orderType),
         closeTime = Lib.getCurrentTime24Format(),
         tableId = int.parse(customerOrder.tableId ?? '0'),
-        totalItemDiscountAmount =
-            double.parse(customerOrder.discountedAmount ?? '0.0'),
+        totalItemDiscountAmount = double.parse(
+            customerOrder.discountedAmount ?? '0.0'),
         subTotalWithDiscount = double.parse(customerOrder.subTotal ?? '0.0') +
             double.parse(customerOrder.discountedAmount ?? '0.0'),
         subTotalDiscountAmount =

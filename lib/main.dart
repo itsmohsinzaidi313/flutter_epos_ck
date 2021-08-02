@@ -7,15 +7,19 @@ import 'package:pos_app/routes/app_routes.dart';
 import 'pages/splash_page.dart';
 import './shared/config.dart';
 
-
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   //Screen orientation set to landscape
   SystemChrome.setPreferredOrientations(
           [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight])
       .then((_) {
-        final bloc = VerboseBloc();
-    runApp(BlocProvider.value(value:bloc, child: App(appRoutes: AppRoutes(verboseBloc: bloc),),));
+    final bloc = VerboseBloc();
+    runApp(BlocProvider.value(
+      value: bloc,
+      child: App(
+        appRoutes: AppRoutes(),
+      ),
+    ));
   });
 }
 

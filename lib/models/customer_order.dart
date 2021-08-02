@@ -1,8 +1,6 @@
 import 'package:pos_app/bloc/payment_bloc/payment_bloc.dart';
 import 'package:pos_app/database/models/device.dart';
 import 'package:pos_app/database/models/register.dart';
-import 'package:pos_app/database/models/sales_detail.dart';
-import 'package:pos_app/database/models/sales_master.dart';
 import 'package:pos_app/database/tables/database_tables.dart';
 import 'package:pos_app/models/customer.dart';
 import 'package:pos_app/models/menu_item.dart';
@@ -27,7 +25,7 @@ class Order {
       date,
       tax,
       outletId,
-      discountedAmount,
+      discountedAmount = '0.0',
       payment,
       cardNumber;
   PAYMENTMODE paymentmode;
@@ -57,18 +55,23 @@ class Order {
         items = itemsList.map((e) => MenuItem.fromMap(e)).toList();
 
   Order.fromDB(Map<String, dynamic> master, List<Map<String, dynamic>> details)
-      : id = master[SalesMasterTable.LOCAL_ID],
-        waiterId = master[SalesMasterTable.WAITER_ID],
-        userId = master[SalesMasterTable.USER_ID],
+      : id = master[SalesMasterTable.LOCAL_ID].toString(),
+        tableId = master[SalesMasterTable.TABLE_ID].toString(),
+        waiterId = master[SalesMasterTable.WAITER_ID].toString(),
+        userId = master[SalesMasterTable.USER_ID].toString(),
         orderType = master[SalesMasterTable.ORDER_TYPE],
-        orderNo = master[SalesMasterTable.SALE_NO],
+        orderNo = master[SalesMasterTable.SALE_NO].toString(),
         time = master[SalesMasterTable.ORDER_TIME],
         date = master[SalesMasterTable.ORDER_TIME],
-        tax = master[SalesMasterTable.SUBTOTAL],
-        outletId = master[SalesMasterTable.OUTLET_ID],
-        discountedAmount = master[SalesMasterTable.TOTAL_DISCOUNT_AMOUNT],
-        payment = master[SalesMasterTable.PAID_AMOUNT],
-        cardNumber = '0';
+        tax = master[SalesMasterTable.SUBTOTAL].toString(),
+        outletId = master[SalesMasterTable.OUTLET_ID].toString(),
+        discountedAmount =
+            master[SalesMasterTable.TOTAL_DISCOUNT_AMOUNT] == null
+                ? '0.0'
+                : master[SalesMasterTable.TOTAL_DISCOUNT_AMOUNT].toString(),
+        payment = master[SalesMasterTable.PAID_AMOUNT].toString() ?? '0.0',
+        cardNumber = '0',
+        items = details.map((e) => MenuItem.fromMap(e)).toList();
 
   List<MenuItem> get cartItems => items ?? [];
 

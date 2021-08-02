@@ -1,6 +1,3 @@
-
-
-import 'package:flutter/cupertino.dart';
 import 'package:pos_app/bloc/verbose_bloc/verbose_bloc.dart';
 import 'package:pos_app/database/sql_commons.dart';
 import 'package:sqflite_common/sqlite_api.dart';

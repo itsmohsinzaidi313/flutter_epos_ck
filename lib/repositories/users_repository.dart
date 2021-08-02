@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import 'package:flutter/foundation.dart';
 import 'package:pos_app/database/local_database.dart';
 import 'package:pos_app/models/user.dart';

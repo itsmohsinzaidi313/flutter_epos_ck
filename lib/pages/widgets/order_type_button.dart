@@ -14,7 +14,7 @@ Widget orderTypeButton(
               image: DecorationImage(
                 fit: BoxFit.cover,
                 image: asset,
-                colorFilter: new ColorFilter.mode(
+                colorFilter: ColorFilter.mode(
                     Colors.black.withOpacity(0.6), BlendMode.dstATop),
               ),
             ),

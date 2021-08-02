@@ -254,7 +254,7 @@ class PosScreen extends StatelessWidget {
                                   },
                                   builder: (context, state) {
                                     if (state is CartItems) {
-                                      if (state.list.length < 1) {
+                                      if (state.list.isEmpty) {
                                         return Container(
                                           alignment: Alignment.bottomCenter,
                                           decoration: BoxDecoration(

@@ -133,9 +133,8 @@ class POSBloc extends Bloc<POSEvents, POSState> {
           if (!requestSubmitted) {
             requestSubmitted = true;
             if (customerOrder.editOrder) {
-              // TODO:
-              // response = await OrderRepo.repo
-              //     .updateOrder(customerOrder: customerOrder);
+              orderStatus = await OrderRepo.repo
+                  .updateOrder(customerOrder: customerOrder);
             } else {
               orderStatus =
                   await OrderRepo.repo.newOrder(customerOrder: customerOrder);
@@ -177,7 +176,7 @@ class POSBloc extends Bloc<POSEvents, POSState> {
   }
 
   bool isOrderValid(Order order) {
-    if (order.cartItems.length <= 0) {
+    if (order.cartItems.isEmpty) {
       return false;
     }
 

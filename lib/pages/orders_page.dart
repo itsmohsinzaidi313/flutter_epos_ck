@@ -1,6 +1,3 @@
-import 'dart:convert';
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:pos_app/models/customer_order.dart';
 import 'package:pos_app/repositories/order_repository.dart';
@@ -193,10 +190,10 @@ class _OrdersScreenState extends State<OrdersScreen>
                       description: order.totalTaxedAmount,
                       fontWeight: FontWeight.bold),
                   Divider(),
-                  boxTile(title: 'TIME', description: '${order.time}'),
+                  boxTile(title: 'TIME', description: order.time),
                   Divider(),
                   order.orderType == '1'
-                      ? boxTile(title: 'TABLE', description: '${order.tableId}')
+                      ? boxTile(title: 'TABLE', description: order.tableId)
                       : Container(),
                   order.orderType != '1'
                       ? boxTile(title: 'NAME', description: '${order.customer}')
@@ -205,7 +202,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                   order.orderType != '1'
                       ? boxTile(
                           title: 'CONTACT',
-                          description: '${order.customer.contact}')
+                          description: order.customer.contact)
                       : Container(),
                   order.orderType != '1' ? Divider() : Container(),
                 ],

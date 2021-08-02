@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
-import 'package:progress_dialog/progress_dialog.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class AppTheme {
@@ -23,7 +22,7 @@ class AppTheme {
       List<Widget> actions = const []}) {
     final appBar = AppBar(
       backgroundColor: appBarBgColor,
-      elevation: appBarElevation == null ? 0.0 : appBarElevation,
+      elevation: appBarElevation ?? 0.0,
       title: Text(appBarTitle),
       centerTitle: true,
       bottom: bottom,
@@ -41,7 +40,7 @@ class AppTheme {
       Function appBarOnTap}) {
     final appBar = AppBar(
       backgroundColor: appBarBgColor,
-      elevation: appBarElevation == null ? 0.0 : appBarElevation,
+      elevation: appBarElevation ?? 0.0,
       title: Text(appBarTitle),
       centerTitle: true,
       actions: <Widget>[

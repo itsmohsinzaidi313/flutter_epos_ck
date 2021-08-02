@@ -82,7 +82,7 @@ class SalesDetails {
         outletId = map[SalesDetailTable.OUTLET_ID],
         delStatus = map[SalesDetailTable.DEL_STATUS];
 
-  SalesDetails.fromItem(int masterId, int userId, int outletId, MenuItem item)
+  SalesDetails.fromItem(this.salesMasterId, this.userId, this.outletId, MenuItem item)
       : foodMenuId = int.parse(item.id),
         menuName = item.name,
         qty = item.quantity,
@@ -97,10 +97,7 @@ class SalesDetails {
         cookingStatus = 'Done',
         cookingStartTime = Lib.getCurrentDateTimeWithFormat(),
         cookingDoneTime = Lib.getCurrentDateTimeWithFormat(),
-        salesMasterId = masterId,
         orderStatus = '0',
-        userId = userId,
-        outletId = outletId,
         delStatus = 'Live';
 
         Map<String, dynamic> getMapInsert() => {

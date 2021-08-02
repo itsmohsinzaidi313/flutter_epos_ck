@@ -84,8 +84,8 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       final status =
           await UsersRepo.repo.login(email: username, password: password);
       if (status) {
-        this._username = Future.value(username);
-        this._password = Future.value(password);
+        _username = Future.value(username);
+        _password = Future.value(password);
         yield LoginSuccessful(message: 'Login successful.');
       } else {
         yield LoginFailed(

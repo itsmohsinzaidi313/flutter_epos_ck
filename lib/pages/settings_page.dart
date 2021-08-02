@@ -2,7 +2,6 @@ import 'dart:developer';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../shared/config.dart';
 
 class SettingsScreen extends StatefulWidget {
   @override
@@ -21,7 +20,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     return Container(
       child: ListView(
         children: [
-          RaisedButton(
+          ElevatedButton(
               child: Text('Ok'),
               onPressed: () {
                 if (Platform.isAndroid) {
