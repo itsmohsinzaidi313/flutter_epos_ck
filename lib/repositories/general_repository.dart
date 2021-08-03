@@ -42,7 +42,7 @@ class GeneralRepo {
   Future<Customer> getCustomer(
       {int localId = 0, int serverId = 0, String name = ''}) async {
     final db = await LocalDatabase.database.getDatabase();
-    
+
     Customer customer = Customer();
     List<Map<String, dynamic>> list = [];
 

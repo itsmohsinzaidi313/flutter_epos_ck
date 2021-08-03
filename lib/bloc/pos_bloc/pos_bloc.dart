@@ -8,7 +8,6 @@ import 'package:pos_app/repositories/categories_repository.dart';
 import 'package:pos_app/repositories/general_repository.dart';
 import 'package:pos_app/repositories/menu_items_repository.dart';
 import 'package:pos_app/repositories/order_repository.dart';
-import 'package:pos_app/repositories/users_repository.dart';
 part 'pos_event.dart';
 part 'pos_state.dart';
 

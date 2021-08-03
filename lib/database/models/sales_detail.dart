@@ -1,5 +1,4 @@
 import 'package:pos_app/database/tables/database_tables.dart';
-import 'package:pos_app/models/customer_order.dart';
 import 'package:pos_app/models/menu_item.dart';
 import 'package:pos_app/shared/app_library.dart';
 

@@ -14,7 +14,7 @@ class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
 
   final String invalidDiscountMessage = 'Please check the discount amount';
   final String invalidPaymentMessage = 'Please check the payment';
-  final String Message = 'Please check the payment, card number or discount';
+  final String message = 'Please check the payment, card number or discount';
   final String invalidCardNumberMessage = 'Please check the card number';
 
   @override
@@ -112,8 +112,8 @@ class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
             totalTaxAmount: customerOrder.totalTaxedAmount);
       }
     } else if (event is Submit) {
-      double discount = double.tryParse(customerOrder.discountedAmount);
-      double payment = double.tryParse(customerOrder.payment);
+      double discount = double.tryParse(customerOrder.discountedAmount),
+          payment = double.tryParse(customerOrder.payment);
       if (discount == null) {
         yield InvalidDiscount(
             message: invalidDiscountMessage,
