@@ -7,8 +7,8 @@ class ErrorDetail{
   ErrorDetail({this.id, this.errorMasterId, this.error});
 
   ErrorDetail.fromMap(Map<String, dynamic> map){
-    this.id = map['id'];
-    this.errorMasterId = map['error_master_id'];
-    this.error = map['error'];
+    id = map['id'];
+    errorMasterId = map['error_master_id'];
+    error = map['error'];
   }
 }

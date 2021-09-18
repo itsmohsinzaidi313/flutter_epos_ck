@@ -1,14 +1,7 @@
+import 'package:pos_app/database/tables/database_tables.dart';
+
 class MenuItem {
-  static const String IdKey = 'Id';
-  static const String CodeKey = 'Code';
-  static const String CatIdKey = 'CategoryId';
-  static const String NameKey = 'Name';
-  static const String PriceKey = 'Price';
-  static const String TaxAmountKey = 'TaxAmount';
-  static const String QuantityKey = 'Quantity';
-  static const String CommentKey = 'Comment';
-  static const String ImageKey = 'image';
-  static const int OPENFOOD_CODE = 151605140604;
+  // static const int OPENFOOD_CODE = 151605140604;
 
   final String id, code, categoryId, name, price, taxAmount, image;
   double quantity;
@@ -25,15 +18,25 @@ class MenuItem {
       this.quantity,
       this.image});
 
-  MenuItem.fromJson(Map<String, dynamic> map)
-      : id = map[IdKey],
-        code = map[CodeKey],
-        categoryId = map[CatIdKey],
-        name = map[NameKey],
-        price = map[PriceKey],
-        taxAmount = map[TaxAmountKey],
-        quantity = double.parse(map[QuantityKey]),
-        image = map[ImageKey];
+  MenuItem.fromMap(Map<String, dynamic> map)
+      : id = map[ItemTable.SERVER_ID].toString(),
+        code = map[ItemTable.CODE].toString(),
+        categoryId = map[ItemTable.CATEGORY_ID].toString(),
+        name = map[ItemTable.NAME],
+        price = map[ItemTable.SALE_PRICE].toString(),
+        taxAmount = map[ItemTable.SALE_PRICE].toString(),
+        quantity = 1,
+        image = map[ItemTable.PHOTO];
+
+  MenuItem.fromDB(Map<String, dynamic> map)
+      : id = map[ItemTable.SERVER_ID].toString(),
+        code = map[ItemTable.CODE].toString(),
+        categoryId = map[ItemTable.CATEGORY_ID].toString(),
+        name = map[ItemTable.NAME],
+        price = map[ItemTable.SALE_PRICE].toString(),
+        taxAmount = map[ItemTable.SALE_PRICE].toString(),
+        quantity = map[SalesDetailTable.QUANTITY],
+        image = map[ItemTable.PHOTO];
 
   MenuItem.fromItem(MenuItem item)
       : id = item.id,
@@ -45,14 +48,4 @@ class MenuItem {
         quantity = item.quantity ?? 1,
         image = item.image,
         comment = item.comment;
-
-  Map<String, dynamic> toJson() => {
-        IdKey: id,
-        CodeKey: code,
-        CatIdKey: categoryId,
-        NameKey: name,
-        PriceKey: price,
-        QuantityKey: quantity,
-        CommentKey: comment,
-      };
 }

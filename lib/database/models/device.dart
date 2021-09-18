@@ -1,3 +1,5 @@
+import 'package:pos_app/database/tables/database_tables.dart';
+
 class Device {
   int id;
   int serverId;
@@ -10,14 +12,14 @@ class Device {
   String dateModified;
 
   Device.fromMap(Map<String, dynamic> map)
-      : serverId = map['id'],
-        outletId = map['outlet_id'],
-        companyId = map['company_id'],
-        deviceKey = map['device_key'],
-        delStatus = map['del_status'],
-        isInstalled = map['is_installed'],
-        dateAdded = map['date_added'],
-        dateModified = map['date_modified'];
+      : serverId = map[DeviceTable.SERVER_ID],
+        outletId = map[DeviceTable.OUTLET_ID],
+        companyId = map[DeviceTable.COMPANY_ID],
+        deviceKey = map[DeviceTable.DEVICE_KEY],
+        delStatus = map[DeviceTable.DEL_STATUS],
+        isInstalled = map[DeviceTable.IS_INSTALLED],
+        dateAdded = map[DeviceTable.DATE_ADDED],
+        dateModified = map[DeviceTable.DATE_MODIFIED];
 
   Device(
       {this.serverId,

@@ -1,13 +1,16 @@
-import 'package:http/http.dart';
+import 'package:pos_app/database/local_database.dart';
+import 'package:pos_app/database/tables/category_table.dart';
 import 'package:pos_app/models/items_category.dart';
-import 'package:pos_app/models/server_response.dart';
-import 'package:pos_app/shared/config.dart';
 
 class CategoryRepo {
   static CategoryRepo repo = CategoryRepo._internal();
 
   CategoryRepo._internal();
 
-  Future<ServerResponse> get rawCategories async =>
-      ServerResponse(response: await get(await Config.getCategoryApi).timeout(Duration(seconds: Config.SERVER_TIMEOUT), onTimeout: () => null));
+  Future<List<Category>> rawCategories() async {
+    final db = await LocalDatabase.database.getDatabase();
+    final list = await db.query(CategoryTable.TABLE_NAME);
+    final categories = list.map((e) => Category.fromMap(e)).toList();
+    return categories;
+  }
 }

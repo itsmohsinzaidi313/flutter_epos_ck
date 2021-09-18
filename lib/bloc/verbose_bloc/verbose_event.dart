@@ -1,8 +1,24 @@
 part of 'verbose_bloc.dart';
 
-abstract class VerboseEvent extends Equatable {
-  const VerboseEvent();
+abstract class VerboseEvent {
+  final String title;
+  final String message;
 
-  @override
-  List<Object> get props => [];
+  VerboseEvent(this.title, this.message);
+}
+
+class VerboseNewEvent extends VerboseEvent {
+  VerboseNewEvent({String title, String message}) : super(title, message);
+}
+
+class VerboseNewOperation extends VerboseEvent {
+  VerboseNewOperation({String title, String message}) : super(title, message);
+}
+
+class VerboseError extends VerboseEvent {
+  VerboseError({String title, String message}) : super(title, message);
+}
+
+class VerboseNotify extends VerboseEvent {
+  VerboseNotify({String title, String message}) : super(title, message);
 }

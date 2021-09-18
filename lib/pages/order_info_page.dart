@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pos_app/bloc/order_info_bloc/order_info_bloc.dart';
+import 'package:pos_app/bloc/verbose_bloc/verbose_bloc.dart';
 import 'package:pos_app/models/waiter.dart';
 import '../shared/app_theme.dart';
 import '../shared/config.dart';
@@ -24,96 +25,104 @@ class OrderInfoScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<OrderInfoBloc, OrderInfoState>(
-        listener: (context, state) async {
-          if (state is ValidSubmission) {
-            Navigator.of(context)
-                .pushNamed('/pos', arguments: state.customerOrder);
-          } else if (state is OrderInfoError) {
-            AppTheme.snackbar(context, state.message, textColor: Colors.red);
-          }
+    return BlocListener<VerboseBloc, VerboseState>(
+      listenWhen: (previous, current) => current is VerboseSnackBarState,
+        listener: (context, state) {
+          AppTheme.snackbar(context, state.message);
         },
-        child: Scaffold(
-          backgroundColor: Colors.grey[200],
-          appBar: AppTheme.appBarNormal(
-              appBarTitle: 'Order Type',
-              appBarBgColor: AppTheme.appBarColor,
-              appBarElevation: 0.0,
-              context: context),
-          body: Container(
-            height: Config.getDeviceHeight(context),
-            width: Config.getDeviceWidth(context),
-            child: Row(
-              children: [
-                Expanded(
-                    child: BlocBuilder<OrderInfoBloc, OrderInfoState>(
-                  buildWhen: (previous, current) {
-                    if (previous.orderType != current.orderType) {
-                      return true;
-                    } else {
-                      return false;
-                    }
-                  },
-                  builder: (context, state) {
-                    switch (state.orderType) {
-                      case ORDERTYPE.DINE_IN:
-                        return dineInLayout;
-                        break;
-                      case ORDERTYPE.TAKE_AWAY:
-                        return takeAwayLayout;
-                        break;
-                      case ORDERTYPE.DELIVERY:
-                        return deliveryLayout;
-                        break;
-                      default:
-                        return Container();
-                        break;
-                    }
-                  },
-                )),
-                Expanded(
-                  child: Container(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          Config.allowDineIn
-                              ? orderTypeButton(
-                                  context,
-                                  'Dine-In',
-                                  () => passEvent(context,
-                                      OrderTypeChanged(type: dineInOrdertype)),
-                                  dineIn)
-                              : Container(),
-                          Config.allowTakeAway
-                              ? orderTypeButton(
-                                  context,
-                                  'Takeaway',
-                                  () => passEvent(
-                                      context,
-                                      OrderTypeChanged(
-                                          type: takeAwayOrderType)),
-                                  takeAway)
-                              : Container(),
-                          Config.allowDelivery
-                              ? orderTypeButton(
-                                  context,
-                                  'Delivery',
-                                  () => passEvent(
-                                      context,
-                                      OrderTypeChanged(
-                                          type: deliveryOrderType)),
-                                  delivery)
-                              : Container(),
-                        ],
+      child: BlocListener<OrderInfoBloc, OrderInfoState>(
+          listener: (context, state) async {
+            if (state is ValidSubmission) {
+              Navigator.of(context)
+                  .pushNamed('/pos', arguments: state.customerOrder);
+            } else if (state is OrderInfoError) {
+              AppTheme.snackbar(context, state.message, textColor: Colors.red);
+            }
+          },
+          child: Scaffold(
+            backgroundColor: Colors.grey[200],
+            appBar: AppTheme.appBarNormal(
+                appBarTitle: 'Order Type',
+                appBarBgColor: AppTheme.appBarColor,
+                appBarElevation: 0.0,
+                context: context),
+            body: Container(
+              height: Config.getDeviceHeight(context),
+              width: Config.getDeviceWidth(context),
+              child: Row(
+                children: [
+                  Expanded(
+                      child: BlocBuilder<OrderInfoBloc, OrderInfoState>(
+                    buildWhen: (previous, current) {
+                      if (previous.orderType != current.orderType) {
+                        return true;
+                      } else {
+                        return false;
+                      }
+                    },
+                    builder: (context, state) {
+                      switch (state.orderType) {
+                        case ORDERTYPE.DINE_IN:
+                          return dineInLayout;
+                          break;
+                        case ORDERTYPE.TAKE_AWAY:
+                          return takeAwayLayout;
+                          break;
+                        case ORDERTYPE.DELIVERY:
+                          return deliveryLayout;
+                          break;
+                        default:
+                          return Container();
+                          break;
+                      }
+                    },
+                  )),
+                  Expanded(
+                    child: Container(
+                      child: SingleChildScrollView(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            Config.allowDineIn
+                                ? orderTypeButton(
+                                    context,
+                                    'Dine-In',
+                                    () => passEvent(
+                                        context,
+                                        OrderTypeChanged(
+                                            type: dineInOrdertype)),
+                                    dineIn)
+                                : Container(),
+                            Config.allowTakeAway
+                                ? orderTypeButton(
+                                    context,
+                                    'Takeaway',
+                                    () => passEvent(
+                                        context,
+                                        OrderTypeChanged(
+                                            type: takeAwayOrderType)),
+                                    takeAway)
+                                : Container(),
+                            Config.allowDelivery
+                                ? orderTypeButton(
+                                    context,
+                                    'Delivery',
+                                    () => passEvent(
+                                        context,
+                                        OrderTypeChanged(
+                                            type: deliveryOrderType)),
+                                    delivery)
+                                : Container(),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
-          ),
-        ));
+          )),
+    );
   }
 
   void passEvent(BuildContext c, OrderInfoEvent event) =>

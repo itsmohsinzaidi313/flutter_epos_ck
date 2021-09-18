@@ -1,57 +1,36 @@
-class Register {
-  String id;
-  String shift;
-  String openingBalance;
-  String closingBalance;
-  String openingBalanceDateTime;
-  String closingBalanceDateTime;
-  String salePaidAmount;
-  String customerDueReceive;
-  String paymentMethodsSale;
-  String registerStatus;
-  String userId;
-  String outletId;
-  String companyId;
-  String registerNo;
-  String deviceKey;
-  String remoteId; //local id
-  String isUpload;
+import 'package:pos_app/database/tables/database_tables.dart';
 
-  Register(
-      {this.id,
-      this.shift,
-      this.openingBalance,
-      this.closingBalance,
-      this.openingBalanceDateTime,
-      this.closingBalanceDateTime,
-      this.salePaidAmount,
-      this.customerDueReceive,
-      this.paymentMethodsSale,
-      this.registerStatus,
-      this.userId,
-      this.outletId,
-      this.companyId,
-      this.registerNo,
-      this.deviceKey,
-      this.remoteId,
-      this.isUpload});
+class Shift {
+  int id;
+  int shiftId;
+  String voucherNo;
+  String openDay;
+  String closingDay;
+  int isOpen;
+  int userId;
+  int outletId;
+  int companyId;
 
-  Register.fromMap(Map<String, dynamic> map)
-      : remoteId = map[''].toString(),
-        shift = map[''],
-        openingBalance = map[''],
-        closingBalance = map[''],
-        openingBalanceDateTime = map[''],
-        closingBalanceDateTime = map[''],
-        salePaidAmount = map[''],
-        customerDueReceive = map[''],
-        paymentMethodsSale = map[''],
-        registerStatus = map[''],
-        userId = map[''],
-        outletId = map[''],
-        companyId = map[''],
-        registerNo = map[''],
-        deviceKey = map[''],
-        id = map[''],
-        isUpload = map[''];
+  Shift({
+    this.id,
+    this.shiftId,
+    this.voucherNo,
+    this.openDay,
+    this.closingDay,
+    this.isOpen,
+    this.userId,
+    this.outletId,
+    this.companyId,
+  });
+
+  Shift.fromMap(Map<String, dynamic> map)
+      : id = map[ShiftTable.LOCAL_ID],
+        shiftId = map[ShiftTable.SHIFT_ID],
+        voucherNo = map[ShiftTable.VOUCHER_NO],
+        openDay = map[ShiftTable.OPEN_DAY],
+        closingDay = map[ShiftTable.CLOSING_DAY],
+        isOpen = map[ShiftTable.IS_OPEN],
+        userId = map[ShiftTable.USER_ID],
+        outletId = map[ShiftTable.OUTLET_ID],
+        companyId = map[ShiftTable.COMPANY_ID];
 }

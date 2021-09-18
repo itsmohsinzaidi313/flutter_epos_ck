@@ -1,11 +1,13 @@
 import 'dart:async';
-import 'dart:developer';
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
+import 'package:pos_app/database/models/register.dart';
 import 'package:pos_app/models/user.dart';
-import 'package:pos_app/repositories/login_repository.dart';
+import 'package:pos_app/repositories/general_repository.dart';
+import 'package:pos_app/repositories/users_repository.dart';
 import 'package:pos_app/shared/config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:sqflite/sqflite.dart';
 part 'login_bloc_event.dart';
 part 'login_bloc_state.dart';
 
@@ -44,47 +46,29 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
           yield* attemptLogin(
               username: await _username, password: await _password);
         }
-        // final response = await UsersRepo.repo.users;
-        // if (response.status) {
-        //   yield UsersLoaded(
-        //       list: (response.data as List<dynamic>)
-        //           .map((e) => User.fromJson(e))
-        //           .toList());
-        // } else {}
       } else if (event is DeviceKeyChanged) {
         if (event.deviceKey == '') {
-          yield InvalidDeviceKey(message: 'Ipaddress is required.');
+          yield InvalidDeviceKey(message: 'DeviceKey is required.');
         } else {
           Config.deviceKey = Future.value(event.deviceKey);
-          yield ValidDevicekey(message: 'Server IP saved.');
+          yield ValidDevicekey(message: 'DeviceKey saved.');
         }
-      }
-      //else if (event is UsernameChanged) {
-      //   if (event.username == '') {
-      //     yield InvalidUsername(message: 'Username is required.');
-      //   } else {
-      //     _username = Future.value(event.username);
-      //     yield ValidUsername();
-      //   }
-      // } else if (event is PasswordChanged) {
-      //   if (event.password == '') {
-      //     yield InvalidPassword(message: 'Password is required.');
-      //   } else {
-      //     _password = Future.value(event.password);
-      //     yield ValidPassword();
-      //   }
-      // }
-      else if (event is LoginPressed) {
+      } else if (event is LoginPressed) {
         if (event.username == '' ||
             event.password == '' ||
             event.deviceKey == '') {
           yield InvalidSubmission(message: 'Please check all fields.');
         } else {
-          yield ValidSubmission(message: 'Login request sent.');
           yield* attemptLogin(
               username: event.username, password: event.password);
+          final register = await GeneralRepo.repo.getCurrentRegister();
+          if (register.localId == null) {
+            yield RegisterClosed();
+          }
         }
       } else if (event is LogoutPressed) {
+        await UsersRepo.repo.login(
+            email: await _username, password: await _password, logout: true);
         _loginStatus = Future.value(false);
         _username = Future.value('');
         _password = Future.value('');
@@ -99,16 +83,16 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
 
   Stream<LoginState> attemptLogin({String username, String password}) async* {
     try {
-      final response =
-          await LoginRepo.repo.login(username: username, password: password);
-      if (response.status) {
-        Config.user = User.fromJson(response.data);
-        _loginStatus = Future.value(true);
-        this._username = Future.value(username);
-        this._password = Future.value(password);
+      final status =
+          await UsersRepo.repo.login(email: username, password: password);
+      if (status) {
+        _username = Future.value(username);
+        _password = Future.value(password);
         yield LoginSuccessful(message: 'Login successful.');
       } else {
-        yield LoginFailed(message: response.message);
+        yield LoginFailed(
+            message:
+                'Login failed. Either email/password is invalid or user does not exist.');
       }
     } catch (e) {
       yield LoginFailed(message: e.toString());

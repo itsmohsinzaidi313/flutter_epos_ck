@@ -7,6 +7,7 @@ class RegisterTable extends SqlCommons {
 
   static const String LOCAL_ID = 'local_id';
   static const String SERVER_ID = 'id';
+  static const String REMOTE_ID = 'remote_id';
   static const String OPENING_BALANCE = 'opening_balance';
   static const String CLOSING_BALANCE = 'closing_balance';
   static const String OPENING_BALANCE_DATE_TIME = 'opening_balance_date_time';
@@ -25,6 +26,7 @@ class RegisterTable extends SqlCommons {
   static const List<String> COLUMN_NAMES = [
     LOCAL_ID,
     SERVER_ID,
+    REMOTE_ID,
     OPENING_BALANCE,
     CLOSING_BALANCE,
     OPENING_BALANCE_DATE_TIME,
@@ -43,6 +45,7 @@ class RegisterTable extends SqlCommons {
 
   static const List<String> COLUMN_TYPES = [
     SqlCommons.INT_PRIMARYKEY,
+    SqlCommons.INTEGER,
     SqlCommons.INTEGER,
     SqlCommons.REAL,
     SqlCommons.REAL,

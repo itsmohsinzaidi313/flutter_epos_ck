@@ -1,3 +1,5 @@
+import 'package:pos_app/database/tables/database_tables.dart';
+
 class Outlet {
   final int serverId;
   final String outletName;
@@ -29,17 +31,17 @@ class Outlet {
       this.delStatus});
 
   Outlet.fromMap(Map<String, dynamic> map)
-      : serverId = map['id'],
-        outletName = map['outlet_name'],
-        outletCode = map['outlet_code'],
-        address = map['address'],
-        phone = map['phone'],
-        invoicePrint = map['invoice_print'],
-        startingDate = map['starting_date'],
-        invoiceFooter = map['invoice_footer'],
-        collectTax = map['collect_tax'],
-        preOrPostOrder = map['pre_or_post_payment'],
-        userId = map['user_id'],
-        companyId = map['company_id'],
-        delStatus = map['del_status'];
+      : serverId = map[OutletTable.SERVER_ID],
+        outletName = map[OutletTable.OUTLET_NAME],
+        outletCode = map[OutletTable.OUTLET_CODE],
+        address = map[OutletTable.ADDRESS],
+        phone = map[OutletTable.PHONE],
+        invoicePrint = map[OutletTable.INVOICE_PRINT],
+        startingDate = map[OutletTable.STARTING_DATE],
+        invoiceFooter = map[OutletTable.INVOICE_FOOTER],
+        collectTax = map[OutletTable.COLLECT_TAX],
+        preOrPostOrder = map[OutletTable.PRE_OR_POST_ORDER],
+        userId = map[OutletTable.USER_ID],
+        companyId = map[OutletTable.COMPANY_ID],
+        delStatus = map[OutletTable.DEL_STATUS];
 }

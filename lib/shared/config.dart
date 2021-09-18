@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:pos_app/models/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Config {
-  static const String appTitle = 'POS';
+  static const String appTitle = 'CLOUD KITCHEN';
 
   static const allowDineIn = true;
   static const allowTakeAway = true;
-  static const allowDelivery = false;
+  static const allowDelivery = true;
+  static const tempDevKey = '923746037';
 
   static Future<String> get deviceKey async {
     final pref = await SharedPreferences.getInstance();
@@ -19,7 +19,6 @@ class Config {
       SharedPreferences.getInstance().then((pref) => fdeviceKey
           .then((deviceKey) => pref.setString('deviceKey', deviceKey)));
 
-  static User user;
   static String activeStatus = '';
 
   static const String DATABASE_NAME = 'CloudKitchen.db';
@@ -29,20 +28,20 @@ class Config {
   static const String DOMIN = 'clients.devaj.technology/demos';
   static const String URL_COMMONS = '/cloud-kitchen/api';
 
-  static String _authToken = '';
-  static set authToken(String value) => _authToken = '?auth=$value';
+  static get authToken async => '?auth=${await deviceKey}';
 
-  static String installApi =
-      '$URL_PREFIX$DOMIN$URL_COMMONS/install$_authToken&sale_limit=20&expense_limit=20';
-  static String addUpdateOrderApi =
-      '$URL_PREFIX$DOMIN$URL_COMMONS/order$_authToken';
-  static String customerUploadApi =
-      '$URL_PREFIX$DOMIN$URL_COMMONS/customer$_authToken';
-  static String openRegisterApi =
-      '$URL_PREFIX$DOMIN$URL_COMMONS/openRegister$_authToken';
-  static String closeRegisterApi =
-      '$URL_PREFIX$DOMIN$URL_COMMONS/closeRegister$_authToken';
-  static String shiftApi = '$URL_PREFIX$DOMIN$URL_COMMONS/shift$_authToken';
+  static Future<String> get installApi async =>
+      '$URL_PREFIX$DOMIN$URL_COMMONS/install${await authToken}&sale_limit=20&expense_limit=20';
+  static Future<String> get addUpdateOrderApi async =>
+      '$URL_PREFIX$DOMIN$URL_COMMONS/order${await authToken}';
+  static Future<String> get customerUploadApi async =>
+      '$URL_PREFIX$DOMIN$URL_COMMONS/customer${await authToken}';
+  static Future<String> get openRegisterApi async =>
+      '$URL_PREFIX$DOMIN$URL_COMMONS/openRegister${await authToken}';
+  static Future<String> get closeRegisterApi async =>
+      '$URL_PREFIX$DOMIN$URL_COMMONS/closeRegister${await authToken}';
+  static Future<String> get shiftApi async =>
+      '$URL_PREFIX$DOMIN$URL_COMMONS/shift${await authToken}';
 
   static const int SPLASH_DURATION = 3; //SECONDS
   static const int SNACKBAR_TIMEOUT = 1; //SECONDS

@@ -1,3 +1,5 @@
+import 'package:pos_app/database/tables/database_tables.dart';
+
 class VatAmount {
   String serverID;
   String name;
@@ -15,11 +17,11 @@ class VatAmount {
       this.delStatus});
 
   VatAmount.fromMap(Map<String, dynamic> map) {
-    serverID = map['id'];
-    name = map['name'];
-    percentage = map['percentage'];
-    companyId = map['company_id'];
-    userId = map['user_id'];
-    delStatus = map['del_status'];
+    serverID = map[VatAmountTable.SERVER_ID];
+    name = map[VatAmountTable.NAME];
+    percentage = map[VatAmountTable.PERCENTAGE];
+    companyId = map[VatAmountTable.COMPANY_ID];
+    userId = map[VatAmountTable.USER_ID];
+    delStatus = map[VatAmountTable.DEL_STATUS];
   }
 }

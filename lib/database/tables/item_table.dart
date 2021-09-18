@@ -14,7 +14,7 @@ class ItemTable extends SqlCommons{
   static const String NAME = 'name';
   static const String SALE_PRICE = 'sale_price';
   static const String PHOTO = 'photo';
-  static const String CATEGORY_NAME = 'category_name';
+  static const String CATEGORY_ID = 'category_id';
   static const String PERCENTAGE = 'percentage';
   static const String QUANTITY = 'quantity';
 
@@ -25,7 +25,7 @@ class ItemTable extends SqlCommons{
     NAME,
     SALE_PRICE,
     PHOTO,
-    CATEGORY_NAME,
+    CATEGORY_ID,
     PERCENTAGE,
     QUANTITY
   ];

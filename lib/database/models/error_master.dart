@@ -7,9 +7,9 @@ class ErrorMaster {
   ErrorMaster({this.id, this.className, this.dateTime, this.title});
 
   ErrorMaster.fromMap(Map<String, dynamic> map) {
-    this.id = map['id'];
-    this.className = map['class_name'];
-    this.dateTime = map['date_time'];
-    this.title = map['title'];
+    id = map['id'];
+    className = map['class_name'];
+    dateTime = map['date_time'];
+    title = map['title'];
   }
 }

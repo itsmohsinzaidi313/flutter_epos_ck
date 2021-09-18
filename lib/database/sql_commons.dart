@@ -24,16 +24,18 @@ abstract class SqlCommons {
 
   Future<void> create() async {
     try {
-      log('TABLE $dbTableName CREATED', name: 'SqlCommons');
-      String query = 'CREATE TABLE IF NOT EXISTS $dbTableName (';
-      for (int i = 0; i < dbColumns.length; i++) {
-        query += '${dbColumns[i]} ${dbColumnsDataTypes[i]},';
+      if (verify()) {
+        log('TABLE $dbTableName CREATED', name: 'SqlCommons');
+        String query = 'CREATE TABLE IF NOT EXISTS $dbTableName (';
+        for (int i = 0; i < dbColumns.length; i++) {
+          query += '${dbColumns[i]} ${dbColumnsDataTypes[i]},';
+        }
+        query = query.substring(0, query.length - 1);
+        query += ');';
+        await database.execute(query);
+        bloc.add(VerboseNewEvent(
+            title: 'SqlCommons', message: 'Table created $dbTableName'));
       }
-      query = query.substring(0, query.length - 1);
-      query += ');';
-      await database.execute(query);
-      // bloc.add(VerboseNewEvent(
-      //     title: 'SqlCommons', message: 'Table created $dbTableName'));
     } catch (e) {
       log('SqlCommons', error: e);
     }
@@ -43,8 +45,8 @@ abstract class SqlCommons {
     if (!skipDrop) {
       log('TABLE $dbTableName DROPPED', name: 'SqlCommons');
       await database.execute('DROP TABLE IF EXISTS $dbTableName');
-      // bloc.add(VerboseNewEvent(
-      //     title: 'SqlCommons', message: 'Table dropped $dbTableName'));
+      bloc.add(VerboseNewEvent(
+          title: 'SqlCommons', message: 'Table dropped $dbTableName'));
     } else {
       log('TABLE $dbTableName DROP SKIPPED', name: 'SqlCommons');
     }
@@ -54,9 +56,10 @@ abstract class SqlCommons {
     if (!skipDelete) {
       int rowsAffected = await database.delete(dbTableName);
       log('TABLE $dbTableName DELETED($rowsAffected)', name: 'SqlCommons');
-      // bloc.add(VerboseNewEvent(
-      //     title: 'SqlCommons', message: 'Table deleted $dbTableName($rowsAffected)'));
-      // return rowsAffected;
+      bloc.add(VerboseNewEvent(
+          title: 'SqlCommons',
+          message: 'Table deleted $dbTableName($rowsAffected)'));
+      return rowsAffected;
     } else {
       log('TABLE $dbTableName DELETE SKIPPED', name: 'SqlCommons');
     }
@@ -64,12 +67,12 @@ abstract class SqlCommons {
 
   bool verify() {
     if (dbColumns.length == dbColumnsDataTypes.length) {
-      // bloc.add(
-      //     VerboseNewEvent(title: 'SqlCommons', message: '$dbTableName OK'));
+      bloc.add(
+          VerboseNewEvent(title: 'SqlCommons', message: '$dbTableName OK'));
       log('TABLE OK', name: 'SqlCommons');
       return true;
     } else {
-      // bloc.add(VerboseError(message: '$dbTableName has invalid Column/Type'));
+      bloc.add(VerboseError(message: '$dbTableName has invalid Column/Type'));
       throw Exception(
           'TABLE $dbTableName IS INVALID.\ndbColumns.length == dbColumnsDataTypes.length SHOULD BE TRUE\nCOLUMNS/TYPES => ${dbColumns.length}/${dbColumnsDataTypes.length}');
     }

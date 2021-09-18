@@ -1,32 +1,31 @@
-import 'dart:convert';
-import 'dart:developer';
+import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pos_app/bloc/verbose_bloc/verbose_bloc.dart';
 import 'package:pos_app/models/customer_order.dart';
-import 'package:pos_app/models/server_response.dart';
 import 'package:pos_app/repositories/order_repository.dart';
+import 'package:pos_app/repositories/printing_repository.dart';
+import 'package:pos_app/services/printing_service/printing_service.dart';
 import 'package:pos_app/shared/app_theme.dart';
 import 'package:pos_app/shared/config.dart';
 
 class OrdersScreen extends StatefulWidget {
-  final List<Order> ordersList;
-  OrdersScreen({@required this.ordersList});
-
-  final enablePayment = false;
-  final enableOrderDelete = false;
-
+  final enablePayment = true;
+  final enableOrderDelete = true;
+  final iconSize = 35.0;
   @override
-  _OrdersScreenState createState() =>
-      _OrdersScreenState(ordersList: ordersList);
+  _OrdersScreenState createState() => _OrdersScreenState();
 }
 
 class _OrdersScreenState extends State<OrdersScreen>
     with SingleTickerProviderStateMixin {
-  List<Order> ordersList;
   List<Tab> tabs;
+  List<Order> ordersList = [];
   TabController tabController;
 
-  _OrdersScreenState({@required this.ordersList}) {
+  _OrdersScreenState() {
+    ordersList.clear();
     tabs = [];
     Tab dineInTab = Tab(
       child: Text('DINE IN'),
@@ -46,18 +45,16 @@ class _OrdersScreenState extends State<OrdersScreen>
     tabController = TabController(length: tabs.length, vsync: this);
   }
 
-  void updateOrders() async {
+  Future<void> updateOrders() async {
     try {
       AppTheme.snackbar(context, 'Refreshing orders...');
-      ServerResponse response =
-          await OrderRepo.repo.getOrders(tiltId: Config.user.tiltId, type: '0');
-      if (response.status) {
-        final list = (response.data as List<dynamic>) ?? [];
-        setState(() {
-          ordersList = list.map((e) => Order.fromJson(e)).toList();
-        });
-      } else {
-        AppTheme.snackbar(context, response.message);
+      List<Order> temp = (await OrderRepo.repo.getOrders()) ?? [];
+      ordersList.clear();
+      for (var item in temp) {
+        ordersList.add(item);
+      }
+      if (mounted) {
+        setState(() {});
       }
     } catch (e) {
       AppTheme.snackbar(context, e.toString(), textColor: Colors.red);
@@ -66,62 +63,45 @@ class _OrdersScreenState extends State<OrdersScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[200],
-      appBar: AppTheme.appBarNormal(
-          appBarTitle: 'Pending Orders',
-          appBarBgColor: AppTheme.appBarColor,
-          appBarElevation: 0.0,
-          context: context,
-          bottom: TabBar(
-            tabs: tabs,
+    // Timer(Duration(seconds: 3), updateOrders);
+    return BlocListener<VerboseBloc, VerboseState>(
+      listenWhen: (previous, current) => current is VerboseSnackBarState,
+      listener: (context, state) {
+        AppTheme.snackbar(context, state.message);
+      },
+      child: Scaffold(
+        backgroundColor: Colors.grey[200],
+        appBar: AppTheme.appBarNormal(
+            appBarTitle: 'Pending Orders',
+            appBarBgColor: AppTheme.appBarColor,
+            appBarElevation: 0.0,
+            context: context,
+            bottom: TabBar(
+              tabs: tabs,
+              controller: tabController,
+            ),
+            actions: [
+              ElevatedButton(
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(Colors.amber),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.sync, color: Colors.red),
+                    Text(
+                      'Refresh',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ],
+                ),
+                onPressed: updateOrders,
+              )
+            ]),
+        body: Container(
+          child: TabBarView(
             controller: tabController,
+            children: getTabWidgets(),
           ),
-          actions: [
-            ElevatedButton(
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(Colors.amber),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.sync, color: Colors.red),
-                  Text(
-                    'Refresh',
-                    style: TextStyle(color: Colors.red),
-                  ),
-                ],
-              ),
-              onPressed: updateOrders,
-            )
-          ]),
-      body: Container(
-        child: TabBarView(
-          controller: tabController,
-          children:
-              getTabWidgets(),
-          //     [
-          //   getOrdersList(
-          //       order: ordersList.where((e) {
-          //     if (e.orderType == '1')
-          //       return true;
-          //     else
-          //       return false;
-          //   }).toList()),
-          //   getOrdersList(
-          //       order: ordersList.where((e) {
-          //     if (e.orderType == '2')
-          //       return true;
-          //     else
-          //       return false;
-          //   }).toList()),
-          //   getOrdersList(
-          //       order: ordersList.where((e) {
-          //     if (e.orderType == '3')
-          //       return true;
-          //     else
-          //       return false;
-          //   }).toList()),
-          // ],
         ),
       ),
     );
@@ -180,7 +160,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                         'ORDER#: ${order.orderNo}',
                         style: TextStyle(
                             color: Colors.white,
-                            fontSize: 22,
+                            fontSize: 25,
                             fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -202,10 +182,10 @@ class _OrdersScreenState extends State<OrdersScreen>
                       description: order.totalTaxedAmount,
                       fontWeight: FontWeight.bold),
                   Divider(),
-                  boxTile(title: 'TIME', description: '${order.time}'),
+                  boxTile(title: 'TIME', description: order.time),
                   Divider(),
                   order.orderType == '1'
-                      ? boxTile(title: 'TABLE', description: '${order.tableId}')
+                      ? boxTile(title: 'TABLE', description: order.tableId)
                       : Container(),
                   order.orderType != '1'
                       ? boxTile(title: 'NAME', description: '${order.customer}')
@@ -213,7 +193,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                   order.orderType != '1' ? Divider() : Container(),
                   order.orderType != '1'
                       ? boxTile(
-                          title: 'CONTACT', description: '${order.contact}')
+                          title: 'CONTACT', description: order.customer.contact)
                       : Container(),
                   order.orderType != '1' ? Divider() : Container(),
                 ],
@@ -221,55 +201,111 @@ class _OrdersScreenState extends State<OrdersScreen>
             ),
             Expanded(child: SizedBox()),
             Container(
+              decoration: BoxDecoration(
+                color: Colors.grey.shade200,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(15),
+                  bottomRight: Radius.circular(15),
+                ),
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  IconButton(
-                    icon: Icon(
-                      Icons.edit_rounded,
-                      color: Colors.amber,
+                  Expanded(
+                    child: TextButton(
+                      child: Container(
+                        padding: const EdgeInsets.all(8.0),
+                        decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.red,
+                            ),
+                            borderRadius: BorderRadius.circular(10)),
+                        child: Text('BILL'),
+                      ),
+                      onPressed: () => PrintingRepo.repo.savePrint(
+                          customerOrder: order,
+                          printType: PrintType.saleReceipt),
                     ),
-                    onPressed: () async {
-                      order.editOrder = true;
-                      await Navigator.of(context)
-                          .pushNamed('/pos', arguments: order);
-                      updateOrders();
-                    },
+                  ),
+                  Expanded(
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.edit_rounded,
+                        color: Colors.amber,
+                        size: widget.iconSize,
+                      ),
+                      onPressed: () async {
+                        order.editOrder = true;
+                        await Navigator.of(context)
+                            .pushNamed('/pos', arguments: order);
+                        await updateOrders();
+                      },
+                    ),
                   ),
                   widget.enablePayment
-                      ? IconButton(
-                          icon: Icon(
-                            Icons.monetization_on_outlined,
-                            color: Colors.green,
+                      ? Expanded(
+                          child: IconButton(
+                            icon: Icon(
+                              Icons.monetization_on_outlined,
+                              color: Colors.green,
+                              size: widget.iconSize,
+                            ),
+                            onPressed: () async {
+                              AppTheme.showAlertDialogYN(context,
+                                  title: 'Order Payment',
+                                  message: 'Are You Sure?',
+                                  onNo: () => Navigator.pop(context),
+                                  onYes: () async {
+                                    await Navigator.of(context).pushNamed(
+                                        '/payment',
+                                        arguments: order);
+                                    await updateOrders();
+                                    Navigator.pop(context);
+                                  });
+                            },
                           ),
-                          onPressed: () async {
-                            AppTheme.showAlertDialogYN(context,
-                                title: 'Order Payment',
-                                message: 'Are You Sure?',
-                                onNo: () => Navigator.pop(context),
-                                onYes: () {
-                                  Navigator.pop(context);
-                                  Navigator.of(context)
-                                      .pushNamed('/payment', arguments: order);
-                                });
-                          },
                         )
                       : Container(),
                   widget.enableOrderDelete
-                      ? IconButton(
-                          icon: Icon(
-                            Icons.delete_rounded,
-                            color: Colors.redAccent,
+                      ? Expanded(
+                          child: IconButton(
+                            icon: Icon(
+                              Icons.delete_rounded,
+                              color: Colors.redAccent,
+                              size: widget.iconSize,
+                            ),
+                            onPressed: () async {
+                              await AppTheme.showAlertDialogYN(context,
+                                  title: 'Delete Order',
+                                  message: 'Are You Sure?',
+                                  onNo: () => Navigator.pop(context),
+                                  onYes: () async {
+                                    await OrderRepo.repo.updateOrder(
+                                        customerOrder: order,
+                                        delete: true,
+                                        uploaded: true);
+                                    Navigator.pop(context);
+                                  });
+
+                              await updateOrders();
+                            },
                           ),
-                          onPressed: () async {
-                            AppTheme.showAlertDialogYN(context,
-                                title: 'Delete Order',
-                                message: 'Are You Sure?',
-                                onNo: () => Navigator.pop(context),
-                                onYes: () => Navigator.pop(context));
-                          },
                         )
                       : Container(),
+                  Expanded(
+                    child: TextButton(
+                        child: Container(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Text('KOT'),
+                          decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Colors.red,
+                              ),
+                              borderRadius: BorderRadius.circular(10)),
+                        ),
+                        onPressed: () => PrintingRepo.repo.savePrint(
+                            customerOrder: order, printType: PrintType.kot)),
+                  )
                 ],
               ),
             ),
@@ -394,7 +430,7 @@ class _OrdersScreenState extends State<OrdersScreen>
       {String title,
       String description,
       FontWeight fontWeight = FontWeight.normal}) {
-    final gridTextStyle = TextStyle(fontSize: 12, fontWeight: fontWeight);
+    final gridTextStyle = TextStyle(fontSize: 15, fontWeight: fontWeight);
     return Row(
       children: [
         Text(

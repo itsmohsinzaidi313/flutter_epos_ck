@@ -5,17 +5,19 @@ import 'package:pos_app/bloc/login_bloc/login_bloc.dart';
 import 'package:pos_app/bloc/order_info_bloc/order_info_bloc.dart';
 import 'package:pos_app/bloc/payment_bloc/payment_bloc.dart';
 import 'package:pos_app/bloc/pos_bloc/pos_bloc.dart';
+import 'package:pos_app/bloc/register_bloc/register_bloc.dart';
 import 'package:pos_app/bloc/report_bloc/report_bloc.dart';
 import 'package:pos_app/models/customer_order.dart';
-import 'package:pos_app/pages/feedback_page.dart';
 import 'package:pos_app/pages/login_page.dart';
-import 'package:pos_app/pages/menu_pages/menu_page.dart';
+import 'package:pos_app/pages/menu_page/menu_page.dart';
 import 'package:pos_app/pages/order_info_page.dart';
-import 'package:pos_app/pages/payment_page%20copy.dart';
+import 'package:pos_app/pages/payment_page.dart';
 import 'package:pos_app/pages/pos_page.dart';
-import 'package:pos_app/pages/report_pages/reports_page.dart';
+import 'package:pos_app/pages/report_page/reports_page.dart';
+import 'package:pos_app/pages/register_page.dart';
 import 'package:pos_app/pages/splash_page.dart';
 import 'package:pos_app/pages/orders_page.dart';
+import 'package:pos_app/pages/sql_view_page.dart';
 
 class AppRoutes {
   LoginBloc _loginBloc;
@@ -23,7 +25,7 @@ class AppRoutes {
   POSBloc _posBloc;
   PaymentBloc _paymentBloc;
   ReportBloc _reportBloc;
-  final Order _customerOrder = Order();
+  RegisterBloc _registerBloc;
 
   AppRoutes() {
     _loginBloc = LoginBloc();
@@ -31,6 +33,7 @@ class AppRoutes {
     _posBloc = POSBloc();
     _paymentBloc = PaymentBloc();
     _reportBloc = ReportBloc();
+    _registerBloc = RegisterBloc();
   }
 
   Route onGeneratedRoute(RouteSettings routeSettings) {
@@ -40,10 +43,8 @@ class AppRoutes {
         break;
       case '/login':
         return MaterialPageRoute(
-          builder: (context) => BlocProvider.value(
-            value: _loginBloc,
-            child: LoginScreen(),
-          ),
+          builder: (context) =>
+              BlocProvider.value(value: _loginBloc, child: LoginScreen()),
         );
         break;
       case '/menu':
@@ -85,22 +86,29 @@ class AppRoutes {
         break;
       case '/orders':
         return MaterialPageRoute(
-          builder: (context) =>
-              OrdersScreen(ordersList: routeSettings.arguments),
+          builder: (context) => OrdersScreen(),
         );
         break;
-      case '/feedback':
+      case '/register':
         return MaterialPageRoute(
-          builder: (context) => FeedbackScreen(
-            order: routeSettings.arguments,
-          ),
-        );
+            builder: (context) => BlocProvider.value(
+                  value: _registerBloc,
+                  child: RegisterScreen(),
+                ));
         break;
       case '/reports':
         return MaterialPageRoute(
           builder: (context) => BlocProvider.value(
             value: _reportBloc,
             child: ReportsPage(),
+          ),
+        );
+        break;
+      case '/database':
+      return MaterialPageRoute(
+          builder: (context) => BlocProvider.value(
+            value: _reportBloc,
+            child: SqlViewPage(),
           ),
         );
         break;
@@ -116,5 +124,6 @@ class AppRoutes {
     _posBloc.close();
     _paymentBloc.close();
     _reportBloc.close();
+    _registerBloc.close();
   }
 }

@@ -3,6 +3,9 @@ import 'package:meta/meta.dart';
 import 'package:bloc/bloc.dart';
 import 'package:pos_app/models/customer_order.dart';
 import 'package:pos_app/models/menu_item.dart';
+import 'package:pos_app/repositories/order_repository.dart';
+import 'package:pos_app/repositories/printing_repository.dart';
+import 'package:pos_app/services/printing_service/printing_service.dart';
 
 part 'payment_event.dart';
 part 'payment_state.dart';
@@ -13,8 +16,7 @@ class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
 
   final String invalidDiscountMessage = 'Please check the discount amount';
   final String invalidPaymentMessage = 'Please check the payment';
-  final String invalidSubmissionMessage =
-      'Please check the payment, card number or discount';
+  final String message = 'Please check the payment, card number or discount';
   final String invalidCardNumberMessage = 'Please check the card number';
 
   @override
@@ -23,6 +25,7 @@ class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
   ) async* {
     if (event is LoadPaymentOrder) {
       customerOrder = event.customerOrder;
+      customerOrder.paymentMode = PAYMENTMODE.CASH;
     } else if (event is PaymentBuild) {
       yield CartItems(
           list: customerOrder.cartItems,
@@ -33,7 +36,7 @@ class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
           totalAmount: customerOrder.subTotal,
           totalTaxAmount: customerOrder.totalTaxedAmount);
     } else if (event is PaymentModeChanged) {
-      customerOrder.paymentmode = event.mode;
+      customerOrder.paymentMode = event.mode;
       yield PaymentType(
           mode: event.mode,
           totalAmount: customerOrder.subTotal,
@@ -85,11 +88,13 @@ class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
           totalAmount: customerOrder.subTotal,
           totalTaxAmount: customerOrder.totalTaxedAmount);
     } else if (event is CardNumberChanged) {
-      if (int.tryParse(event.cardNumber) == null) {
+      if (event.cardNumber == null || event.cardNumber == '') {
         yield InvalidCardNumber(
             message: invalidCardNumberMessage,
             totalAmount: customerOrder.subTotal,
             totalTaxAmount: customerOrder.totalTaxedAmount);
+      } else {
+        customerOrder.cardNumber = event.cardNumber;
       }
     } else if (event is DiscountChanged) {
       double discount = double.tryParse(event.discount);
@@ -109,15 +114,15 @@ class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
             totalTaxAmount: customerOrder.totalTaxedAmount);
       }
     } else if (event is Submit) {
-      double discount = double.tryParse(customerOrder.discountedAmount);
-      double payment = double.tryParse(customerOrder.payment);
+      double discount = double.tryParse(customerOrder.discountedAmount),
+          payment = double.tryParse(customerOrder.payment);
       if (discount == null) {
         yield InvalidDiscount(
             message: invalidDiscountMessage,
             totalAmount: customerOrder.subTotal,
             totalTaxAmount: customerOrder.totalTaxedAmount);
       }
-      if (customerOrder.paymentmode == PAYMENTMODE.CASH) {
+      if (customerOrder.paymentMode == PAYMENTMODE.CASH) {
         if (payment == null) {
           yield InvalidPayment(
               message: invalidPaymentMessage,
@@ -131,16 +136,29 @@ class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
                 totalAmount: customerOrder.subTotal,
                 totalTaxAmount: customerOrder.totalTaxedAmount);
           } else {
-            yield ValidSubmission();
+            bool status =
+                await OrderRepo.repo.updateOrder(customerOrder: customerOrder);
+            yield status
+                ? ValidSubmission()
+                : InvalidSubmission(message: 'Unable to pay order.');
           }
-        } else if (customerOrder.paymentmode == PAYMENTMODE.CREDIT) {
+        } else if (customerOrder.paymentMode == PAYMENTMODE.CREDIT) {
           if (int.tryParse(customerOrder.cardNumber) == null) {
             yield InvalidCardNumber(
                 message: invalidCardNumberMessage,
                 totalAmount: customerOrder.subTotal,
                 totalTaxAmount: customerOrder.totalTaxedAmount);
           } else {
-            yield ValidSubmission();
+            bool status =
+                await OrderRepo.repo.updateOrder(customerOrder: customerOrder, paid: true, uploaded: false);
+                
+            status
+                ? PrintingRepo.repo.savePrint(customerOrder: customerOrder, printType: PrintType.saleReceipt)
+                : null;
+
+            yield status
+                ? ValidSubmission()
+                : InvalidSubmission(message: 'Unable to pay order.');
           }
         }
       }

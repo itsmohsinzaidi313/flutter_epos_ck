@@ -1,3 +1,5 @@
+import 'package:pos_app/database/tables/database_tables.dart';
+
 class Modifier {
   final int serverId;
   final String name;
@@ -17,11 +19,11 @@ class Modifier {
       this.delStatus});
 
   Modifier.fromMap(Map<String, dynamic> map)
-      : serverId = map['id'],
-        name = map['name'],
-        price = map['price'],
-        description = map['description'],
-        userId = map['user_id'],
-        companyId = map['company_id'],
-        delStatus = map['del_status'];
+      : serverId = map[ModifierTable.SERVER_ID],
+        name = map[ModifierTable.NAME],
+        price = map[ModifierTable.PRICE],
+        description = map[ModifierTable.DESCRIPTION],
+        userId = map[ModifierTable.USER_ID],
+        companyId = map[ModifierTable.COMPANY_ID],
+        delStatus = map[ModifierTable.DEL_STATUS];
 }

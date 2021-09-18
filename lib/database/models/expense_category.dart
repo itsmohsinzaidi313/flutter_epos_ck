@@ -15,11 +15,11 @@ class ExpenseCategory {
       this.delStatus});
 
   ExpenseCategory.fromMap(Map<String, dynamic> map) {
-    this.serverId = map['id'];
-    this.name = map['name'];
-    this.description = map['description'];
-    this.userId = map['user_id'];
-    this.companyId = map['company_id'];
-    this.delStatus = map['del_status'];
+    serverId = map['id'];
+    name = map['name'];
+    description = map['description'];
+    userId = map['user_id'];
+    companyId = map['company_id'];
+    delStatus = map['del_status'];
   }
 }

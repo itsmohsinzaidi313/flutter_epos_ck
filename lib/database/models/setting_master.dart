@@ -4,7 +4,7 @@ class SettingMaster{
   SettingMaster({this.id, this.title});
 
   SettingMaster.fromMap(Map<String, dynamic> map){
-    this.id = map['id'];
-    this.title = map['title'];
+    id = map['id'];
+    title = map['title'];
   }
 }

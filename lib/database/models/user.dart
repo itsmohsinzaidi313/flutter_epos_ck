@@ -1,3 +1,5 @@
+import 'package:pos_app/database/tables/database_tables.dart';
+
 class User {
   final String serverId;
   final String fullName;
@@ -33,19 +35,19 @@ class User {
       this.delStatus});
 
   User.fromMap(Map<String, dynamic> map)
-      : serverId = map['id'],
-        fullName = map['full_name'],
-        phone = map['phone'],
-        emailAddress = map['email_address'],
-        password = map['password'],
-        designation = map['designation'],
-        willLogin = map['will_login'],
-        role = map['role'],
-        outletId = map['outlet_id'],
-        companyId = map['company_id'],
-        accountCreationDate = map['account_creation_date'],
-        language = map['language'],
-        lastLogin = map['last_login'],
-        activeStatus = map['active_status'],
-        delStatus = map['del_status'];
+      : serverId = map[UserTable.SERVER_ID],
+        fullName = map[UserTable.FULL_NAME],
+        phone = map[UserTable.PHONE],
+        emailAddress = map[UserTable.EMAIL],
+        password = map[UserTable.PASSWORD],
+        designation = map[UserTable.DESIGNATION],
+        willLogin = map[UserTable.WILL_LOGIN],
+        role = map[UserTable.ROLE],
+        outletId = map[UserTable.OUTLET_ID],
+        companyId = map[UserTable.COMPANY_ID],
+        accountCreationDate = map[UserTable.ACCOUNT_CREATED_DATE],
+        language = map[UserTable.LANGUAGE],
+        lastLogin = map[UserTable.LAST_LOGIN],
+        activeStatus = map[UserTable.ACTIVE_STATUS],
+        delStatus = map[UserTable.DEL_STATUS];
 }

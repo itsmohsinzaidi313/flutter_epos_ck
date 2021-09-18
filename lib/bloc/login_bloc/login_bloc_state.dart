@@ -58,3 +58,7 @@ class UsersLoaded extends LoginState {
   final List<User> list;
   UsersLoaded({this.list});
 }
+
+class DatabaseMissing extends LoginState{}
+
+class RegisterClosed extends LoginState {}

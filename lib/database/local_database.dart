@@ -62,7 +62,7 @@ class LocalDatabase {
           onUpgrade: _onUpgrade,
           onDowngrade: _onDowngrade);
 
-  List<SqlCommons> _tables = [];
+  List<SqlCommons> _tables;
   List<SqlCommons> tables(Database db, VerboseBloc bloc) => _tables ??= [
         CategoryTable(db, bloc),
         CompanyTable(db, bloc),
@@ -76,6 +76,7 @@ class LocalDatabase {
         ModifierTable(db, bloc),
         OrdersTable(db, bloc),
         OutletTable(db, bloc),
+        OutletPrinterTable(db, bloc),
         PaymentMethodTable(db, bloc),
         RegisterTable(db, bloc),
         SalesDetailTable(db, bloc),
@@ -86,12 +87,19 @@ class LocalDatabase {
         TablesTable(db, bloc),
         UserTable(db, bloc),
         VatAmountTable(db, bloc),
+        DepartmentTable(db, bloc),
+        DepartmentPrinterTable(db, bloc),
+        PrintingMasterTable(db, bloc),
+        PrintingDetailTable(db, bloc),
       ];
 
   Future<void> _createTables(Database db) async {
-    for (var table in tables(db, _bloc)) {
+    List<SqlCommons> list = tables(db, _bloc);
+    for (var table in list) {
       await table.create();
     }
+    _bloc.add(VerboseNewEvent(
+        title: 'Local Database', message: 'Installation successful.'));
   }
 
   Future<void> _deleteTables(Database db) async {
@@ -107,9 +115,10 @@ class LocalDatabase {
   }
 
   FutureOr<void> _onCreate(Database db, int version) async {
-    if (version == 0) {
-      log('DATABASE CREATED. VERSION: $version', name: 'onCreate');
+    if (version == 1) {
+      log('DATABASE CREATED. VERSION: $version', name: 'LocalDatabase');
       await _createTables(db);
+      db.setVersion(2);
     }
   }
 
@@ -117,7 +126,7 @@ class LocalDatabase {
       Database db, int oldVersion, int newVersion) async {
     if (oldVersion < newVersion) {
       log('DATABASE UPGRADED. VERSION: $oldVersion => $newVersion',
-          name: 'onUpgrade');
+          name: 'LocalDatabase');
       await _dropTables(db);
       await _createTables(db);
     }
@@ -127,12 +136,12 @@ class LocalDatabase {
       Database db, int oldVersion, int newVersion) async {
     if (oldVersion > newVersion) {
       log('DATABASE DOWNGRADED. VERSION: $oldVersion => $newVersion',
-          name: 'onDownGrade');
+          name: 'LocalDatabase');
       await _dropTables(db);
       await _createTables(db);
     }
   }
 
   FutureOr<void> _onOpen(Database db) async =>
-      log('Database Version: ${await db.getVersion()}');
+      log('Database Version: ${await db.getVersion()}', name: 'LocalDatabase');
 }

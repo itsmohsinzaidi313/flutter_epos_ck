@@ -1,6 +1,9 @@
+import 'package:pos_app/database/tables/database_tables.dart';
+
 class Customer {
   String localId;
   final int serverId;
+  final int remoteId;
   final String name;
   final String phone;
   final String email;
@@ -16,6 +19,7 @@ class Customer {
 
   Customer(
       {this.serverId,
+      this.remoteId,
       this.name,
       this.phone,
       this.email,
@@ -30,36 +34,38 @@ class Customer {
       this.isUpload});
 
   Customer.fromMap(Map<String, dynamic> map)
-      : localId = map['local_id'].toString(),
-        serverId = map['id'],
-        name = map['name'],
-        phone = map['phone'],
-        email = map['email'],
-        address = map['address'],
-        gstNumber = map['gst_number'],
-        areaId = map['area_id'],
-        userId = map['user_id'],
-        companyId = map['company_id'],
-        delStatus = map['del_status'],
-        dateOfBirth = map['date_of_birth'],
-        dateOfAnniversary = map['date_of_anniversary'],
-        isUpload = map['is_upload'];
+      : localId = map[CustomerTable.LOCAL_ID].toString(),
+        serverId = map[CustomerTable.SERVER_ID],
+        remoteId = map[CustomerTable.REMOTE_ID],
+        name = map[CustomerTable.NAME],
+        phone = map[CustomerTable.PHONE].toString(),
+        email = map[CustomerTable.EMAIL],
+        address = map[CustomerTable.ADDRESS],
+        gstNumber = map[CustomerTable.GST_NUMBER],
+        areaId = map[CustomerTable.AREA_ID],
+        userId = map[CustomerTable.USER_ID],
+        companyId = map[CustomerTable.COMPANY_ID],
+        delStatus = map[CustomerTable.DEL_STATUS],
+        dateOfBirth = map[CustomerTable.DATE_OF_BIRTH],
+        dateOfAnniversary = map[CustomerTable.DATE_OF_ANNIVERSARY],
+        isUpload = map[CustomerTable.IS_UPLOADED];
 
   Map<String, dynamic> toMap(Customer customer) {
     return {
-      'id': customer.serverId,
-      'name': customer.name,
-      'phone': customer.phone,
-      'email': customer.email,
-      'address': customer.address,
-      'gst_number': customer.gstNumber,
-      'area_id': customer.areaId,
-      'user_id': customer.userId,
-      'company_id': customer.companyId,
-      'del_status': customer.delStatus,
-      'date_of_birth': customer.dateOfBirth,
-      'date_of_anniversary': customer.dateOfAnniversary,
-      'is_upload': customer.isUpload
+      CustomerTable.SERVER_ID: customer.serverId,
+      CustomerTable.REMOTE_ID: customer.remoteId,
+      CustomerTable.NAME: customer.name,
+      CustomerTable.PHONE: customer.phone,
+      CustomerTable.EMAIL: customer.email,
+      CustomerTable.ADDRESS: customer.address,
+      CustomerTable.GST_NUMBER: customer.gstNumber,
+      CustomerTable.AREA_ID: customer.areaId,
+      CustomerTable.USER_ID: customer.userId,
+      CustomerTable.COMPANY_ID: customer.companyId,
+      CustomerTable.DEL_STATUS: customer.delStatus,
+      CustomerTable.DATE_OF_BIRTH: customer.dateOfBirth,
+      CustomerTable.DATE_OF_ANNIVERSARY: customer.dateOfAnniversary,
+      CustomerTable.IS_UPLOADED: customer.isUpload
     };
   }
 }

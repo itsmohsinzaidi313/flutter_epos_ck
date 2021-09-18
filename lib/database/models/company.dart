@@ -1,3 +1,5 @@
+import 'package:pos_app/database/tables/database_tables.dart';
+
 class Company {
   final int serverId;
   final String currency;
@@ -31,18 +33,18 @@ class Company {
       this.token});
 
   Company.fromMap(Map<String, dynamic> map)
-      : serverId = map['id'],
-        currency = map['currency'],
-        timezone = map['timezone'],
-        dateFormat = map['date_format'],
-        outletId = map['outlet_id'],
-        name = map['name'],
-        email = map['email'],
-        phone1 = map['phone_1'],
-        phone2 = map['phone_2'],
-        address = map['address'],
-        status = map['status'],
-        dateAdded = map['date_added'],
-        expiryDate = map['expiry_date'],
-        token = map['token'];
+      : serverId = map[CompanyTable.SERVER_ID],
+        currency = map[CompanyTable.CURRENCY],
+        timezone = map[CompanyTable.TIMEZONE],
+        dateFormat = map[CompanyTable.DATEFORMAT],
+        outletId = map[CompanyTable.OUTLET_ID],
+        name = map[CompanyTable.NAME],
+        email = map[CompanyTable.EMAIL],
+        phone1 = map[CompanyTable.PHONE1],
+        phone2 = map[CompanyTable.PHONE2],
+        address = map[CompanyTable.ADDRESS],
+        status = map[CompanyTable.STATUS],
+        dateAdded = map[CompanyTable.DATE_ADDED],
+        expiryDate = map[CompanyTable.EXPIRY_DATE],
+        token = map[CompanyTable.TOKEN];
 }

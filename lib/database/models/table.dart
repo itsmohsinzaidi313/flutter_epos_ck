@@ -1,3 +1,5 @@
+import 'package:pos_app/database/tables/database_tables.dart';
+
 class Table {
   String serverId;
   String name;
@@ -21,13 +23,13 @@ class Table {
       this.delStatus});
 
   Table.fromMap(Map<String, dynamic> map)
-      : serverId = map['id'],
-        name = map['name'],
-        sitCapacity = map['sit_capacity'],
-        position = map['position'],
-        description = map['description'],
-        userId = map['user_id'],
-        outletId = map['outlet_id'],
-        companyId = map['company_id'],
-        delStatus = map['del_status'];
+      : serverId = map[TablesTable.SERVER_ID],
+        name = map[TablesTable.NAME],
+        sitCapacity = map[TablesTable.SIT_CAPACITY],
+        position = map[TablesTable.POSITION],
+        description = map[TablesTable.DESCRIPTION],
+        userId = map[TablesTable.USER_ID],
+        outletId = map[TablesTable.OUTLET_ID],
+        companyId = map[TablesTable.COMPANY_ID],
+        delStatus = map[TablesTable.DEL_STATUS];
 }

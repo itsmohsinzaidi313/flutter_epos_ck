@@ -1,7 +1,5 @@
 import 'dart:async';
-import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
-import 'package:progress_dialog/progress_dialog.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class AppTheme {
@@ -23,45 +21,11 @@ class AppTheme {
       List<Widget> actions = const []}) {
     final appBar = AppBar(
       backgroundColor: appBarBgColor,
-      elevation: appBarElevation == null ? 0.0 : appBarElevation,
+      elevation: appBarElevation ?? 0.0,
       title: Text(appBarTitle),
       centerTitle: true,
       bottom: bottom,
       actions: actions,
-    );
-    return appBar;
-  }
-
-  static Widget appBarWithBadge(
-      {BuildContext context,
-      String appBarTitle,
-      String badgeText,
-      Color appBarBgColor,
-      double appBarElevation,
-      Function appBarOnTap}) {
-    final appBar = AppBar(
-      backgroundColor: appBarBgColor,
-      elevation: appBarElevation == null ? 0.0 : appBarElevation,
-      title: Text(appBarTitle),
-      centerTitle: true,
-      actions: <Widget>[
-        InkWell(
-          onTap: appBarOnTap,
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Badge(
-              child: Icon(Icons.shopping_cart, color: Colors.white, size: 40),
-              badgeContent: Text(
-                badgeText,
-                style: TextStyle(color: Colors.white),
-              ),
-              badgeColor: Colors.red,
-              toAnimate: true,
-              animationType: BadgeAnimationType.fade,
-            ),
-          ),
-        ),
-      ],
     );
     return appBar;
   }
@@ -158,10 +122,10 @@ class AppTheme {
             content: text(text: message),
             actions: [
               TextButton(
-                  child: text(text: 'Yes', color: Colors.blue),
+                  child: text(text: 'Yes', color: Colors.red),
                   onPressed: onYes),
               TextButton(
-                  child: text(text: 'No', color: Colors.blue), onPressed: onNo)
+                  child: text(text: 'No', color: Colors.red), onPressed: onNo)
             ],
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8))));
@@ -177,10 +141,10 @@ class AppTheme {
             content: text(text: message),
             actions: [
               TextButton(
-                  child: text(text: 'Yes', color: Colors.blue),
+                  child: text(text: 'Yes', color: Colors.red),
                   onPressed: () => Navigator.of(context).pop<bool>(true)),
               TextButton(
-                  child: text(text: 'No', color: Colors.blue),
+                  child: text(text: 'No', color: Colors.red),
                   onPressed: () => Navigator.of(context).pop<bool>(false))
             ],
             shape: RoundedRectangleBorder(
@@ -206,11 +170,11 @@ class AppTheme {
     return TextStyle(fontSize: fontSize, fontWeight: fontWeight, color: color);
   }
 
-  static Future<dynamic> showAlertDialogOK(BuildContext context,
-      {String title, String message, Function onOK}) {
-    return showDialog(
+  static Future<void> showAlertDialogOK(BuildContext context,
+      {String title, String message, Function onOK, bool barrierDismissible = false}) async {
+    await showDialog(
         context: context,
-        barrierDismissible: false,
+        barrierDismissible: barrierDismissible,
         builder: (value) => AlertDialog(
               title:
                   text(text: title, fontWeight: FontWeight.bold, fontSize: 20),

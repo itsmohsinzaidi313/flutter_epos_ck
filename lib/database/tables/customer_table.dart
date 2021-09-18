@@ -1,16 +1,13 @@
-
-
-import 'package:flutter/cupertino.dart';
 import 'package:pos_app/bloc/verbose_bloc/verbose_bloc.dart';
 import 'package:pos_app/database/sql_commons.dart';
 import 'package:sqflite_common/sqlite_api.dart';
 
-class CustomerTable extends SqlCommons{
-
+class CustomerTable extends SqlCommons {
   static const String TABLE_NAME = 'customers'; //7
 
   static const String LOCAL_ID = 'local_id';
   static const String SERVER_ID = 'id';
+  static const String REMOTE_ID = 'remote_id';
   static const String NAME = 'name';
   static const String PHONE = 'phone';
   static const String EMAIL = 'email';
@@ -27,6 +24,7 @@ class CustomerTable extends SqlCommons{
   static const List<String> COLUMN_NAMES = [
     LOCAL_ID,
     SERVER_ID,
+    REMOTE_ID,
     NAME,
     PHONE,
     EMAIL,
@@ -44,6 +42,7 @@ class CustomerTable extends SqlCommons{
   static const List<String> COLUMN_TYPES = [
     SqlCommons.INT_PRIMARYKEY,
     SqlCommons.INTEGER,
+    SqlCommons.INTEGER,
     SqlCommons.TEXT,
     SqlCommons.INTEGER,
     SqlCommons.TEXT,
@@ -56,8 +55,8 @@ class CustomerTable extends SqlCommons{
     SqlCommons.TEXT,
     SqlCommons.TEXT,
     SqlCommons.INTEGER,
-
   ];
 
-  CustomerTable(Database database, VerboseBloc bloc) : super(TABLE_NAME, COLUMN_NAMES, COLUMN_TYPES, database, bloc);
+  CustomerTable(Database database, VerboseBloc bloc)
+      : super(TABLE_NAME, COLUMN_NAMES, COLUMN_TYPES, database, bloc);
 }

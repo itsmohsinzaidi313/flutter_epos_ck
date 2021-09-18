@@ -1,19 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:pos_app/shared/config.dart';
-import 'package:http/http.dart';
-import 'package:pos_app/models/server_response.dart';
+import 'package:pos_app/database/local_database.dart';
+import 'package:pos_app/database/tables/database_tables.dart';
+import 'package:pos_app/models/menu_item.dart';
 
 class MenuItemRepo {
   static MenuItemRepo repo = MenuItemRepo._internal();
   MenuItemRepo._internal();
-  Future<ServerResponse> allItems() async => ServerResponse(
-      response: await get('${await Config.getItemsApi}?phrase=*').timeout(
-          Duration(seconds: Config.SERVER_TIMEOUT),
-          onTimeout: () => null));
+  Future<List<MenuItem>> allItems() async {
+    final db = await LocalDatabase.database.getDatabase();
+    final list = (await db.query(ItemTable.TABLE_NAME)) ?? [];
+    final items = list.map((e) => MenuItem.fromMap(e)).toList();
+    return items;
+  }
 
-  Future<ServerResponse> searchItems({@required String phrase}) async =>
-      ServerResponse(
-          response: await get('${await Config.getItemsApi}?phrase=$phrase')
-              .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
-                  onTimeout: () => null));
+  Future<List<MenuItem>> searchItems({@required String phrase}) async {
+    final items = await allItems();
+    return items
+        .where((element) =>
+            element.name.toLowerCase().contains(phrase.toLowerCase()))
+        .toList();
+  }
 }

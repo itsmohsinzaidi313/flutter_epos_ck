@@ -1,26 +1,19 @@
-import 'dart:developer';
-
 import 'package:pos_app/bloc/payment_bloc/payment_bloc.dart';
+import 'package:pos_app/database/models/device.dart';
+import 'package:pos_app/database/models/register.dart';
+import 'package:pos_app/database/tables/database_tables.dart';
+import 'package:pos_app/models/customer.dart';
 import 'package:pos_app/models/menu_item.dart';
 
 class Order {
-  static const _OrderIdKey = 'Id';
-  static const _ItemsKey = 'Items';
-  static const _WaiterKey = 'Waiter';
-  static const _TableKey = 'Table';
-  static const _OrderTypeKey = 'OrderType';
-  static const _CoversKey = 'Covers';
-  static const _CustomerKey = 'Customer';
-  static const _ContactKey = 'Contact';
-  static const _AddressKey = 'Address';
-  static const _UserIdKey = 'UserId';
-  static const _OrderNoKey = 'OrderNo';
-  static const _OrderTimeKey = 'Time';
-  static const _OrderDateKey = 'Date';
-  static const _TiltIdKey = 'TiltId';
-  static const _TaxKey = 'TotalTax';
-
+  static const String DINEIN = '1';
+  static const String TAKEAWAY = '2';
+  static const String DELIVERY = '3';
   List<MenuItem> items = [];
+  Register register = Register();
+  Customer customer = Customer();
+  Device device = Device();
+
   String id,
       waiterId,
       tableId,
@@ -28,65 +21,62 @@ class Order {
       orderType,
       orderNo,
       covers,
-      customer,
-      contact,
-      address,
       time,
       date,
       tax,
-      tiltId,
-      discountedAmount,
+      outletId,
+      discountedAmount = '0.0',
       payment,
       cardNumber;
-  PAYMENTMODE paymentmode;
+  PAYMENTMODE paymentMode;
   bool editOrder = false;
 
   Order(
       {this.id,
       this.waiterId,
       this.tableId,
-      this.address,
-      this.contact,
       this.covers,
       this.customer,
       this.orderType,
       this.orderNo});
 
-  Order.fromJson(Map<String, dynamic> map)
-      : id = map[_OrderIdKey].toString(),
-        waiterId = map[_WaiterKey],
-        tableId = map[_TableKey],
-        address = map[_AddressKey],
-        contact = map[_ContactKey],
-        covers = map[_CoversKey].toString(),
-        customer = map[_CustomerKey],
-        orderType = map[_OrderTypeKey],
-        userId = map[_UserIdKey],
-        orderNo = map[_OrderNoKey].toString(),
-        time = map[_OrderTimeKey],
-        date = map[_OrderDateKey],
-        items = (map[_ItemsKey] as List<dynamic>)
-            .map((e) => MenuItem.fromJson(e))
-            .toList();
+  Order.fromMap(Map<String, dynamic> map, Map<String, dynamic> customerMap,
+      List<Map<String, dynamic>> itemsList)
+      : id = map[SalesMasterTable.SERVER_ID].toString(),
+        waiterId = map[SalesMasterTable.WAITER_ID],
+        tableId = map[SalesMasterTable.TABLE_ID],
+        covers = map[OrdersTable.PERSONS].toString(),
+        orderType = map[SalesMasterTable.ORDER_TYPE],
+        userId = map[SalesMasterTable.USER_ID],
+        orderNo = map[SalesMasterTable.SALE_NO].toString(),
+        time = map[SalesMasterTable.ORDER_TIME],
+        date = map[SalesMasterTable.SALE_DATE],
+        customer = Customer.fromMap(customerMap),
+        items = itemsList.map((e) => MenuItem.fromMap(e)).toList();
 
-  Map<String, dynamic> get toJson => {
-        _ItemsKey: items.map((e) => e.toJson()).toList(),
-        _OrderIdKey: id ?? '0',
-        _WaiterKey: waiterId ?? '0',
-        _TableKey: tableId ?? '0',
-        _AddressKey: address ?? '0',
-        _ContactKey: contact ?? '0',
-        _CoversKey: covers ?? '0',
-        _CustomerKey: customer ?? '0',
-        _OrderTypeKey: orderType ?? '0',
-        _UserIdKey: userId ?? '0',
-        _TiltIdKey: tiltId ?? '0'
-      };
+  Order.fromDB(Map<String, dynamic> master, List<Map<String, dynamic>> details)
+      : id = master[SalesMasterTable.LOCAL_ID].toString(),
+        tableId = master[SalesMasterTable.TABLE_ID].toString(),
+        waiterId = master[SalesMasterTable.WAITER_ID].toString(),
+        userId = master[SalesMasterTable.USER_ID].toString(),
+        orderType = master[SalesMasterTable.ORDER_TYPE],
+        orderNo = master[SalesMasterTable.SALE_NO].toString(),
+        time = master[SalesMasterTable.DATETIME].toString().substring(11),
+        date = master[SalesMasterTable.DATETIME].toString().substring(0, 10),
+        tax = master[SalesMasterTable.SUBTOTAL].toString(),
+        outletId = master[SalesMasterTable.OUTLET_ID].toString(),
+        discountedAmount =
+            master[SalesMasterTable.TOTAL_DISCOUNT_AMOUNT] == null
+                ? '0.0'
+                : master[SalesMasterTable.TOTAL_DISCOUNT_AMOUNT].toString(),
+        payment = master[SalesMasterTable.PAID_AMOUNT].toString() ?? '0.0',
+        cardNumber = '0',
+        items = details.map((e) => MenuItem.fromDB(e)).toList();
 
   List<MenuItem> get cartItems => items ?? [];
 
   void addCartItem(MenuItem item) {
-    if (items == null) items = [];
+    items ??= [];
     bool itemExists = false;
     for (var i = 0; i < items.length; i++) {
       if (items[i].id == item.id) {
@@ -101,7 +91,7 @@ class Order {
   }
 
   void reduceCartItem(int itemId, {bool removeZeroQuantity = true}) {
-    if (items == null) items = [];
+    items ??= [];
     for (var i = 0; i < items.length; i++) {
       if (items[i].id == '$itemId') {
         if (items[i].quantity > 0) {
@@ -151,11 +141,9 @@ class Order {
     id = '';
     waiterId = '';
     tableId = '';
-    address = '';
-    contact = '';
     covers = '';
     cardNumber = '';
-    customer = '';
+    customer = Customer();
     orderType = '';
     userId = '';
     orderNo = '';
@@ -169,8 +157,6 @@ class Order {
     id = order.id;
     waiterId = order.waiterId;
     tableId = order.tableId;
-    address = order.address;
-    contact = order.contact;
     covers = order.covers;
     cardNumber = order.cardNumber;
     customer = order.customer;
