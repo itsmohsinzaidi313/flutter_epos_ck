@@ -121,7 +121,7 @@ class FeedbackScreen extends StatelessWidget {
                         context, '/menu', (route) => false);
                   } else {
                     AppTheme.snackbar(context,
-                        'Your feedback could be saved at the moment. Please check WiFi connectivity or contact I.T. Support.\n${response.data.toString()}');
+                        'Your feedback could not be saved at the moment. Please check WiFi connectivity or contact I.T. Support.\n${response.data.toString()}');
                   }
                 } catch (e) {
                   log('Error', error: e);

@@ -14,14 +14,18 @@ class OrderRepo {
   /// To get all orders posted from this device pass [tiltId] and set [type] to [0]
   /// To get single order pass [tiltId], [orderNo] and [orderDate] and set [type] to [1]
   Future<ServerResponse> getOrders(
-      {String tiltId, String type = '', String orderNo = ''}) async => ServerResponse(
-      response: await get(Uri.parse(
-              '${await Config.getOrdersApi}?tiltId=${tiltId ?? Config.user.tiltId}&type=$type&orderNo=$orderNo'))
-          .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
-              onTimeout: () => null),
-    );
+          {String tiltId, String type = '', String orderNo = ''}) async =>
+      ServerResponse(
+        response: await get(Uri.parse(
+                '${await Config.getOrdersApi}?tiltId=${tiltId ?? Config.user.tiltId}&type=$type&orderNo=$orderNo'))
+            .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
+                onTimeout: () => null),
+      );
 
-  Future<ServerResponse> newOrder({@required Order customerOrder}) async => ServerResponse(
+  Future<ServerResponse> newOrder({@required Order customerOrder}) async {
+    log('"${jsonEncode(customerOrder.toJson).replaceAll('"', '\\"').toString()}"',
+        name: 'newOrder');
+    return ServerResponse(
       response: await post(await Config.getOrdersApi,
               headers: {'Content-type': 'application/json'},
               body:
@@ -29,6 +33,7 @@ class OrderRepo {
           .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
               onTimeout: () => null),
     );
+  }
 
   Future<ServerResponse> updateOrder({@required Order customerOrder}) async {
     log(await Config.getOrdersApi);
