@@ -7,10 +7,8 @@ class MenuItem {
   static const String TaxAmountKey = 'TaxAmount';
   static const String QuantityKey = 'Quantity';
   static const String CommentKey = 'Comment';
-  static const String ImageKey = 'image';
-  static const int OPENFOOD_CODE = 151605140604;
 
-  final String id, code, categoryId, name, price, taxAmount, image;
+  final String id, code, categoryId, name, price, taxAmount;
   double quantity;
 
   String comment;
@@ -22,8 +20,7 @@ class MenuItem {
       this.name,
       this.price,
       this.taxAmount,
-      this.quantity,
-      this.image});
+      this.quantity});
 
   MenuItem.fromJson(Map<String, dynamic> map)
       : id = map[IdKey],
@@ -32,8 +29,7 @@ class MenuItem {
         name = map[NameKey],
         price = map[PriceKey],
         taxAmount = map[TaxAmountKey],
-        quantity = double.parse(map[QuantityKey]),
-        image = map[ImageKey];
+        quantity = double.parse(map[QuantityKey]);
 
   MenuItem.fromItem(MenuItem item)
       : id = item.id,
@@ -43,16 +39,15 @@ class MenuItem {
         price = item.price,
         taxAmount = item.taxAmount,
         quantity = item.quantity ?? 1,
-        image = item.image,
         comment = item.comment;
 
-  Map<String, dynamic> toJson() => {
+  Map<String, dynamic> toMap() => {
         IdKey: id,
         CodeKey: code,
         CatIdKey: categoryId,
         NameKey: name,
         PriceKey: price,
         QuantityKey: quantity,
-        CommentKey: comment,
+        CommentKey: comment ?? '',
       };
 }

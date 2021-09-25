@@ -1,66 +1,49 @@
+import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:pos_app/models/objects/customer_order.dart';
-import 'package:pos_app/models/objects/server_response.dart';
 import 'package:pos_app/repositories/order_repository.dart';
 import 'package:pos_app/shared/app_theme.dart';
-import 'package:pos_app/shared/config.dart';
 
-class OrdersScreen extends StatefulWidget {
-  final List<Order> ordersList;
-  OrdersScreen({@required this.ordersList});
-
+class OrdersPage extends StatefulWidget {
   final enablePayment = false;
   final enableOrderDelete = false;
 
   @override
-  _OrdersScreenState createState() =>
-      _OrdersScreenState(ordersList: ordersList);
+  _OrdersPageState createState() => _OrdersPageState();
 }
 
-class _OrdersScreenState extends State<OrdersScreen>
-    with SingleTickerProviderStateMixin {
-  List<Order> ordersList;
-  List<Tab> tabs;
-  TabController tabController;
-
-  _OrdersScreenState({@required this.ordersList}) {
-    tabs = [];
-    Tab dineInTab = Tab(
-      child: Text('DINE IN'),
-    );
-    Tab takeAwayTab = Tab(
-      child: Text('TAKE AWAY'),
-    );
-    Tab deliveryTab = Tab(
-      child: Text('DELIVERY'),
-    );
-    final tabsBuffer = [dineInTab, takeAwayTab, deliveryTab];
-    // tabs = tabsBuffer;
-    if (Config.allowDineIn) tabs.add(tabsBuffer[0]);
-    if (Config.allowTakeAway) tabs.add(tabsBuffer[1]);
-    if (Config.allowDelivery) tabs.add(tabsBuffer[2]);
-
-    tabController = TabController(length: tabs.length, vsync: this);
-  }
-
+class _OrdersPageState extends State<OrdersPage> {
+  List<Order> ordersList = [];
   void updateOrders() async {
     try {
-      AppTheme.snackbar(context, 'Refreshing orders...');
-      ServerResponse response =
-          await OrderRepo.repo.getOrders(tiltId: Config.user.tiltId, type: '0');
-      if (response.status) {
-        final list = (response.data as List<dynamic>) ?? [];
-        setState(() {
-          ordersList = list.map((e) => Order.fromJson(e)).toList();
-        });
+      if (mounted)
+        AppTheme.snackbar(context, 'Refreshing orders...', duration: 1);
+      final response = await OrderRepo.repo.getOrders();
+      if (response.statusCode == HttpStatus.ok) {
+        final json = jsonDecode(response.body);
+        final list = (json as List<dynamic>) ?? [];
+        if (mounted)
+          setState(() {
+            ordersList = list.map((e) => Order.fromMap(e)).toList();
+            AppTheme.snackbar(context, 'Orders updated', duration: 1);
+          });
+      } else if (response.statusCode == HttpStatus.notFound) {
+        if (mounted)
+          setState(() {
+            ordersList = [];
+            AppTheme.snackbar(context, 'No order are available', duration: 1);
+          });
       } else {
-        AppTheme.snackbar(context, response.message);
+        if (mounted)
+          AppTheme.snackbar(context,
+              'Unable to get orders\nStatusCode: ${response.statusCode}\n${response.body}');
       }
     } catch (e) {
-      AppTheme.snackbar(context, e.toString(), textColor: Colors.red);
+      if (mounted)
+        AppTheme.snackbar(context, e.toString(), textColor: Colors.red);
     }
   }
 
@@ -69,93 +52,32 @@ class _OrdersScreenState extends State<OrdersScreen>
     return Scaffold(
       backgroundColor: Colors.grey[200],
       appBar: AppTheme.appBarNormal(
-          appBarTitle: 'Pending Orders',
-          appBarBgColor: AppTheme.appBarColor,
-          appBarElevation: 0.0,
-          context: context,
-          bottom: TabBar(
-            tabs: tabs,
-            controller: tabController,
-          ),
-          actions: [
-            ElevatedButton(
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(Colors.amber),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.sync, color: Colors.red),
-                  Text(
-                    'Refresh',
-                    style: TextStyle(color: Colors.red),
-                  ),
-                ],
-              ),
-              onPressed: updateOrders,
-            )
-          ]),
+        appBarTitle: 'Pending Orders',
+        appBarBgColor: AppTheme.appBarColor,
+        appBarElevation: 0.0,
+        context: context,
+        actions: [
+          ElevatedButton(
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all(Colors.amber),
+            ),
+            child: Row(
+              children: [
+                Icon(Icons.sync, color: Colors.red),
+                Text(
+                  'Refresh',
+                  style: TextStyle(color: Colors.red),
+                ),
+              ],
+            ),
+            onPressed: updateOrders,
+          )
+        ],
+      ),
       body: Container(
-        child: TabBarView(
-          controller: tabController,
-          children:
-              getTabWidgets(),
-          //     [
-          //   getOrdersList(
-          //       order: ordersList.where((e) {
-          //     if (e.orderType == '1')
-          //       return true;
-          //     else
-          //       return false;
-          //   }).toList()),
-          //   getOrdersList(
-          //       order: ordersList.where((e) {
-          //     if (e.orderType == '2')
-          //       return true;
-          //     else
-          //       return false;
-          //   }).toList()),
-          //   getOrdersList(
-          //       order: ordersList.where((e) {
-          //     if (e.orderType == '3')
-          //       return true;
-          //     else
-          //       return false;
-          //   }).toList()),
-          // ],
-        ),
+        child: getOrdersList(order: ordersList),
       ),
     );
-  }
-
-  List<Widget> getTabWidgets() {
-    final widgetsBuffer = <Widget>[
-      getOrdersList(
-          order: ordersList.where((e) {
-        if (e.orderType == '1')
-          return true;
-        else
-          return false;
-      }).toList()),
-      getOrdersList(
-          order: ordersList.where((e) {
-        if (e.orderType == '2')
-          return true;
-        else
-          return false;
-      }).toList()),
-      getOrdersList(
-          order: ordersList.where((e) {
-        if (e.orderType == '3')
-          return true;
-        else
-          return false;
-      }).toList()),
-    ];
-    final tabWidgets = <Widget>[];
-    if (Config.allowDineIn) tabWidgets.add(widgetsBuffer[0]);
-    if (Config.allowTakeAway) tabWidgets.add(widgetsBuffer[1]);
-    if (Config.allowDelivery) tabWidgets.add(widgetsBuffer[2]);
-    return tabWidgets;
   }
 
   Widget orderGridItem({@required Order order}) {
@@ -204,18 +126,11 @@ class _OrdersScreenState extends State<OrdersScreen>
                   Divider(),
                   boxTile(title: 'TIME', description: '${order.time}'),
                   Divider(),
-                  order.orderType == '1'
-                      ? boxTile(title: 'TABLE', description: '${order.tableId}')
-                      : Container(),
-                  order.orderType != '1'
-                      ? boxTile(title: 'NAME', description: '${order.customer}')
-                      : Container(),
-                  order.orderType != '1' ? Divider() : Container(),
-                  order.orderType != '1'
-                      ? boxTile(
-                          title: 'CONTACT', description: '${order.contact}')
-                      : Container(),
-                  order.orderType != '1' ? Divider() : Container(),
+                  boxTile(title: 'TABLE', description: '${order.tableId}'),
+                  Divider(),
+                  boxTile(
+                      title: 'MEMBER NAME',
+                      description: '${order.members.first.memberName}'),
                 ],
               ),
             ),
@@ -279,85 +194,6 @@ class _OrdersScreenState extends State<OrdersScreen>
     );
   }
 
-  Widget orderListItem({@required Order order}) {
-    return InkWell(
-        child: ListTile(
-          leading: Text(order.orderNo.toString()),
-          title: order.orderType == '1'
-              ? Text(
-                  'ORDER#: ${order.orderNo} | TIME: ${order.time} | TABLE: ${order.tableId}',
-                  style:
-                      TextStyle(letterSpacing: 2, fontWeight: FontWeight.bold),
-                )
-              : Text(
-                  'ORDER#: ${order.orderNo} | TIME: ${order.time} | CUSTOMER: ${order.customer}',
-                  style:
-                      TextStyle(letterSpacing: 2, fontWeight: FontWeight.bold),
-                ),
-        ),
-        onDoubleTap: () {});
-  }
-
-  Widget getListItemExpansion({@required Order order}) {
-    return ExpansionTile(
-      title: order.orderType == '1'
-          ? Text(
-              'ORDER#: ${order.orderNo} | TIME: ${order.time} | TABLE: ${order.tableId}',
-              style: TextStyle(letterSpacing: 2, fontWeight: FontWeight.bold),
-            )
-          : Text(
-              'ORDER#: ${order.orderNo} | TIME: ${order.time} | CUSTOMER: ${order.customer}',
-              style: TextStyle(letterSpacing: 2, fontWeight: FontWeight.bold),
-            ),
-      leading: Text(order.orderNo.toString()),
-      trailing: Icon(Icons.arrow_drop_down),
-      children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                IconButton(
-                  icon: Icon(
-                    Icons.edit_rounded,
-                    color: Colors.amber,
-                  ),
-                  onPressed: () {
-                    Navigator.of(context).pushNamed('/pos', arguments: order);
-                  },
-                ),
-                IconButton(
-                  icon: Icon(
-                    Icons.monetization_on_outlined,
-                    color: Colors.green,
-                  ),
-                  onPressed: () => Navigator.of(context)
-                      .pushNamed('/payment', arguments: order),
-                ),
-                IconButton(
-                  icon: Icon(
-                    Icons.delete_rounded,
-                    color: Colors.redAccent,
-                  ),
-                  onPressed: () async {
-                    await AppTheme.showAlertDialogYN(context,
-                        title: 'Delete Order',
-                        message: 'Are You Sure?',
-                        onNo: () => Navigator.of(context).pop(false),
-                        onYes: () {
-                          Navigator.of(context).pop(true);
-                        });
-                  },
-                ),
-              ],
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
   Widget getOrdersList({List<Order> order}) {
     if (order.length < 1) {
       return Center(
@@ -371,23 +207,13 @@ class _OrdersScreenState extends State<OrdersScreen>
         ),
       );
     }
-    return false
-        ? ListView.builder(
-            scrollDirection: Axis.vertical,
-            physics: ClampingScrollPhysics(),
-            shrinkWrap: true,
-            itemCount: order.length,
-            itemBuilder: (context, index) {
-              return getListItemExpansion(order: order[index]);
-            },
-          )
-        : GridView.builder(
-            shrinkWrap: true,
-            itemCount: order.length,
-            gridDelegate:
-                SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4),
-            itemBuilder: (context, index) => orderGridItem(order: order[index]),
-          );
+    return GridView.builder(
+      shrinkWrap: true,
+      itemCount: order.length,
+      gridDelegate:
+          SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4),
+      itemBuilder: (context, index) => orderGridItem(order: order[index]),
+    );
   }
 
   Widget boxTile(

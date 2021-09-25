@@ -4,7 +4,7 @@ import 'package:pos_app/models/objects/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Config {
-  static const String appTitle = 'POS';
+  static const String appTitle = 'KBC';
 
   static const allowDineIn = true;
   static const allowTakeAway = true;
@@ -20,28 +20,22 @@ class Config {
           fServerIp.then((serverIp) => pref.setString('ipAddress', serverIp)));
 
   static User user;
-  static Future<String> get _apiCommon async =>
-      'http://${await serverIp}/api/pos';
+  static Future<String> get _apiCommon async => 'http://${await serverIp}/api';
+  static String key = "?key=123";
 
-  static Future<String> get getLoginApi async => '${await _apiCommon}/Login';
-  static Future<String> get getCategoryApi async =>
-      '${await _apiCommon}/Category';
-  static Future<String> get getItemsApi async => '${await _apiCommon}/Item';
-  static Future<String> get getTablesApi async => '${await _apiCommon}/Table';
-  static Future<String> get getWaitersApi async =>
-      '${await _apiCommon}/Waiters';
-  static Future<String> get getOrdersApi async => '${await _apiCommon}/Order';
-  static Future<String> get getCustomerApi async =>
-      '${await _apiCommon}/Customer';
-  static Future<String> get getUsersApi async => '${await _apiCommon}/User';
-  static Future<String> get postFeedbackApi async =>
-      '${await _apiCommon}/Feedback';
+  static Future<String> get getLoginApi async => '${await _apiCommon}/User$key';
+  static Future<String> get getMenuApi async => '${await _apiCommon}/Menu$key';
+  static Future<String> get ordersApi async =>
+      '${await _apiCommon}/Order$key';
+  static Future<String> get getUsersApi async => '${await _apiCommon}/User$key';
+  static Future<String> get getSessions async =>
+      '${await _apiCommon}/Sessions$key';
+  static Future<String> get getVenues async => '${await _apiCommon}/Venues$key';
+  static Future<String> get searchMembersApi async =>
+      "${await _apiCommon}/Members$key";
   static Future<String> get checkServerApi async =>
       '${await _apiCommon}/Status';
 
-  static String _authToken;
-  static set authToken(String value) => _authToken = value;
-  static String get authToken => _authToken;
   static String activeStatus = 'Online';
   static const int SCREEN_START_TIME = 3;
   static const int SNACKBAR_TIMEOUT = 1;

@@ -1,9 +1,10 @@
 import 'dart:convert';
 
+import 'package:equatable/equatable.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 
-class ServerResponse {
+class ServerResponse extends Equatable{
   static const String _StatusKey = 'Status';
   static const String _MessageKey = 'Message';
   static const String _DataKey = 'Data';
@@ -20,4 +21,7 @@ class ServerResponse {
         ? {_StatusKey: false, _MessageKey: 'Timeout', _DataKey: Null}
         : jsonDecode(response.body);
   }
+
+  @override
+  List<Object> get props => [_map];
 }

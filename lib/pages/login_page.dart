@@ -4,12 +4,12 @@ import 'package:pos_app/shared/app_theme.dart';
 import 'package:pos_app/bloc/login_bloc/login_bloc.dart';
 import '../shared/config.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginPage extends StatefulWidget {
   @override
-  _LoginScreenState createState() => _LoginScreenState();
+  _LoginPageState createState() => _LoginPageState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginPageState extends State<LoginPage> {
   String username;
   String password;
   String ipAddress;
