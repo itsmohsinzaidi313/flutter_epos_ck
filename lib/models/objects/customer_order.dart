@@ -1,86 +1,83 @@
 import 'dart:developer';
 
-import 'package:pos_app/bloc/payment_bloc/payment_bloc.dart';
+import 'package:pos_app/models/objects/member.dart';
 import 'package:pos_app/models/objects/menu_item.dart';
 
 class Order {
-  static const _OrderIdKey = 'Id';
-  static const _ItemsKey = 'Items';
-  static const _WaiterKey = 'Waiter';
-  static const _TableKey = 'Table';
-  static const _OrderTypeKey = 'OrderType';
-  static const _CoversKey = 'Covers';
-  static const _CustomerKey = 'Customer';
-  static const _ContactKey = 'Contact';
-  static const _AddressKey = 'Address';
-  static const _UserIdKey = 'UserId';
-  static const _OrderNoKey = 'OrderNo';
-  static const _OrderTimeKey = 'Time';
-  static const _OrderDateKey = 'Date';
-  static const _TiltIdKey = 'TiltId';
-  static const _TaxKey = 'TotalTax';
+  static const _orderIdKey = 'orderKey',
+      _itemsKey = 'items',
+      _waiterKey = 'waiterId',
+      _tableKey = 'tableId',
+      _coversKey = 'covers',
+      _userIdKey = 'userId',
+      _orderTimeKey = 'time',
+      _orderDateKey = 'date',
+      _deviceIdKey = 'deviceKey',
+      _slipNoKey = 'slipNo',
+      _membersKey = 'members',
+      _sessionIdKey = 'sessionId',
+      _venueIdKey = 'venueId',
+      _partyKey = 'isParty',
+      _tiltIdKey = 'tiltId';
 
   List<MenuItem> items = [];
+  List<Member> members = [];
   String id,
       waiterId,
       tableId,
       userId,
-      orderType,
+      sessionId,
+      venueId,
       orderNo,
       covers,
-      customer,
-      contact,
-      address,
       time,
       date,
       tax,
-      tiltId,
+      slipNo,
+      deviceKey,
       discountedAmount,
       payment,
-      cardNumber;
-  PAYMENTMODE paymentmode;
+      cardNumber,
+      tiltId;
+  bool party = false;
   bool editOrder = false;
 
-  Order(
-      {this.id,
-      this.waiterId,
-      this.tableId,
-      this.address,
-      this.contact,
-      this.covers,
-      this.customer,
-      this.orderType,
-      this.orderNo});
+  Order({this.id, this.waiterId, this.tableId, this.covers, this.orderNo});
 
-  Order.fromJson(Map<String, dynamic> map)
-      : id = map[_OrderIdKey].toString(),
-        waiterId = map[_WaiterKey],
-        tableId = map[_TableKey],
-        address = map[_AddressKey],
-        contact = map[_ContactKey],
-        covers = map[_CoversKey].toString(),
-        customer = map[_CustomerKey],
-        orderType = map[_OrderTypeKey],
-        userId = map[_UserIdKey],
-        orderNo = map[_OrderNoKey].toString(),
-        time = map[_OrderTimeKey],
-        date = map[_OrderDateKey],
-        items = (map[_ItemsKey] as List<dynamic>)
+  Order.fromMap(Map<String, dynamic> map)
+      : id = map[_orderIdKey].toString(),
+        waiterId = map[_waiterKey],
+        tableId = map[_tableKey],
+        covers = map[_coversKey].toString(),
+        userId = map[_userIdKey],
+        time = map[_orderTimeKey],
+        date = map[_orderDateKey],
+        party = map[_partyKey],
+        sessionId = map[_sessionIdKey],
+        venueId = map[_venueIdKey],
+        orderNo = map[_slipNoKey],
+        tiltId = map[_tiltIdKey],
+        slipNo = map[_slipNoKey],
+        members = (map[_membersKey] as List<dynamic>)
+            .map((e) => Member.fromJson(e))
+            .toList(),
+        items = (map[_itemsKey] as List<dynamic>)
             .map((e) => MenuItem.fromJson(e))
             .toList();
 
-  Map<String, dynamic> get toJson => {
-        _ItemsKey: items.map((e) => e.toJson()).toList(),
-        _OrderIdKey: id ?? '0',
-        _WaiterKey: waiterId ?? '0',
-        _TableKey: tableId ?? '0',
-        _AddressKey: address ?? '0',
-        _ContactKey: contact ?? '0',
-        _CoversKey: covers ?? '0',
-        _CustomerKey: customer ?? '0',
-        _OrderTypeKey: orderType ?? '0',
-        _UserIdKey: userId ?? '0',
-        _TiltIdKey: tiltId ?? '0'
+  Map<String, dynamic> get toMap => {
+        _membersKey: members.map((e) => e.toMap()).toList(),
+        _itemsKey: items.map((e) => e.toMap()).toList(),
+        _venueIdKey: venueId ?? '0',
+        _sessionIdKey: sessionId ?? '0',
+        _waiterKey: waiterId ?? '0',
+        _tableKey: tableId ?? '0',
+        _userIdKey: userId ?? '0',
+        _slipNoKey: slipNo ?? '0',
+        _orderIdKey: id ?? '0',
+        _coversKey: covers ?? '0',
+        _tiltIdKey: tiltId ?? '0',
+        _partyKey: party,
       };
 
   List<MenuItem> get cartItems => items ?? [];
@@ -148,33 +145,29 @@ class Order {
 
   void reset() {
     items = [];
+    members = [];
     id = '';
     waiterId = '';
     tableId = '';
-    address = '';
-    contact = '';
     covers = '';
     cardNumber = '';
-    customer = '';
-    orderType = '';
     userId = '';
     orderNo = '';
     time = '';
     date = '';
+    sessionId = '';
+    venueId = '';
     discountedAmount = '';
   }
 
   void copyOrder(Order order) {
     items = order.items;
+    members = order.members;
     id = order.id;
     waiterId = order.waiterId;
     tableId = order.tableId;
-    address = order.address;
-    contact = order.contact;
     covers = order.covers;
     cardNumber = order.cardNumber;
-    customer = order.customer;
-    orderType = order.orderType;
     userId = order.userId;
     orderNo = order.orderNo;
     time = order.time;

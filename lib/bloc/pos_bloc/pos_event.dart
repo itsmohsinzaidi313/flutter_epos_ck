@@ -71,8 +71,3 @@ class ItemQuantityChanged extends POSEvents {
   final double quantity;
   ItemQuantityChanged({this.code, @required this.itemId, this.quantity});
 }
-
-class AddOpenItem extends POSEvents {
-  final MenuItem openItem;
-  AddOpenItem({this.openItem});
-}

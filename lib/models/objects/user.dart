@@ -1,14 +1,14 @@
 class User {
-  static const String _IdKey = 'Id';
-  static const String _NameKey = 'Name';
-  static const String _TiltIdKey = 'TiltId';
+  static const String _IdKey = 'userId';
+  static const String _NameKey = 'username';
+  static const String _TiltIdKey = 'tiltId';
   final String id;
   final String name;
   final String tiltId;
   User({this.id, this.name, this.tiltId});
 
   User.fromJson(Map<String, dynamic> map)
-      : id = map[_IdKey],
+      : id = map[_IdKey].toString(),
         name = map[_NameKey],
-        tiltId = map[_TiltIdKey];
+        tiltId = map[_TiltIdKey].toString();
 }

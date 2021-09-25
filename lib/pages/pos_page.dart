@@ -4,21 +4,23 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pos_app/bloc/pos_bloc/pos_bloc.dart';
+import 'package:pos_app/models/objects/customer_order.dart';
 import 'package:pos_app/models/objects/items_category.dart';
 import 'package:pos_app/models/objects/menu_item.dart';
-import 'package:pos_app/repositories/menu_items_repository.dart';
+import 'package:pos_app/repositories/menu_repository.dart';
 import 'package:pos_app/shared/app_theme.dart';
 import 'package:pos_app/shared/config.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:pos_app/pages/widgets/app_widgets.dart';
 
-class PosScreen extends StatelessWidget {
-  // final subTotal = TextEditingController();
-  // final taxAmount = TextEditingController();
+class PosPage extends StatelessWidget {
+  final Order order;
+  PosPage({this.order});
   String subTotal = '';
   String taxAmount = '';
   String totalAmount = '';
+  bool ranOnce = false;
   final _autoCompleteController = TextEditingController(text: '');
   final TextStyle titleStyle = TextStyle(
     color: Colors.black,
@@ -27,11 +29,16 @@ class PosScreen extends StatelessWidget {
   final TextStyle textStyle = TextStyle(
     color: Colors.black,
   );
-  final _listKey = GlobalKey<AnimatedListState>();
-  final _cartKey = GlobalKey<AnimatedListState>();
+
+  void init(BuildContext context) {
+    passEvent(context, LoadPOSOrder(customerOrder: order));
+    passEvent(context, POSBuild());
+    ranOnce = !ranOnce;
+  }
+
   @override
   Widget build(BuildContext context) {
-    passEvent(context, POSBuild());
+    if (!ranOnce) init(context);
     return BlocListener<POSBloc, POSState>(
         listener: (context, state) async {
           if (state is SubmissionInvalid) {
@@ -505,21 +512,13 @@ class PosScreen extends StatelessWidget {
               // color: Colors.redAccent,
               child: InkWell(
                   onTap: () {
-                    if (item.code == MenuItem.OPENFOOD_CODE.toString()) {
-                      openFoodDialog(context, item.categoryId).then((openItem) {
-                        if (openItem != null) {
-                          passEvent(context, AddOpenItem(openItem: openItem));
-                        }
-                      });
-                    } else {
-                      passEvent(
-                        context,
-                        AddItem(
-                          code: int.parse(item.code),
-                          itemId: int.parse(item.id),
-                        ),
-                      );
-                    }
+                    passEvent(
+                      context,
+                      AddItem(
+                        code: int.parse(item.code),
+                        itemId: int.parse(item.id),
+                      ),
+                    );
                   },
                   child: itemButton2(context, item)),
             ),
@@ -705,13 +704,7 @@ class PosScreen extends StatelessWidget {
       suggestionsCallback: (pattern) async {
         List<MenuItem> list = [];
         if (pattern != '') {
-          final serverResponse =
-              await MenuItemRepo.repo.searchItems(phrase: pattern);
-          if (serverResponse.status) {
-            for (var item in (serverResponse.data as List)) {
-              list.add(MenuItem.fromJson(item));
-            }
-          }
+          list = await MenuRepo.repo.searchItems(phrase: pattern);
         }
         return list;
       },

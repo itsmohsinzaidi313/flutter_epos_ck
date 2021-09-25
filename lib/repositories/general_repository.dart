@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:http/http.dart';
 import 'package:pos_app/models/objects/server_response.dart';
@@ -15,4 +16,21 @@ class GeneralRepo {
   //           onTimeout: () => null));
   //   return response.status;
   // }
+
+  static Response _sessionsResponse;
+  Future<Response> getSessions() async {
+    if (_sessionsResponse == null ||
+        _sessionsResponse.statusCode != HttpStatus.ok) {
+      _sessionsResponse = await get(await Config.getSessions);
+    }
+    return _sessionsResponse;
+  }
+
+  static Response _venueResponse;
+  Future<Response> getVenues() async {
+    if (_venueResponse == null || _venueResponse.statusCode != HttpStatus.ok) {
+      _venueResponse = await get(await Config.getVenues);
+    }
+    return _venueResponse;
+  }
 }

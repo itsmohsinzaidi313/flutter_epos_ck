@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:meta/meta.dart';
 import 'package:pos_app/models/objects/user.dart';
@@ -101,14 +103,15 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     try {
       final response =
           await LoginRepo.repo.login(username: username, password: password);
-      if (response.status) {
-        Config.user = User.fromJson(response.data);
+      if (response.statusCode == HttpStatus.ok) {
+        final json = jsonDecode(response.body);
+        Config.user = User.fromJson(json);
         _loginStatus = Future.value(true);
         this._username = Future.value(username);
         this._password = Future.value(password);
         yield LoginSuccessful(message: 'Login successful.');
       } else {
-        yield LoginFailed(message: response.message);
+        yield LoginFailed(message: '');
       }
     } catch (e) {
       yield LoginFailed(message: e.toString());

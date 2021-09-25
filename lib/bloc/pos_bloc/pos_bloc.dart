@@ -1,14 +1,16 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:http/http.dart';
 import 'package:pos_app/models/objects/customer_order.dart';
 import 'package:pos_app/models/objects/items_category.dart';
+import 'package:pos_app/models/objects/menu.dart';
 import 'package:pos_app/models/objects/menu_item.dart';
 import 'package:pos_app/models/objects/server_response.dart';
-import 'package:pos_app/repositories/categories_repository.dart';
-import 'package:pos_app/repositories/menu_items_repository.dart';
+import 'package:pos_app/repositories/menu_repository.dart';
 import 'package:pos_app/repositories/order_repository.dart';
 import 'package:pos_app/shared/config.dart';
 part 'pos_event.dart';
@@ -16,8 +18,7 @@ part 'pos_state.dart';
 
 class POSBloc extends Bloc<POSEvents, POSState> {
   Order customerOrder;
-  List<Category> listCategories = [];
-  List<MenuItem> listItems = [];
+  Menu menu = Menu();
   bool requestSubmitted = false;
   POSBloc() : super(PosInitial());
 
@@ -30,62 +31,48 @@ class POSBloc extends Bloc<POSEvents, POSState> {
         if (customerOrder == null) {
           customerOrder = Order();
         }
-        final cateResponse = await CategoryRepo.repo.rawCategories;
-        final itemResponse = await MenuItemRepo.repo.allItems();
-        try {
-          listCategories = (cateResponse.data as List<dynamic>)
-              .map((e) => Category.fromJson(e))
-              .toList();
-          listItems = (itemResponse.data as List<dynamic>)
-              .map((e) => MenuItem.fromJson(e))
-              .toList();
-        } catch (e) {
-          yield POSError(message: e.toString());
-        }
-        listCategories.first.selected = true;
-        yield CategoriesLoaded(list: listCategories);
-        yield ItemsLoaded(
-            list: listItems
-                .where((e) => e.categoryId == listCategories.first.id)
-                .toList());
+        final menuResponse = await MenuRepo.repo.getMenu();
+        if (menuResponse.statusCode == HttpStatus.ok) {
+          final json = jsonDecode(menuResponse.body);
+          menu = Menu.fromJson(json);
+          menu.categories.first.selected = true;
+          yield CategoriesLoaded(list: menu.categories);
+          yield ItemsLoaded(
+              list: menu.items
+                  .where((e) => e.categoryId == menu.categories.first.id)
+                  .toList());
 
-        yield CartItems(
-          list: customerOrder.cartItems,
-          subTotal: customerOrder.subTotal,
-          totalAmount: customerOrder.totalTaxedAmount,
-          taxAmount: customerOrder.totalTax,
-        );
+          yield CartItems(
+            list: customerOrder.cartItems,
+            subTotal: customerOrder.subTotal,
+            totalAmount: customerOrder.totalTaxedAmount,
+            taxAmount: customerOrder.totalTax,
+          );
+        } else {
+          yield POSError(message: 'Connection failed');
+        }
       } else if (event is CategoryChanged) {
-        listCategories.forEach((e) {
+        menu.categories.forEach((e) {
           if (e.id == event.categoryId) {
             e.selected = true;
           } else {
             e.selected = false;
           }
         });
-        yield CategoriesLoaded(list: listCategories);
+        yield CategoriesLoaded(list: menu.categories);
         yield ItemsLoaded(
-            list: listItems
+            list: menu.items
                 .where((e) => e.categoryId == event.categoryId)
                 .toList());
       } else if (event is LoadItems) {
         yield ItemsLoaded(
-            list: listItems
+            list: menu.items
                 .where((e) => e.categoryId == event.categoryId)
                 .toList());
       } else if (event is AddItem) {
-        if (event.code == MenuItem.OPENFOOD_CODE) {
-          customerOrder.addCartItem(
-            MenuItem(
-              code: event.code.toString(),
-              id: event.itemId.toString(),
-            ),
-          );
-        } else {
-          customerOrder.addCartItem(listItems
-              .where((element) => element.code == '${event.code}')
-              .first);
-        }
+        customerOrder.addCartItem(menu.items
+            .where((element) => element.code == '${event.code}')
+            .first);
         yield CartItems(
           list: customerOrder.cartItems,
           subTotal: customerOrder.subTotal,
@@ -141,14 +128,6 @@ class POSBloc extends Bloc<POSEvents, POSState> {
           totalAmount: customerOrder.totalTaxedAmount,
           taxAmount: customerOrder.totalTax,
         );
-      } else if (event is AddOpenItem) {
-        customerOrder.addCartItem(event.openItem);
-        yield CartItems(
-          list: customerOrder.cartItems,
-          subTotal: customerOrder.subTotal,
-          totalAmount: customerOrder.totalTaxedAmount,
-          taxAmount: customerOrder.totalTax,
-        );
       } else if (event is AddComment) {
         customerOrder.addItemComment(event.itemId, event.comment);
         yield CartItems(
@@ -158,31 +137,35 @@ class POSBloc extends Bloc<POSEvents, POSState> {
           taxAmount: customerOrder.totalTax,
         );
       } else if (event is PostOrder) {
-        yield POSLoading(message: 'Submitting order please wait...');
-        customerOrder.tiltId = Config.user.tiltId;
+        yield POSLoading(message: 'Saving order please wait...');
+        customerOrder.deviceKey = Config.user.tiltId;
         if (isOrderValid(customerOrder)) {
-          ServerResponse response;
+          Response response;
           if (!requestSubmitted) {
             requestSubmitted = true;
             if (customerOrder.editOrder) {
+              // if (false)
               response = await OrderRepo.repo
                   .updateOrder(customerOrder: customerOrder);
             } else {
-              response =
-                  await OrderRepo.repo.newOrder(customerOrder: customerOrder);
+              // if (false)
+              response = await OrderRepo.repo.newOrder(order: customerOrder);
             }
             requestSubmitted = false;
           } else {
             yield POSLoading(message: 'Submitting order please wait...');
           }
-          if (response.status) {
+          if (response.statusCode == HttpStatus.created) {
             if (customerOrder.editOrder) {
               yield OrderUpdated(message: 'Order Updated');
             } else {
               yield OrderPosted(message: 'Order Saved');
             }
           } else {
-            yield OrderPostFailed(message: response.message);
+            final message = jsonDecode(response.body)['Message'];
+            yield OrderPostFailed(
+                message:
+                    'Order Save/Update Failed\nStatusCode: ${response.statusCode}\n$message');
           }
         } else {
           yield SubmissionInvalid(
