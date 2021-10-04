@@ -111,7 +111,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         this._password = Future.value(password);
         yield LoginSuccessful(message: 'Login successful.');
       } else {
-        yield LoginFailed(message: '');
+        yield LoginFailed(message: jsonDecode(response.body)['Message']);
       }
     } catch (e) {
       yield LoginFailed(message: e.toString());

@@ -245,6 +245,16 @@ class _LoginPageState extends State<LoginPage> {
                                                     .visiblePassword,
                                                 onChanged: (value) =>
                                                     password = value,
+                                                onSubmitted: (value) {
+                                                  context.read<LoginBloc>().add(
+                                                      LoginPressed(
+                                                          ipaddress:
+                                                              ipAddress ?? '',
+                                                          username:
+                                                              username ?? '',
+                                                          password:
+                                                              password ?? ''));
+                                                },
                                               ),
                                             ),
                                             Positioned(

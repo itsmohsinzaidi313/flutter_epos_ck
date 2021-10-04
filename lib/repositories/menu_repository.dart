@@ -6,6 +6,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart';
 import 'package:pos_app/models/objects/menu.dart';
 import 'package:pos_app/models/objects/menu_item.dart';
+import 'package:pos_app/shared/app_library.dart';
 import 'package:pos_app/shared/config.dart';
 
 class MenuRepo {
@@ -14,11 +15,15 @@ class MenuRepo {
 
   Response _menuCache;
   Future<Response> getMenu() async {
-    if (_menuCache == null || _menuCache.statusCode != HttpStatus.ok || true)
-      _menuCache = await get('${await Config.getMenuApi}&phrase=*').timeout(
-          Duration(seconds: Config.SERVER_TIMEOUT),
-          onTimeout: () => null);
-    return _menuCache;
+    try {
+      if (_menuCache == null || _menuCache.statusCode != HttpStatus.ok || true)
+        _menuCache = await get('${await Config.getMenuApi}&phrase=*').timeout(
+            Duration(seconds: Config.SERVER_TIMEOUT),
+            onTimeout: () => Lib.timeOutResponse);
+      return _menuCache;
+    } catch (e) {
+      return Lib.httpErrorResponseHandler(error: e, caller: 'MenuRepo');
+    }
   }
 
   Future<List<MenuItem>> searchItems({@required String phrase}) async {

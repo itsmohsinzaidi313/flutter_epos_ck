@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:pos_app/models/objects/customer_order.dart';
 import 'package:pos_app/repositories/order_repository.dart';
@@ -128,9 +129,23 @@ class _OrdersPageState extends State<OrdersPage> {
                   Divider(),
                   boxTile(title: 'TABLE', description: '${order.tableId}'),
                   Divider(),
-                  boxTile(
-                      title: 'MEMBER NAME',
-                      description: '${order.members.first.memberName}'),
+                  Row(
+                    children: [
+                      Text(
+                        'MEMBER NAME  ',
+                        style: TextStyle(
+                            fontSize: 12, fontWeight: FontWeight.normal),
+                      ),
+                      Expanded(
+                        child: Text(
+                          order.members.first.memberName,
+                          maxLines: 1,
+                          style: TextStyle(
+                              fontSize: 12, overflow: TextOverflow.clip),
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),

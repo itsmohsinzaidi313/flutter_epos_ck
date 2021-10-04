@@ -1,6 +1,5 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:pos_app/shared/app_library.dart';
 import 'package:pos_app/shared/config.dart';
 import 'package:http/http.dart';
 
@@ -8,9 +7,14 @@ class LoginRepo {
   static LoginRepo repo = LoginRepo._internal();
   LoginRepo._internal();
   Future<Response> login(
-          {@required String username, @required String password}) async =>
-      await get(
+      {@required String username, @required String password}) async {
+    try {
+      return await get(
               '${await Config.getLoginApi}&username=$username&password=$password')
           .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
-              onTimeout: () => null);
+              onTimeout: () => Lib.timeOutResponse);
+    } catch (e) {
+      return Lib.httpErrorResponseHandler(error: e, caller: 'LoginRepo');
+    }
+  }
 }

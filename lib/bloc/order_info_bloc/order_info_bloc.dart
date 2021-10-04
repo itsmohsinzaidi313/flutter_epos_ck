@@ -100,21 +100,24 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
     }
   }
 
-  Stream<OrderInfoStateSession> decodeSession(Response response) async* {
+  Stream<OrderInfoState> decodeSession(Response response) async* {
     if (response.statusCode == HttpStatus.ok) {
       final json = jsonDecode(response.body);
       final list =
           (json as List<dynamic>).map((e) => Session.fromJson(e)).toList();
       yield OrderInfoStateSession(sessions: list);
+    } else {
+      yield OrderInfoError(message: jsonDecode(response.body)['Message']);
     }
   }
 
-  Stream<OrderInfoStateVenues> decodeVenues(Response response) async* {
+  Stream<OrderInfoState> decodeVenues(Response response) async* {
     if (response.statusCode == HttpStatus.ok) {
       final json = jsonDecode(response.body);
       final list =
           (json as List<dynamic>).map((e) => Venue.fromJson(e)).toList();
       yield OrderInfoStateVenues(venues: list);
-    }
+    } else
+      yield OrderInfoError(message: jsonDecode(response.body)['Message']);
   }
 }

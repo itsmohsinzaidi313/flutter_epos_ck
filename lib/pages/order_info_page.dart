@@ -221,42 +221,37 @@ class OrderInfoPage extends StatelessWidget {
   Widget submitButton() {
     return BlocBuilder<OrderInfoBloc, OrderInfoState>(
       builder: (context, state) {
-        return Padding(
+        return Container(
           padding: const EdgeInsets.only(right: 5.0),
-          child: SizedBox(
-            width: Config.getDeviceWidth(context) * 0.4,
-            height: Config.getDeviceHeight(context) * 0.08,
-            child: ElevatedButton.icon(
-              onPressed: () => passEvent(context, OrderInfoSubmit()),
-              style: ButtonStyle(
-                  backgroundColor:
-                      MaterialStateProperty.all(AppTheme.listTextColor)),
-              label: Flexible(
-                flex: 1,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      'SUBMIT',
-                      style: GoogleFonts.ubuntuCondensed(
-                        color: Colors.white,
-                        letterSpacing: 1.0,
-                        fontSize: 20,
-                      ),
-                    ),
-                    Icon(
-                      Icons.arrow_forward,
-                      color: Colors.white,
-                      size: 20,
-                    ),
-                  ],
+          width: Config.getDeviceWidth(context) * 0.4,
+          height: Config.getDeviceHeight(context) * 0.08,
+          child: ElevatedButton.icon(
+            onPressed: () => passEvent(context, OrderInfoSubmit()),
+            style: ButtonStyle(
+                backgroundColor:
+                    MaterialStateProperty.all(AppTheme.listTextColor)),
+            label: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  'SUBMIT',
+                  style: GoogleFonts.ubuntuCondensed(
+                    color: Colors.white,
+                    letterSpacing: 1.0,
+                    fontSize: 20,
+                  ),
                 ),
-              ),
-              icon: Icon(
-                Icons.check,
-                color: Colors.green,
-                size: 20,
-              ),
+                Icon(
+                  Icons.arrow_forward,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ],
+            ),
+            icon: Icon(
+              Icons.check,
+              color: Colors.green,
+              size: 20,
             ),
           ),
         );
@@ -324,37 +319,35 @@ class OrderInfoPage extends StatelessWidget {
   }
 
   Widget seeMultipleMembers({BuildContext context, List<Member> member}) {
-    return Material(
-      child: InkWell(
-        onTap: () async {
-          await selectedMembersDialog(context, member);
-        },
-        child: Container(
-          padding: EdgeInsets.all(10.0),
-          margin: EdgeInsets.symmetric(vertical: 5.0, horizontal: 5.0),
-          decoration: BoxDecoration(
-            shape: BoxShape.rectangle,
-            borderRadius: BorderRadius.circular(10),
-            color: Colors.green,
-          ),
-          child: Row(
-            children: [
-              Text(
-                member.length > 1 ? 'Multiple Members' : '...',
-                style: GoogleFonts.ubuntuCondensed(
-                  fontSize: 25,
-                  color: Colors.green[50],
-                ),
+    return InkWell(
+      onTap: () async {
+        await selectedMembersDialog(context, member);
+      },
+      child: Container(
+        padding: EdgeInsets.all(10.0),
+        margin: EdgeInsets.symmetric(vertical: 5.0, horizontal: 5.0),
+        decoration: BoxDecoration(
+          shape: BoxShape.rectangle,
+          borderRadius: BorderRadius.circular(10),
+          color: Colors.green,
+        ),
+        child: Row(
+          children: [
+            Text(
+              member.length > 1 ? 'Multiple Members' : '...',
+              style: GoogleFonts.ubuntuCondensed(
+                fontSize: 25,
+                color: Colors.green[50],
               ),
-              SizedBox(
-                width: 20,
-              ),
-              Icon(
-                Icons.touch_app_rounded,
-                color: Colors.white,
-              ),
-            ],
-          ),
+            ),
+            SizedBox(
+              width: 20,
+            ),
+            Icon(
+              Icons.touch_app_rounded,
+              color: Colors.white,
+            ),
+          ],
         ),
       ),
     );

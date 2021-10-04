@@ -1,4 +1,9 @@
+import 'dart:convert';
+import 'dart:developer';
+import 'dart:io';
+
 import 'package:flutter/services.dart';
+import 'package:http/http.dart';
 import 'package:intl/intl.dart';
 
 class Lib {
@@ -9,7 +14,7 @@ class Lib {
   static forceLandscapeView() async =>
       await SystemChrome.setPreferredOrientations(
           [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
-          
+
   // static Future<Response> get timeout => Future.value(Response(
   //     jsonEncode({'Status': false, 'Message': 'Offline', 'Data': 0}),
   //     HttpStatus.requestTimeout));
@@ -66,5 +71,17 @@ class Lib {
     DateFormat formatDateTime = DateFormat("HH:mm:ss");
     String currentTime = formatDateTime.format(dateTime);
     return currentTime;
+  }
+
+  static get timeOutResponse => Response(
+      jsonEncode({"Message": "Connection timeout"}), HttpStatus.requestTimeout);
+
+  static Response httpErrorResponseHandler({Exception error, String caller = ''}) {
+    log('Error: ${error.toString()}', error: error, name: caller);
+    final map = {"Message": error.toString()};
+    if (error is SocketException) {
+      map['Message'] = 'Cannot connect to server';
+    }
+    return Response(jsonEncode(map), HttpStatus.serviceUnavailable);
   }
 }

@@ -19,18 +19,31 @@ class GeneralRepo {
 
   static Response _sessionsResponse;
   Future<Response> getSessions() async {
-    if (_sessionsResponse == null ||
-        _sessionsResponse.statusCode != HttpStatus.ok) {
-      _sessionsResponse = await get(await Config.getSessions);
+    try {
+      if (_sessionsResponse == null ||
+          _sessionsResponse.statusCode != HttpStatus.ok) {
+        _sessionsResponse = await get(await Config.getSessions).timeout(
+            Duration(seconds: Config.SERVER_TIMEOUT),
+            onTimeout: () => Lib.timeOutResponse);
+      }
+      return _sessionsResponse;
+    } catch (e) {
+      return Lib.httpErrorResponseHandler(error: e, caller: 'GeneralRepo');
     }
-    return _sessionsResponse;
   }
 
   static Response _venueResponse;
   Future<Response> getVenues() async {
-    if (_venueResponse == null || _venueResponse.statusCode != HttpStatus.ok) {
-      _venueResponse = await get(await Config.getVenues);
+    try {
+      if (_venueResponse == null ||
+          _venueResponse.statusCode != HttpStatus.ok) {
+        _venueResponse = await get(await Config.getVenues).timeout(
+            Duration(seconds: Config.SERVER_TIMEOUT),
+            onTimeout: () => Lib.timeOutResponse);
+      }
+      return _venueResponse;
+    } catch (e) {
+      return Lib.httpErrorResponseHandler(error: e, caller: 'GeneralRepo');
     }
-    return _venueResponse;
   }
 }

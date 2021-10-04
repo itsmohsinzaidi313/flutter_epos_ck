@@ -39,7 +39,7 @@ class Config {
   static String activeStatus = 'Online';
   static const int SCREEN_START_TIME = 3;
   static const int SNACKBAR_TIMEOUT = 1;
-  static const int SERVER_TIMEOUT = 30;
+  static const int SERVER_TIMEOUT = 10;
 
   static const int serviceCycleDelay = 5; //SECONDS
 
