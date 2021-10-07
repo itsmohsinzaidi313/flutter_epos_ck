@@ -245,6 +245,15 @@ class _LoginScreenState extends State<LoginScreen> {
                                                     .visiblePassword,
                                                 onChanged: (value) =>
                                                     password = value,
+                                                onSubmitted: (value) => context
+                                                    .read<LoginBloc>()
+                                                    .add(LoginPressed(
+                                                        ipaddress:
+                                                            ipAddress ?? '',
+                                                        username:
+                                                            username ?? '',
+                                                        password:
+                                                            password ?? '')),
                                               ),
                                             ),
                                             Positioned(

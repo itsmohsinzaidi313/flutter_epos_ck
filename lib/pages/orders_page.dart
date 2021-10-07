@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:pos_app/models/objects/customer_order.dart';
-import 'package:pos_app/models/objects/server_response.dart';
+import 'package:pos_app/models/customer_order.dart';
 import 'package:pos_app/repositories/order_repository.dart';
+import 'package:pos_app/shared/app_library.dart';
 import 'package:pos_app/shared/app_theme.dart';
 import 'package:pos_app/shared/config.dart';
 
@@ -49,15 +50,15 @@ class _OrdersScreenState extends State<OrdersScreen>
   void updateOrders() async {
     try {
       AppTheme.snackbar(context, 'Refreshing orders...');
-      ServerResponse response =
-          await OrderRepo.repo.getOrders(tiltId: Config.user.tiltId, type: '0');
-      if (response.status) {
-        final list = (response.data as List<dynamic>) ?? [];
+      final response =
+          await OrderRepo.repo.getOrders(tiltId: Config.user.tiltId);
+      if (response.statusCode == HttpStatus.ok) {
+        final list = (jsonDecode(response.body) as List<dynamic>) ?? [];
         setState(() {
           ordersList = list.map((e) => Order.fromJson(e)).toList();
         });
       } else {
-        AppTheme.snackbar(context, response.message);
+        AppTheme.snackbar(context, Lib.getMessage(response));
       }
     } catch (e) {
       AppTheme.snackbar(context, e.toString(), textColor: Colors.red);

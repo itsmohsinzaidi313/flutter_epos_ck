@@ -53,6 +53,6 @@ class MenuItem {
         NameKey: name,
         PriceKey: price,
         QuantityKey: quantity,
-        CommentKey: comment,
+        CommentKey: comment ?? '',
       };
 }

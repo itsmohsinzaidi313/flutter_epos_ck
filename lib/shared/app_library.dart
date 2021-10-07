@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/services.dart';
@@ -12,8 +13,24 @@ class Lib {
   static forceLandscapeView() async =>
       await SystemChrome.setPreferredOrientations(
           [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight]);
-          
-  // static Future<Response> get timeout => Future.value(Response(
-  //     jsonEncode({'Status': false, 'Message': 'Offline', 'Data': 0}),
-  //     HttpStatus.requestTimeout));
+
+  static Response get timeout => Response(
+      jsonEncode({
+        'Status': false,
+        'Message': 'Connection request timeout',
+        'Data': 0
+      }),
+      HttpStatus.requestTimeout);
+
+  static Response httpErrorResponseHandler(
+      {Exception error, String caller = ''}) {
+    log('Error: ${error.toString()}', error: error, name: caller);
+    final message = {'Status': false, 'Message': error.toString(), 'Data': 0};
+    if (error is SocketException) {
+      message['Message'] = 'Cannot connect to server';
+    }
+    return Response(jsonEncode(message), HttpStatus.requestTimeout);
+  }
+
+  static String getMessage(Response response) => jsonDecode(response.body)['Message'];
 }

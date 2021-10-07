@@ -1,24 +1,23 @@
 import 'dart:developer';
 
 import 'package:pos_app/bloc/payment_bloc/payment_bloc.dart';
-import 'package:pos_app/models/objects/menu_item.dart';
+import 'package:pos_app/models/menu_item.dart';
 
 class Order {
-  static const _OrderIdKey = 'Id';
-  static const _ItemsKey = 'Items';
-  static const _WaiterKey = 'Waiter';
-  static const _TableKey = 'Table';
-  static const _OrderTypeKey = 'OrderType';
-  static const _CoversKey = 'Covers';
-  static const _CustomerKey = 'Customer';
-  static const _ContactKey = 'Contact';
-  static const _AddressKey = 'Address';
-  static const _UserIdKey = 'UserId';
-  static const _OrderNoKey = 'OrderNo';
-  static const _OrderTimeKey = 'Time';
-  static const _OrderDateKey = 'Date';
-  static const _TiltIdKey = 'TiltId';
-  static const _TaxKey = 'TotalTax';
+  static const _OrderIdKey = 'id';
+  static const _ItemsKey = 'items';
+  static const _WaiterKey = 'waiter';
+  static const _TableKey = 'table';
+  static const _OrderTypeKey = 'orderType';
+  static const _CoversKey = 'covers';
+  static const _CustomerKey = 'customer';
+  static const _ContactKey = 'contact';
+  static const _AddressKey = 'address';
+  static const _UserIdKey = 'userId';
+  static const _OrderNoKey = 'orderNo';
+  static const _OrderTimeKey = 'time';
+  static const _OrderDateKey = 'date';
+  static const _TiltIdKey = 'tiltId';
 
   List<MenuItem> items = [];
   String id,

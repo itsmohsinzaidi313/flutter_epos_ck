@@ -1,12 +1,15 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:draggable_floating_button/draggable_floating_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pos_app/bloc/pos_bloc/pos_bloc.dart';
-import 'package:pos_app/models/objects/items_category.dart';
-import 'package:pos_app/models/objects/menu_item.dart';
-import 'package:pos_app/repositories/menu_items_repository.dart';
+import 'package:pos_app/models/items_category.dart';
+import 'package:pos_app/models/menu_item.dart';
+import 'package:pos_app/repositories/menu_repository.dart';
 import 'package:pos_app/shared/app_theme.dart';
 import 'package:pos_app/shared/config.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -690,6 +693,7 @@ class PosScreen extends StatelessWidget {
     return TypeAheadField(
       hideOnEmpty: true,
       textFieldConfiguration: TextFieldConfiguration(
+        controller: _autoCompleteController,
         autofocus: false,
         decoration: InputDecoration(
           hintText: 'Search by item name here',
@@ -702,18 +706,8 @@ class PosScreen extends StatelessWidget {
           ),
         ),
       ),
-      suggestionsCallback: (pattern) async {
-        List<MenuItem> list = [];
-        if (pattern != '') {
-          final serverResponse =
-              await MenuItemRepo.repo.searchItems(phrase: pattern);
-          if (serverResponse.status) {
-            for (var item in (serverResponse.data as List)) {
-              list.add(MenuItem.fromJson(item));
-            }
-          }
-        }
-        return list;
+      suggestionsCallback: (phrase) async {
+        return itemsSearch(phrase);
       },
       itemBuilder: (context, itemData) {
         return ListTile(
@@ -735,4 +729,9 @@ class PosScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+Future<List<MenuItem>> itemsSearch(String phrase) async {
+  if (phrase == '') return <MenuItem>[];
+  return MenuRepo.repo.searchItems(phrase);
 }

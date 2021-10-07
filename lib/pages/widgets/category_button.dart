@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pos_app/bloc/pos_bloc/pos_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:pos_app/models/objects/items_category.dart';
+import 'package:pos_app/models/items_category.dart';
 import 'package:pos_app/shared/config.dart';
 
 Widget categoryButton(BuildContext context, List<Category> list, int index) => Card(

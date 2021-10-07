@@ -1,15 +1,16 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:pos_app/models/objects/customer_order.dart';
-import 'package:pos_app/models/objects/items_category.dart';
-import 'package:pos_app/models/objects/menu_item.dart';
-import 'package:pos_app/models/objects/server_response.dart';
-import 'package:pos_app/repositories/categories_repository.dart';
-import 'package:pos_app/repositories/menu_items_repository.dart';
+import 'package:http/http.dart';
+import 'package:pos_app/models/customer_order.dart';
+import 'package:pos_app/models/items_category.dart';
+import 'package:pos_app/models/menu_item.dart';
+import 'package:pos_app/repositories/menu_repository.dart';
 import 'package:pos_app/repositories/order_repository.dart';
+import 'package:pos_app/shared/app_library.dart';
 import 'package:pos_app/shared/config.dart';
 part 'pos_event.dart';
 part 'pos_state.dart';
@@ -30,25 +31,7 @@ class POSBloc extends Bloc<POSEvents, POSState> {
         if (customerOrder == null) {
           customerOrder = Order();
         }
-        final cateResponse = await CategoryRepo.repo.rawCategories;
-        final itemResponse = await MenuItemRepo.repo.allItems();
-        try {
-          listCategories = (cateResponse.data as List<dynamic>)
-              .map((e) => Category.fromJson(e))
-              .toList();
-          listItems = (itemResponse.data as List<dynamic>)
-              .map((e) => MenuItem.fromJson(e))
-              .toList();
-        } catch (e) {
-          yield POSError(message: e.toString());
-        }
-        listCategories.first.selected = true;
-        yield CategoriesLoaded(list: listCategories);
-        yield ItemsLoaded(
-            list: listItems
-                .where((e) => e.categoryId == listCategories.first.id)
-                .toList());
-
+        yield* loadMenu();
         yield CartItems(
           list: customerOrder.cartItems,
           subTotal: customerOrder.subTotal,
@@ -161,28 +144,26 @@ class POSBloc extends Bloc<POSEvents, POSState> {
         yield POSLoading(message: 'Submitting order please wait...');
         customerOrder.tiltId = Config.user.tiltId;
         if (isOrderValid(customerOrder)) {
-          ServerResponse response;
+          Response response;
           if (!requestSubmitted) {
             requestSubmitted = true;
-            if (customerOrder.editOrder) {
-              response = await OrderRepo.repo
-                  .updateOrder(customerOrder: customerOrder);
+            if (!customerOrder.editOrder) {
+              response = await postOrder(customerOrder);
             } else {
-              response =
-                  await OrderRepo.repo.newOrder(customerOrder: customerOrder);
+              response = await updateOrder(customerOrder);
             }
             requestSubmitted = false;
           } else {
-            yield POSLoading(message: 'Submitting order please wait...');
+            yield POSLoading(message: 'Please wait...');
           }
-          if (response.status) {
+          if (response.statusCode == HttpStatus.created) {
             if (customerOrder.editOrder) {
               yield OrderUpdated(message: 'Order Updated');
             } else {
               yield OrderPosted(message: 'Order Saved');
             }
           } else {
-            yield OrderPostFailed(message: response.message);
+            yield OrderPostFailed(message: Lib.getMessage(response));
           }
         } else {
           yield SubmissionInvalid(
@@ -194,6 +175,7 @@ class POSBloc extends Bloc<POSEvents, POSState> {
         customerOrder = event.customerOrder;
       }
     } catch (e) {
+      log('Error: ${e.toString()}', name: 'posBloc');
       yield POSError(message: e.toString());
     }
   }
@@ -210,4 +192,35 @@ class POSBloc extends Bloc<POSEvents, POSState> {
     }
     return true;
   }
+
+  Stream<POSState> loadMenu() async* {
+    final response = await MenuRepo.repo.getMenu();
+    if (response.statusCode == HttpStatus.ok) {
+      try {
+        final json = jsonDecode(response.body);
+        listCategories = (json['Categories'] as List<dynamic>)
+            .map((e) => Category.fromJson(e))
+            .toList();
+        listItems = (json['Items'] as List<dynamic>)
+            .map((e) => MenuItem.fromJson(e))
+            .toList();
+        yield CategoriesLoaded(list: listCategories);
+        yield ItemsLoaded(
+            list: listItems
+                .where((e) => e.categoryId == listCategories.first.id)
+                .toList());
+      } catch (e) {
+        yield POSError(message: e.toString());
+      }
+      listCategories.first.selected = true;
+    } else {
+      yield SubmissionInvalid(message: jsonDecode(response.body)['Message']);
+    }
+  }
+
+  Future<Response> postOrder(Order order) async =>
+      await OrderRepo.repo.newOrder(customerOrder: order);
+
+  Future<Response> updateOrder(Order order) async =>
+      await OrderRepo.repo.updateOrder(customerOrder: order);
 }

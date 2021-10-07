@@ -1,9 +1,13 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 import 'package:bloc/bloc.dart';
+import 'package:http/http.dart';
 import 'package:meta/meta.dart';
-import 'package:pos_app/models/objects/user.dart';
+import 'package:pos_app/models/user.dart';
 import 'package:pos_app/repositories/login_repository.dart';
+import 'package:pos_app/shared/app_library.dart';
 import 'package:pos_app/shared/config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 part 'login_bloc_event.dart';
@@ -56,7 +60,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
           yield InvalidIpAddress(message: 'Ipaddress is required.');
         } else {
           Config.serverIp = Future.value(event.ipaddress);
-          yield ValidIpAddress(message: 'Server IP saved.');
+          yield* checkServerStatus(event.ipaddress);
         }
       }
       //else if (event is UsernameChanged) {
@@ -101,17 +105,30 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
     try {
       final response =
           await LoginRepo.repo.login(username: username, password: password);
-      if (response.status) {
-        Config.user = User.fromJson(response.data);
+      if (response.statusCode == HttpStatus.ok) {
+        Config.user = User.fromJson(jsonDecode(response.body));
         _loginStatus = Future.value(true);
         this._username = Future.value(username);
         this._password = Future.value(password);
         yield LoginSuccessful(message: 'Login successful.');
       } else {
-        yield LoginFailed(message: response.message);
+        yield LoginFailed(message: Lib.getMessage(response));
       }
     } catch (e) {
       yield LoginFailed(message: e.toString());
+    }
+  }
+
+  Stream<LoginState> checkServerStatus(String ipAddress) async* {
+    final response = await get(await Config.serverStatusApi).timeout(
+        Duration(seconds: Config.SERVER_TIMEOUT),
+        onTimeout: () => Lib.timeout);
+    if (response.statusCode == HttpStatus.ok) {
+      yield ValidIpAddress(message: 'Server ip address saved');
+    } else {
+      yield LoginFailed(
+          message:
+              'Server did not respond to request.\nPlease check the ip address or server configurations');
     }
   }
 }

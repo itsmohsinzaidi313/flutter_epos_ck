@@ -1,10 +1,13 @@
+import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:pos_app/bloc/login_bloc/login_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:pos_app/models/objects/customer_order.dart';
+import 'package:pos_app/models/customer_order.dart';
 import 'package:pos_app/repositories/order_repository.dart';
+import 'package:pos_app/shared/app_library.dart';
 import 'package:pos_app/shared/app_theme.dart';
 import 'package:pos_app/shared/config.dart';
 import 'package:pos_app/pages/widgets/menu_card.dart';
@@ -29,15 +32,18 @@ class MenuPageButtons {
             try {
               AppTheme.snackbar(
                   context, 'Loading pending orders please wait...');
-              OrderRepo.repo.getOrders(type: '0').then((response) {
-                if (response.status) {
-                  List<Order> ordersList = (response.data as List<dynamic>)
-                      .map((e) => Order.fromJson(e))
-                      .toList();
+              OrderRepo.repo.getOrders().then((response) {
+                if (response.statusCode == HttpStatus.ok) {
+                  final ordersList =
+                      (jsonDecode(response.body) as List<dynamic>)
+                              .map((e) => Order.fromJson(e))
+                              .toList() ??
+                          <Order>[];
+                  if (ordersList.isEmpty) return;
                   Navigator.of(context)
                       .pushNamed('/orders', arguments: ordersList);
                 } else {
-                  AppTheme.snackbar(context, response.message);
+                  AppTheme.snackbar(context, Lib.getMessage(response));
                 }
               }).catchError((e) => AppTheme.snackbar(context, e.toString(),
                   textColor: Colors.red));
@@ -220,12 +226,12 @@ class MenuPageButtons {
     }
   }
 
-  Future<Order> _getOrder(
-      BuildContext context, String orderNo) async {
-    final response = await OrderRepo.repo
-        .getOrders(orderNo: orderNo, type: '1');
-    if (response.status) {
-      return Order.fromJson(response.data);
+  Future<Order> _getOrder(BuildContext context, String orderNo) async {
+    final response = await OrderRepo.repo.getOrders(
+      orderNo: orderNo,
+    );
+    if (response.statusCode == HttpStatus.ok) {
+      return Order.fromJson(jsonDecode(response.body));
     } else {
       AppTheme.snackbar(context, 'No order found');
       return null;

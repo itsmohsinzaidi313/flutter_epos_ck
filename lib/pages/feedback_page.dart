@@ -1,10 +1,11 @@
 import 'dart:convert';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:pos_app/models/objects/customer_order.dart';
-import 'package:pos_app/models/objects/feedback.dart';
-import 'package:pos_app/models/objects/server_response.dart';
+import 'package:pos_app/models/customer_order.dart';
+import 'package:pos_app/models/feedback.dart';
+import 'package:pos_app/shared/app_library.dart';
 import 'package:pos_app/shared/app_theme.dart';
 import 'package:pos_app/shared/config.dart';
 import 'package:pos_app/repositories/feedback_repository.dart';
@@ -113,15 +114,15 @@ class FeedbackScreen extends StatelessWidget {
                 });
                 try {
                   log('${jsonEncode(feedback.toMap())}');
-                  ServerResponse response =
+                  final response =
                       await FeedbackRepo.repo.uploadFeedback(feedback);
-                  if (response.status) {
+                  if (response.statusCode == HttpStatus.ok) {
                     AppTheme.snackbar(context, 'Thankyou for your time.');
                     Navigator.pushNamedAndRemoveUntil(
                         context, '/menu', (route) => false);
                   } else {
                     AppTheme.snackbar(context,
-                        'Your feedback could not be saved at the moment. Please check WiFi connectivity or contact I.T. Support.\n${response.data.toString()}');
+                        'Your feedback could not be saved at the moment. Please check WiFi connectivity or contact I.T. Support.\n${Lib.getMessage(response)}');
                   }
                 } catch (e) {
                   log('Error', error: e);

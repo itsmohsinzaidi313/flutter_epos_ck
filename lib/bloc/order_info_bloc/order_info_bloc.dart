@@ -1,12 +1,14 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 import 'package:bloc/bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:pos_app/models/objects/customer_order.dart';
-import 'package:pos_app/models/objects/customer_table.dart';
-import 'package:pos_app/models/objects/waiter.dart';
+import 'package:pos_app/models/customer_order.dart';
+import 'package:pos_app/models/customer_table.dart';
+import 'package:pos_app/models/waiter.dart';
 import 'package:pos_app/repositories/customer_repository.dart';
-import 'package:pos_app/models/objects/customer.dart';
+import 'package:pos_app/models/customer.dart';
 import 'package:pos_app/repositories/tables_repository.dart';
 import 'package:pos_app/repositories/waiters_repository.dart';
 import 'package:pos_app/shared/config.dart';
@@ -26,16 +28,10 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
     try {
       if (event is OrderInfoBuild) {
         customerOrder = Order();
-        final waiterResponse = await WaiterRepo.repo.waiters;
-        final tablesResponse = await TablesRepo.repo.tables;
+        listWaiters = await getWaiters();
+        listTables = await getTables();
         customerOrder.userId = Config.user.id;
         customerOrder.orderType = (ORDERTYPE.DINE_IN.index + 1).toString();
-        listWaiters = (waiterResponse.data as List<dynamic>)
-            .map((e) => Waiter.fromJson(e))
-            .toList();
-        listTables = (tablesResponse.data as List<dynamic>)
-            .map((e) => Tables.fromJson(e))
-            .toList();
         yield OrderTypeState(type: ORDERTYPE.DINE_IN);
         yield WaitersState(waiters: listWaiters, type: ORDERTYPE.DINE_IN);
       }
@@ -75,7 +71,8 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
           } else if (event is CoversChanged) {
             customerOrder.covers = event.covers.toString();
           } else if (event is Submit) {
-            if (customerOrder.waiterId == null || customerOrder.waiterId.isEmpty) {
+            if (customerOrder.waiterId == null ||
+                customerOrder.waiterId.isEmpty) {
               yield InvalidWaiter(
                   message: 'Please select waiter.', type: dineIn);
             } else if (customerOrder.covers == null ||
@@ -118,26 +115,19 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
               yield InvalidContact(
                   type: takeAway, message: 'Please enter contact number');
             } else {
-              final response = await CustomerRepo.repo
-                  .customer(contact: customerOrder.contact);
-              if (response.status) {
-                List<Customer> list = (response.data as List<dynamic>)
-                    .map((e) => Customer.fromJson(e))
-                    .toList();
-
-                if (list.isNotEmpty) {
-                  Customer customer = list.first;
-                  customerOrder.customer = customer.name;
-                  customerOrder.contact = customer.contact;
-                  yield CustomerFound(
-                      type: takeAway,
-                      customer: customer,
-                      message: 'Customer found.');
-                } else {
-                  yield CustomerNotFound(
-                      type: takeAway, message: 'Customer not found');
-                }
-              } else {}
+              final list = await getCustomers(customerOrder.contact);
+              if (list.isNotEmpty) {
+                Customer customer = list.first;
+                customerOrder.customer = customer.name;
+                customerOrder.contact = customer.contact;
+                yield CustomerFound(
+                    type: takeAway,
+                    customer: customer,
+                    message: 'Customer found.');
+              } else {
+                yield CustomerNotFound(
+                    type: takeAway, message: 'Customer not found');
+              }
             }
           } else {}
           break;
@@ -158,26 +148,20 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
               yield InvalidContact(
                   type: delivery, message: 'Please enter contact number');
             } else {
-              final response = await CustomerRepo.repo
-                  .customer(contact: customerOrder.contact);
-              if (response.status) {
-                List<Customer> list = (response.data as List<dynamic>)
-                    .map((e) => Customer.fromJson(e))
-                    .toList();
-                if (list.isNotEmpty) {
-                  Customer customer = list.first;
-                  customerOrder.customer = customer.name;
-                  customerOrder.contact = customer.contact;
-                  customerOrder.address = customer.address;
-                  yield CustomerFound(
-                      type: delivery,
-                      customer: customer,
-                      message: 'Customer found.');
-                } else {
-                  yield CustomerNotFound(
-                      type: delivery, message: 'Customer not found');
-                }
-              } else {}
+              final list = await getCustomers(customerOrder.contact);
+              if (list.isNotEmpty) {
+                Customer customer = list.first;
+                customerOrder.customer = customer.name;
+                customerOrder.contact = customer.contact;
+                customerOrder.address = customer.address;
+                yield CustomerFound(
+                    type: delivery,
+                    customer: customer,
+                    message: 'Customer found.');
+              } else {
+                yield CustomerNotFound(
+                    type: delivery, message: 'Customer not found');
+              }
             }
           } else if (event is Submit) {
             if (customerOrder.customer == null ||
@@ -207,5 +191,38 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
     } catch (e) {
       yield OrderInfoError(type: event.orderType, message: e.toString());
     }
+  }
+
+  Future<List<Tables>> getTables() async {
+    final response = await TablesRepo.repo.tables;
+    if (response.statusCode == HttpStatus.ok) {
+      return (jsonDecode(response.body) as List<dynamic>)
+          .map((e) => Tables.fromJson(e))
+          .toList();
+    } else {
+      return [];
+    }
+  }
+
+  Future<List<Waiter>> getWaiters() async {
+    final response = await WaiterRepo.repo.waiters;
+    if (response.statusCode == HttpStatus.ok) {
+      return (jsonDecode(response.body) as List<dynamic>)
+          .map((e) => Waiter.fromJson(e))
+          .toList();
+    } else {
+      return [];
+    }
+  }
+
+  Future<List<Customer>> getCustomers(String contact) async {
+    final response =
+        await CustomerRepo.repo.customer(contact: customerOrder.contact);
+    if (response.statusCode == HttpStatus.ok) {
+      return (jsonDecode(response.body) as List<dynamic>)
+          .map((e) => Customer.fromJson(e))
+          .toList();
+    }
+    return [];
   }
 }

@@ -1,10 +1,16 @@
+import 'dart:convert';
+import 'dart:typed_data';
+
+import 'package:crypto/crypto.dart';
+import 'package:device_info/device_info.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:pos_app/models/objects/user.dart';
+import 'package:pos_app/models/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Config {
-  static const String appTitle = 'POS';
+  static const String appTitle = 'KBC POS';
+  static const String _AuthKey = '123';
 
   static const allowDineIn = true;
   static const allowTakeAway = true;
@@ -23,29 +29,39 @@ class Config {
   static Future<String> get _apiCommon async =>
       'http://${await serverIp}/api/pos';
 
-  static Future<String> get getLoginApi async => '${await _apiCommon}/Login';
-  static Future<String> get getCategoryApi async =>
-      '${await _apiCommon}/Category';
-  static Future<String> get getItemsApi async => '${await _apiCommon}/Item';
-  static Future<String> get getTablesApi async => '${await _apiCommon}/Table';
-  static Future<String> get getWaitersApi async =>
-      '${await _apiCommon}/Waiters';
-  static Future<String> get getOrdersApi async => '${await _apiCommon}/Order';
-  static Future<String> get getCustomerApi async =>
-      '${await _apiCommon}/Customer';
-  static Future<String> get getUsersApi async => '${await _apiCommon}/User';
-  static Future<String> get postFeedbackApi async =>
-      '${await _apiCommon}/Feedback';
-  static Future<String> get checkServerApi async =>
-      '${await _apiCommon}/Status';
+  static String get _key => md5.convert(utf8.encode(_AuthKey)).toString();
 
-  static String _authToken;
-  static set authToken(String value) => _authToken = value;
-  static String get authToken => _authToken;
+  static Future<String> get getLoginApi async =>
+      '${await _apiCommon}/Login?key=$_key';
+  static Future<String> get getTablesApi async =>
+      '${await _apiCommon}/Table?key=$_key';
+  static Future<String> get getWaitersApi async =>
+      '${await _apiCommon}/Waiters?key=$_key';
+  static Future<String> get ordersApi async =>
+      '${await _apiCommon}/Order?key=$_key';
+  static Future<String> get getCustomerApi async =>
+      '${await _apiCommon}/Customer?key=$_key';
+  static Future<String> get getUsersApi async =>
+      '${await _apiCommon}/User?key=$_key';
+  static Future<String> get postFeedbackApi async =>
+      '${await _apiCommon}/Feedback?key=$_key';
+  static Future<String> get getMenuApi async =>
+      '${await _apiCommon}/Menu?key=$_key';
+  static Future<String> get serverStatusApi async =>
+      '${await _apiCommon}/Status?key=$_key';
+
+  static AndroidDeviceInfo _deviceData;
+  static AndroidDeviceInfo get deviceData {
+    if (_deviceData == null) {
+      DeviceInfoPlugin().androidInfo.then((value) => _deviceData = value);
+    }
+    return _deviceData;
+  }
+
   static String activeStatus = 'Online';
   static const int SCREEN_START_TIME = 3;
   static const int SNACKBAR_TIMEOUT = 1;
-  static const int SERVER_TIMEOUT = 30;
+  static const int SERVER_TIMEOUT = 5;
 
   static const int serviceCycleDelay = 5; //SECONDS
 

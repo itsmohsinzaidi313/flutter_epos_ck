@@ -2,8 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 
 import 'package:http/http.dart';
-import 'package:pos_app/models/objects/feedback.dart';
-import 'package:pos_app/models/objects/server_response.dart';
+import 'package:pos_app/models/feedback.dart';
 import 'package:pos_app/shared/config.dart';
 
 class FeedbackRepo {
@@ -15,10 +14,9 @@ class FeedbackRepo {
         'Please rate your visit on value for the money?',
         'Cleanliness?',
       ];
-  Future<ServerResponse> uploadFeedback(CustomerFeedback feedback) async => ServerResponse(
-        response: await post(Uri.parse(await Config.postFeedbackApi),
+  Future<Response> uploadFeedback(CustomerFeedback feedback) async =>  await post(Uri.parse(await Config.postFeedbackApi),
                 headers: {'Content-type': 'application/json'},
                 body: jsonEncode(feedback.toMap()))
             .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
-                onTimeout: () => null));
+                onTimeout: () => null);
 }
