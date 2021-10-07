@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:crypto/crypto.dart';
 import 'package:device_info/device_info.dart';
@@ -9,7 +8,7 @@ import 'package:pos_app/models/user.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class Config {
-  static const String appTitle = 'KBC POS';
+  static const String appTitle = 'POS';
   static const String _AuthKey = '123';
 
   static const allowDineIn = true;
