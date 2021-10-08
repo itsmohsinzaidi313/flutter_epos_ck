@@ -14,12 +14,14 @@ class MenuRepo {
   static Response _menuResponseCache;
   Future<Response> getMenu() async {
     if (_menuResponseCache == null ||
-        _menuResponseCache.statusCode != HttpStatus.ok)
-      return await get('${await Config.getMenuApi}&phrase=*').timeout(
-          Duration(seconds: Config.SERVER_TIMEOUT),
-          onTimeout: () => Lib.timeout);
-    else
-      return _menuResponseCache;
+        _menuResponseCache.statusCode != HttpStatus.ok) {
+      _menuResponseCache = await get('${await Config.getMenuApi}&phrase=*')
+          .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
+              onTimeout: () => Lib.timeout)
+          .onError((error, stackTrace) =>
+              Lib.httpErrorResponseHandler(error: error));
+    }
+    return _menuResponseCache;
   }
 
   Future<List<MenuItem>> searchItems(String phrase) async {

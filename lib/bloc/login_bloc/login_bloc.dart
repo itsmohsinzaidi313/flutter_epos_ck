@@ -120,9 +120,11 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   }
 
   Stream<LoginState> checkServerStatus(String ipAddress) async* {
-    final response = await get(await Config.serverStatusApi).timeout(
-        Duration(seconds: Config.SERVER_TIMEOUT),
-        onTimeout: () => Lib.timeout);
+    final response = await get(await Config.serverStatusApi)
+        .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
+            onTimeout: () => Lib.timeout)
+        .onError(
+            (error, stackTrace) => Lib.httpErrorResponseHandler(error: error));
     if (response.statusCode == HttpStatus.ok) {
       yield ValidIpAddress(message: 'Server ip address saved');
     } else {

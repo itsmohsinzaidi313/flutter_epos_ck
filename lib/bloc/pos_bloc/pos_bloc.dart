@@ -214,7 +214,7 @@ class POSBloc extends Bloc<POSEvents, POSState> {
       }
       listCategories.first.selected = true;
     } else {
-      yield SubmissionInvalid(message: jsonDecode(response.body)['Message']);
+      yield SubmissionInvalid(message: Lib.getMessage(response));
     }
   }
 

@@ -194,7 +194,7 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
   }
 
   Future<List<Tables>> getTables() async {
-    final response = await TablesRepo.repo.tables;
+    final response = await TablesRepo.repo.tables();
     if (response.statusCode == HttpStatus.ok) {
       return (jsonDecode(response.body) as List<dynamic>)
           .map((e) => Tables.fromJson(e))
@@ -205,7 +205,7 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
   }
 
   Future<List<Waiter>> getWaiters() async {
-    final response = await WaiterRepo.repo.waiters;
+    final response = await WaiterRepo.repo.waiters();
     if (response.statusCode == HttpStatus.ok) {
       return (jsonDecode(response.body) as List<dynamic>)
           .map((e) => Waiter.fromJson(e))

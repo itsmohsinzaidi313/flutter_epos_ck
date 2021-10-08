@@ -22,20 +22,27 @@ class OrderRepo {
   Future<Response> newOrder({@required Order customerOrder}) async {
     log(await Config.ordersApi, name: 'newOrder');
     log(jsonEncode(customerOrder.toJson), name: 'newOrder');
+    return Lib.timeout;
     return await post(await Config.ordersApi,
             headers: {'Content-type': 'application/json'},
             body: jsonEncode(customerOrder.toJson))
         .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
-            onTimeout: () => Lib.timeout);
+            onTimeout: () => Lib.timeout)
+        .onError(
+            (error, stackTrace) => Lib.httpErrorResponseHandler(error: error));
   }
 
   Future<Response> updateOrder({@required Order customerOrder}) async {
-    // log(await Config.ordersApi, name: 'updateOrder');
-    // log(jsonEncode(customerOrder.toJson), name: 'updateOrder');
+    log(await Config.ordersApi, name: 'updateOrder');
+    log(jsonEncode(customerOrder.toJson), name: 'updateOrder');
+    return Lib.timeout;
+
     return await put(await Config.ordersApi,
             headers: {'Content-type': 'application/json'},
             body: jsonEncode(customerOrder.toJson))
         .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
-            onTimeout: () => Lib.timeout);
+            onTimeout: () => Lib.timeout)
+        .onError(
+            (error, stackTrace) => Lib.httpErrorResponseHandler(error: error));
   }
 }

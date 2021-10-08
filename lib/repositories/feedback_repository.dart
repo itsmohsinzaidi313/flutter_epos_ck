@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:http/http.dart';
 import 'package:pos_app/models/feedback.dart';
+import 'package:pos_app/shared/app_library.dart';
 import 'package:pos_app/shared/config.dart';
 
 class FeedbackRepo {
@@ -14,9 +15,12 @@ class FeedbackRepo {
         'Please rate your visit on value for the money?',
         'Cleanliness?',
       ];
-  Future<Response> uploadFeedback(CustomerFeedback feedback) async =>  await post(Uri.parse(await Config.postFeedbackApi),
-                headers: {'Content-type': 'application/json'},
-                body: jsonEncode(feedback.toMap()))
-            .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
-                onTimeout: () => null);
+  Future<Response> uploadFeedback(CustomerFeedback feedback) async =>
+      await post(Uri.parse(await Config.postFeedbackApi),
+              headers: {'Content-type': 'application/json'},
+              body: jsonEncode(feedback.toMap()))
+          .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
+              onTimeout: () => Lib.timeout)
+          .onError((error, stackTrace) =>
+              Lib.httpErrorResponseHandler(error: error));
 }

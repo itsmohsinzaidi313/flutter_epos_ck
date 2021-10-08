@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:pos_app/bloc/payment_bloc/payment_bloc.dart';
 import 'package:pos_app/models/menu_item.dart';
+import 'package:pos_app/shared/app_library.dart';
 
 class Order {
   static const _OrderIdKey = 'id';
@@ -64,6 +65,7 @@ class Order {
         orderNo = map[_OrderNoKey].toString(),
         time = map[_OrderTimeKey],
         date = map[_OrderDateKey],
+        tiltId = map[_TiltIdKey],
         items = (map[_ItemsKey] as List<dynamic>)
             .map((e) => MenuItem.fromJson(e))
             .toList();
@@ -79,7 +81,9 @@ class Order {
         _CustomerKey: customer ?? '0',
         _OrderTypeKey: orderType ?? '0',
         _UserIdKey: userId ?? '0',
-        _TiltIdKey: tiltId ?? '0'
+        _TiltIdKey: tiltId ?? '0',
+        _OrderDateKey: Lib.getDate(),
+        _OrderTimeKey: Lib.getTime12HR(),
       };
 
   List<MenuItem> get cartItems => items ?? [];
