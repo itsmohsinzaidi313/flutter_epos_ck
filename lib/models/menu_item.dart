@@ -1,13 +1,13 @@
 class MenuItem {
-  static const String IdKey = 'Id';
-  static const String CodeKey = 'Code';
-  static const String CatIdKey = 'CategoryId';
-  static const String NameKey = 'Name';
-  static const String PriceKey = 'Price';
-  static const String TaxAmountKey = 'TaxAmount';
-  static const String QuantityKey = 'Quantity';
-  static const String CommentKey = 'Comment';
-  static const String ImageKey = 'image';
+  static const String _IdKey = 'Id',
+      _CodeKey = 'Code',
+      _CatIdKey = 'CategoryId',
+      _NameKey = 'Name',
+      _PriceKey = 'Price',
+      _TaxAmountKey = 'TaxAmount',
+      _QuantityKey = 'Quantity',
+      _CommentKey = 'Comment',
+      _ImageKey = 'image';
   static const int OPENFOOD_CODE = 151605140604;
 
   final String id, code, categoryId, name, price, taxAmount, image;
@@ -25,15 +25,15 @@ class MenuItem {
       this.quantity,
       this.image});
 
-  MenuItem.fromJson(Map<String, dynamic> map)
-      : id = map[IdKey],
-        code = map[CodeKey],
-        categoryId = map[CatIdKey],
-        name = map[NameKey],
-        price = map[PriceKey],
-        taxAmount = map[TaxAmountKey],
-        quantity = double.parse(map[QuantityKey]),
-        image = map[ImageKey];
+  MenuItem.fromMap(Map<String, dynamic> map)
+      : id = map[_IdKey],
+        code = map[_CodeKey],
+        categoryId = map[_CatIdKey],
+        name = map[_NameKey],
+        price = map[_PriceKey],
+        taxAmount = map[_TaxAmountKey],
+        quantity = double.parse(map[_QuantityKey]),
+        image = map[_ImageKey];
 
   MenuItem.fromItem(MenuItem item)
       : id = item.id,
@@ -46,13 +46,14 @@ class MenuItem {
         image = item.image,
         comment = item.comment;
 
-  Map<String, dynamic> toJson() => {
-        IdKey: id,
-        CodeKey: code,
-        CatIdKey: categoryId,
-        NameKey: name,
-        PriceKey: price,
-        QuantityKey: quantity,
-        CommentKey: comment ?? '',
+  Map<String, dynamic> toMap() => {
+        _IdKey: id,
+        _CodeKey: code,
+        _CatIdKey: categoryId,
+        _NameKey: name,
+        _PriceKey: price,
+        _TaxAmountKey: taxAmount,
+        _QuantityKey: quantity,
+        _CommentKey: comment ?? '',
       };
 }

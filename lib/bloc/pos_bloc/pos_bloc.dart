@@ -6,7 +6,9 @@ import 'package:bloc/bloc.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart';
 import 'package:pos_app/models/customer_order.dart';
+import 'package:pos_app/models/deals.dart';
 import 'package:pos_app/models/items_category.dart';
+import 'package:pos_app/models/menu.dart';
 import 'package:pos_app/models/menu_item.dart';
 import 'package:pos_app/repositories/menu_repository.dart';
 import 'package:pos_app/repositories/order_repository.dart';
@@ -17,8 +19,7 @@ part 'pos_state.dart';
 
 class POSBloc extends Bloc<POSEvents, POSState> {
   Order customerOrder;
-  List<Category> listCategories = [];
-  List<MenuItem> listItems = [];
+  Menu menu;
   bool requestSubmitted = false;
   POSBloc() : super(PosInitial());
 
@@ -39,21 +40,21 @@ class POSBloc extends Bloc<POSEvents, POSState> {
           taxAmount: customerOrder.totalTax,
         );
       } else if (event is CategoryChanged) {
-        listCategories.forEach((e) {
+        menu.listCategories.forEach((e) {
           if (e.id == event.categoryId) {
             e.selected = true;
           } else {
             e.selected = false;
           }
         });
-        yield CategoriesLoaded(list: listCategories);
+        yield CategoriesLoaded(list: menu.listCategories);
         yield ItemsLoaded(
-            list: listItems
+            list: menu.listItems
                 .where((e) => e.categoryId == event.categoryId)
                 .toList());
       } else if (event is LoadItems) {
         yield ItemsLoaded(
-            list: listItems
+            list: menu.listItems
                 .where((e) => e.categoryId == event.categoryId)
                 .toList());
       } else if (event is AddItem) {
@@ -65,7 +66,7 @@ class POSBloc extends Bloc<POSEvents, POSState> {
             ),
           );
         } else {
-          customerOrder.addCartItem(listItems
+          customerOrder.addCartItem(menu.listItems
               .where((element) => element.code == '${event.code}')
               .first);
         }
@@ -198,12 +199,24 @@ class POSBloc extends Bloc<POSEvents, POSState> {
     if (response.statusCode == HttpStatus.ok) {
       try {
         final json = jsonDecode(response.body);
-        listCategories = (json['Categories'] as List<dynamic>)
+        final listCategories = (json['Categories'] as List<dynamic>)
             .map((e) => Category.fromJson(e))
             .toList();
-        listItems = (json['Items'] as List<dynamic>)
-            .map((e) => MenuItem.fromJson(e))
+        final listItems = (json['Items'] as List<dynamic>)
+            .map((e) => MenuItem.fromMap(e))
             .toList();
+        final listFixedDeals = (json['FixedDeals'] as List<dynamic>)
+            .map((e) => FixedDeal.fromMap(e))
+            .toList();
+        final listOnSpotDeals = (json['OnSpotDeals'] as List<dynamic>)
+            .map((e) => MenuItem.fromMap(e))
+            .toList();
+        this.menu = Menu(
+          listCategories: listCategories,
+          listItems: listItems,
+          listFixedDeals: listFixedDeals,
+          listOnSpotDeals: listOnSpotDeals,
+        );
         yield CategoriesLoaded(list: listCategories);
         yield ItemsLoaded(
             list: listItems
@@ -212,7 +225,7 @@ class POSBloc extends Bloc<POSEvents, POSState> {
       } catch (e) {
         yield POSError(message: e.toString());
       }
-      listCategories.first.selected = true;
+      menu.listCategories.first.selected = true;
     } else {
       yield SubmissionInvalid(message: Lib.getMessage(response));
     }

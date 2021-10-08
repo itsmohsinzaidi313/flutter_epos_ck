@@ -10,9 +10,6 @@ class OrderRepo {
   static OrderRepo repo = OrderRepo._internal();
   OrderRepo._internal();
 
-  /// Gets order from server
-  /// To get all orders posted from this device pass [tiltId] and set [type] to [0]
-  /// To get single order pass [tiltId], [orderNo] and [orderDate] and set [type] to [1]
   Future<Response> getOrders({String tiltId, String orderNo = '*'}) async =>
       await get(Uri.parse(
               '${await Config.ordersApi}&tiltId=${tiltId ?? Config.user.tiltId}&orderNo=$orderNo'))
@@ -36,7 +33,6 @@ class OrderRepo {
     log(await Config.ordersApi, name: 'updateOrder');
     log(jsonEncode(customerOrder.toJson), name: 'updateOrder');
     return Lib.timeout;
-
     return await put(await Config.ordersApi,
             headers: {'Content-type': 'application/json'},
             body: jsonEncode(customerOrder.toJson))

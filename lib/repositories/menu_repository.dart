@@ -33,7 +33,7 @@ class MenuRepo {
                   .toString()
                   .toLowerCase()
                   .contains(phrase.toLowerCase()))
-              .map((e) => MenuItem.fromJson(e))
+              .map((e) => MenuItem.fromMap(e))
               .toList() ??
           <MenuItem>[];
     } else {
