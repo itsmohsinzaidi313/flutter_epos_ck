@@ -28,7 +28,6 @@ class _SplashScreenState extends State<SplashScreen> {
     Config.deviceKey = Future.value('');
     // FOR TESTING ONLY
     await deleteDatabase(Config.DATABASE_NAME);
-    final bloc = context.read<VerboseBloc>();
     final deviceKey = await Config.deviceKey;
 
     if (deviceKey == '') {
@@ -37,7 +36,8 @@ class _SplashScreenState extends State<SplashScreen> {
         Config.deviceKey = Future.value(input);
         final db = await LocalDatabase.database
             .initialize(verboseBloc: context.read<VerboseBloc>());
-        final import = ImportData(database: db, bloc: bloc);
+        final import =
+            ImportData(database: db, bloc: context.read<VerboseBloc>());
         final importSuccessful = await import.import();
         if (!importSuccessful) {
           await AppTheme.showAlertDialogOK(context,

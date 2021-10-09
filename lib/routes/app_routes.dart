@@ -38,7 +38,7 @@ class AppRoutes {
 
   Route onGeneratedRoute(RouteSettings routeSettings) {
     switch (routeSettings.name) {
-      case '/':
+      case '/splash':
         return MaterialPageRoute(builder: (context) => SplashScreen());
         break;
       case '/login':

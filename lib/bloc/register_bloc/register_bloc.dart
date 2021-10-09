@@ -31,28 +31,9 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
       closingAmount = event.amount;
     } else if (event is RegisterOpen) {
       if (openingAmount > 0) {
-        final db = await LocalDatabase.database.getDatabase();
-        final device = await GeneralRepo.repo.getCurrentDevice();
-        final list = await db.query(RegisterTable.TABLE_NAME, columns: [
-          '(IFNULL(COUNT(${RegisterTable.LOCAL_ID}),0) + 1) count'
-        ]);
+        final status =
+            await GeneralRepo.repo.openShift(openingAmount: openingAmount);
 
-        final register = Register();
-        register.userId = int.parse((await UsersRepo.repo.getCurrentUser()).id);
-        register.registerNo =
-            await Lib.codeGenerator('REG', list.first['count']);
-        register.openingBalance = openingAmount;
-        register.openingBalanceDateTime = Lib.getCurrentDateTimeWithFormat();
-
-        register.closingBalance = 0.0;
-        register.closingBalanceDateTime = '0000-00-00 00:00:00';
-
-        register.deviceKey = device.deviceKey;
-        register.companyId = device.companyId;
-        register.outletId = device.outletId;
-        register.registerStatus = 1;
-        register.isUpload = 0;
-        await db.insert(RegisterTable.TABLE_NAME, register.getMap());
         yield RegisterOpened();
       }
     } else if (event is RegisterClose) {
