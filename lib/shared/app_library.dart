@@ -28,7 +28,8 @@ class Lib {
     if (error is SocketException) {
       message['Message'] = 'Cannot connect to server';
     }
-    return Response(jsonEncode(message), HttpStatus.connectionClosedWithoutResponse);
+    return Response(
+        jsonEncode(message), HttpStatus.connectionClosedWithoutResponse);
   }
 
   static String getMessage(Response response) =>

@@ -5,14 +5,15 @@ import 'package:pos_app/routes/app_routes.dart';
 import 'pages/splash_page.dart';
 import './shared/config.dart';
 
-
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   //Screen orientation set to landscape
   SystemChrome.setPreferredOrientations(
           [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight])
       .then((_) {
-    runApp(App(appRoutes: AppRoutes(),));
+    runApp(App(
+      appRoutes: AppRoutes(),
+    ));
   });
 }
 
@@ -31,7 +32,7 @@ class _AppState extends State<App> {
     return MaterialApp(
       title: Config.appTitle,
       // debugShowCheckedModeBanner: false,
-      home: SplashScreen(),
+      initialRoute: '/splash',
       theme: ThemeData(
         brightness: Brightness.light,
         primarySwatch: Colors.red,

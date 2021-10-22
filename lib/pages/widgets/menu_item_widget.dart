@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:pos_app/models/menu_item.dart';
+import 'package:pos_app/models/item.dart';
 import 'package:pos_app/shared/config.dart';
 
-Widget itemButton1(BuildContext context, MenuItem item) => Stack(
+Widget itemButton1(BuildContext context, Item item) => Stack(
       children: [
         Positioned(
           left: 0,
@@ -76,7 +76,7 @@ Widget itemButton1(BuildContext context, MenuItem item) => Stack(
                       // mainAxisAlignment: MainAxisAlignment.end,
                       children: [
                         Text(
-                          'PKR ${double.parse(item.price).toInt().toString()}',
+                          'PKR ${item.price.toInt().toString()}',
                           style: GoogleFonts.ubuntuCondensed(
                             color: Colors.red.shade500,
                             fontSize: 12,
@@ -114,37 +114,84 @@ Widget itemButton1(BuildContext context, MenuItem item) => Stack(
       ],
     );
 
-Widget itemButton2(BuildContext context, MenuItem item) => Padding(
+Widget itemButton2(
+        {BuildContext context,
+        Item item,
+        String subtitle,
+        bool showSubtitle = false,
+        bool isSelectable = false,
+        bool selected = false,
+        bool}) =>
+    Padding(
       padding: const EdgeInsets.all(8.0),
-      child: Column(
+      child: Stack(
         children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              item.name.toUpperCase(),
-              textAlign: TextAlign.center,
-              style: GoogleFonts.ubuntuCondensed(
-                color: Colors.grey.shade800,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 0,
-                wordSpacing: 0.5,
-              ),
-            ),
+          Positioned(
+            bottom: 10,
+            right: 10,
+            child: isSelectable
+                ? Center(
+                    child: selected
+                        ? Icon(
+                            Icons.check_circle_rounded,
+                            color: Colors.red,
+                          )
+                        : Icon(
+                            Icons.check_circle_outline_outlined,
+                            color: Colors.grey[400],
+                          ),
+                  )
+                : Container(),
           ),
-          Divider(
-            color: Colors.amber[800],
-          ),
-          Expanded(
-            child: Text(
-              'PKR ${double.parse(item.price).toInt().toString()}',
-              style: GoogleFonts.ubuntuCondensed(
-                color: Colors.red.shade500,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                wordSpacing: 1.0,
+          Column(
+            children: [
+              Expanded(
+                flex: 2,
+                child: Text(
+                  item.name.toUpperCase(),
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.ubuntuCondensed(
+                    color: Colors.grey.shade800,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 0,
+                    wordSpacing: 0.5,
+                  ),
+                ),
               ),
-            ),
+              showSubtitle
+                  ? Expanded(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            subtitle,
+                            style: GoogleFonts.ubuntuCondensed(
+                              color: Colors.amber.shade800,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              wordSpacing: 1.0,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : Container(),
+              Divider(
+                color: Colors.amber.shade800,
+              ),
+              Expanded(
+                child: Text(
+                  'PKR ${item.price}',
+                  style: GoogleFonts.ubuntuCondensed(
+                    color: Colors.red.shade500,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    wordSpacing: 1.0,
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),

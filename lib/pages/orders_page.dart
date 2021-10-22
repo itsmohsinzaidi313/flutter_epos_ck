@@ -54,9 +54,7 @@ class _OrdersScreenState extends State<OrdersScreen>
           await OrderRepo.repo.getOrders(tiltId: Config.user.tiltId);
       if (response.statusCode == HttpStatus.ok) {
         final list = (jsonDecode(response.body) as List<dynamic>) ?? [];
-        setState(() {
-          ordersList = list.map((e) => Order.fromJson(e)).toList();
-        });
+        setState(() => ordersList = list.map((e) => Order.fromMap(e)).toList());
       } else {
         AppTheme.snackbar(context, Lib.getMessage(response));
       }
@@ -98,8 +96,7 @@ class _OrdersScreenState extends State<OrdersScreen>
       body: Container(
         child: TabBarView(
           controller: tabController,
-          children:
-              getTabWidgets(),
+          children: getTabWidgets(),
           //     [
           //   getOrdersList(
           //       order: ordersList.where((e) {
@@ -214,7 +211,8 @@ class _OrdersScreenState extends State<OrdersScreen>
                   order.orderType != '1' ? Divider() : Container(),
                   order.orderType != '1'
                       ? boxTile(
-                          title: 'CONTACT', description: '${order.contact}')
+                          title: 'CONTACT',
+                          description: '${order.customer.contact}')
                       : Container(),
                   order.orderType != '1' ? Divider() : Container(),
                 ],
@@ -222,6 +220,13 @@ class _OrdersScreenState extends State<OrdersScreen>
             ),
             Expanded(child: SizedBox()),
             Container(
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(15),
+                  bottomRight: Radius.circular(15),
+                ),
+                color: Colors.grey[100],
+              ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [

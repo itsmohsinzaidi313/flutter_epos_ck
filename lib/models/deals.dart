@@ -1,28 +1,90 @@
-import 'package:pos_app/models/menu_item.dart';
+import 'dart:developer';
 
-class FixedDeal extends MenuItem {
-  static const String _IdKey = 'Id',
-      _CodeKey = 'Code',
-      _CatIdKey = 'CategoryId',
-      _NameKey = 'Name',
-      _PriceKey = 'Price',
-      _TaxAmountKey = 'TaxAmount',
-      _QuantityKey = 'Quantity',
-      _CommentKey = 'Comment',
-      _ImageKey = 'Image',
-      _ItemsKey = 'Items';
+import 'package:equatable/equatable.dart';
+import 'package:pos_app/models/item.dart';
 
-  final List<MenuItem> dealItems;
+class MenuItem extends Item with EquatableMixin {
+  MenuItem({
+    String id,
+    String code,
+    String categoryId,
+    String name,
+    double price,
+    double taxAmount,
+    double quantity,
+    String image,
+    String comment,
+    bool selected,
+  }) : super(
+            id: id,
+            code: code,
+            categoryId: categoryId,
+            name: name,
+            price: price,
+            taxAmount: taxAmount,
+            quantity: quantity,
+            image: image,
+            comment: comment,
+            selected: selected);
+
+  MenuItem.fromMap(Map<String, dynamic> map)
+      : super(
+            id: map[Item.IdKey],
+            code: map[Item.CodeKey],
+            categoryId: map[Item.CatIdKey],
+            name: map[Item.NameKey],
+            price: map[Item.PriceKey],
+            taxAmount: map[Item.TaxAmountKey],
+            quantity: map[Item.QuantityKey],
+            image: map[Item.ImageKey],
+            selected: map[Item.SelectedKey],
+            comment: map[Item.CommentKey]);
+
+  MenuItem.fromMenuItem(MenuItem item)
+      : super(
+            id: item.id,
+            categoryId: item.categoryId,
+            code: item.code,
+            name: item.name,
+            price: item.price,
+            quantity: item.quantity,
+            comment: item.comment,
+            image: item.image,
+            selected: item.selected,
+            taxAmount: item.taxAmount);
+
+  Map<String, dynamic> toMap() => {
+        Item.IdKey: id,
+        Item.CodeKey: code,
+        Item.CatIdKey: categoryId,
+        Item.NameKey: name,
+        Item.PriceKey: price,
+        Item.TaxAmountKey: taxAmount,
+        Item.QuantityKey: quantity,
+        Item.ImageKey: image,
+        Item.SelectedKey: selected,
+        Item.CommentKey: comment,
+      };
+
+  @override
+  List<Object> get props => [id];
+}
+
+class FixedDeal extends Item with EquatableMixin {
+  static String _ItemsKey = 'Items';
+  final List<Item> dealItems;
 
   FixedDeal(
       {String id,
       String code,
       String categoryId,
       String name,
-      String price,
-      String taxAmount,
+      double price,
+      double taxAmount,
       double quantity,
       String image,
+      String comment,
+      bool selected,
       this.dealItems})
       : super(
             id: id,
@@ -32,59 +94,75 @@ class FixedDeal extends MenuItem {
             price: price,
             taxAmount: taxAmount,
             quantity: quantity,
-            image: image);
+            image: image,
+            comment: comment,
+            selected: selected);
 
   FixedDeal.fromMap(Map<String, dynamic> map)
       : this.dealItems = (map[_ItemsKey] as List<dynamic>)
-            .map((e) => MenuItem.fromMap(e))
+            .map((e) => Item.fromMap(e))
             .toList(),
         super(
-            id: map[_IdKey],
-            code: map[_CodeKey],
-            categoryId: map[_CatIdKey],
-            name: map[_NameKey],
-            price: map[_PriceKey],
-            taxAmount: map[_TaxAmountKey],
-            quantity: double.parse(map[_QuantityKey]),
-            image: map[_ImageKey]);
+            id: map[Item.IdKey],
+            code: map[Item.CodeKey],
+            categoryId: map[Item.CatIdKey],
+            name: map[Item.NameKey],
+            price: map[Item.PriceKey],
+            taxAmount: map[Item.TaxAmountKey],
+            quantity: map[Item.QuantityKey],
+            image: map[Item.ImageKey],
+            selected: map[Item.SelectedKey],
+            comment: map[Item.CommentKey]);
+
+  FixedDeal.fromDeal(FixedDeal deal)
+      : dealItems = deal.dealItems,
+        super(
+            id: deal.id,
+            categoryId: deal.categoryId,
+            code: deal.code,
+            name: deal.name,
+            price: deal.price,
+            quantity: deal.quantity,
+            comment: deal.comment,
+            image: deal.image,
+            selected: deal.selected,
+            taxAmount: deal.taxAmount);
 
   @override
   Map<String, dynamic> toMap() => {
-        _IdKey: id,
-        _CodeKey: code,
-        _CatIdKey: categoryId,
-        _NameKey: name,
-        _TaxAmountKey: taxAmount,
-        _PriceKey: price,
-        _QuantityKey: quantity,
-        _CommentKey: comment ?? '',
+        Item.IdKey: id,
+        Item.CodeKey: code,
+        Item.CatIdKey: categoryId,
+        Item.NameKey: name,
+        Item.TaxAmountKey: taxAmount,
+        Item.PriceKey: price,
+        Item.QuantityKey: quantity,
+        Item.CommentKey: comment ?? '',
+        Item.SelectedKey: selected,
         _ItemsKey: dealItems.map((e) => e.toMap()).toList(),
       };
+
+  @override
+  List<Object> get props => [id];
 }
 
-class OnSpotDeals extends MenuItem {
-  static const String _IdKey = 'Id',
-      _CodeKey = 'Code',
-      _CatIdKey = 'CategoryId',
-      _NameKey = 'Name',
-      _PriceKey = 'Price',
-      _TaxAmountKey = 'TaxAmount',
-      _QuantityKey = 'Quantity',
-      _CommentKey = 'Comment',
-      _ImageKey = 'Image',
-      _ItemsKey = 'Items';
-
+class OnSpotDeal extends Item with EquatableMixin {
+  static const String _DealItemsKey = 'DealItems',
+      _UniqueDealId = 'UniqueDealId';
+  final String uniqueDealId;
   final List<OnSpotDealItem> dealItems;
-
-  OnSpotDeals(
-      {String id,
-      String code,
-      String categoryId,
-      String name,
-      String price,
-      String taxAmount,
-      double quantity,
-      String image,
+  bool changeable = true;
+  OnSpotDeal(
+      {this.uniqueDealId = '',
+      String id = '',
+      String code = '',
+      String categoryId = '',
+      String name = '',
+      double price = 0,
+      double taxAmount = 0,
+      double quantity = 0,
+      String image = '',
+      bool selected,
       this.dealItems})
       : super(
             id: id,
@@ -94,47 +172,87 @@ class OnSpotDeals extends MenuItem {
             price: price,
             taxAmount: taxAmount,
             quantity: quantity,
-            image: image);
+            image: image,
+            selected: selected);
 
-  OnSpotDeals.fromMap(Map<String, dynamic> map)
-      : this.dealItems = (map[_ItemsKey] as List<dynamic>)
+  OnSpotDeal.fromMap(Map<String, dynamic> map)
+      : this.uniqueDealId = map[_UniqueDealId],
+        this.dealItems = (map[_DealItemsKey] as List<dynamic>)
             .map((e) => OnSpotDealItem.fromMap(e))
             .toList(),
         super(
-            id: map[_IdKey],
-            code: map[_CodeKey],
-            categoryId: map[_CatIdKey],
-            name: map[_NameKey],
-            price: map[_PriceKey],
-            taxAmount: map[_TaxAmountKey],
-            quantity: double.parse(map[_QuantityKey]),
-            image: map[_ImageKey]);
+            id: map[Item.IdKey],
+            code: map[Item.CodeKey],
+            categoryId: map[Item.CatIdKey],
+            name: map[Item.NameKey],
+            price: map[Item.PriceKey],
+            taxAmount: map[Item.TaxAmountKey],
+            quantity: map[Item.QuantityKey],
+            selected: map[Item.SelectedKey],
+            comment: '',
+            image: map[Item.ImageKey]);
+
+  OnSpotDeal.fromOnSpotDeal(OnSpotDeal deal)
+      : this.uniqueDealId = deal.uniqueDealId,
+        this.dealItems = deal.dealItems,
+        super(
+            id: deal.id,
+            code: deal.code,
+            categoryId: deal.categoryId,
+            name: deal.name,
+            price: deal.price,
+            quantity: deal.quantity,
+            comment: deal.comment,
+            image: deal.image,
+            selected: deal.selected,
+            taxAmount: deal.taxAmount);
+
+  OnSpotDeal.newDeal(OnSpotDeal deal, List<OnSpotDealItem> items)
+      : this.uniqueDealId = deal.uniqueDealId,
+        this.dealItems = items,
+        super(
+            id: deal.id,
+            code: deal.code,
+            categoryId: deal.categoryId,
+            name: deal.name,
+            price: deal.price,
+            quantity: deal.quantity,
+            comment: deal.comment,
+            image: deal.image,
+            selected: deal.selected,
+            taxAmount: deal.taxAmount);
 
   @override
   Map<String, dynamic> toMap() => {
-        _IdKey: id,
-        _CodeKey: code,
-        _CatIdKey: categoryId,
-        _NameKey: name,
-        _TaxAmountKey: taxAmount,
-        _PriceKey: price,
-        _QuantityKey: quantity,
-        _CommentKey: comment ?? '',
-        _ItemsKey: dealItems.map((e) => e.toMap()).toList(),
+        _UniqueDealId: uniqueDealId,
+        Item.IdKey: id,
+        Item.CodeKey: code,
+        Item.CatIdKey: categoryId,
+        Item.NameKey: name,
+        Item.TaxAmountKey: taxAmount,
+        Item.PriceKey: price,
+        Item.QuantityKey: quantity,
+        Item.CommentKey: comment ?? '',
+        Item.SelectedKey: selected,
+        _DealItemsKey: dealItems.map((e) => e.toMap()).toList(),
       };
+  static String signature = '';
+
+  @override
+  List<Object> get props {
+    signature = '';
+    signature += id;
+    signature += name;
+    signature += dealItems.length.toString();
+    for (var item in dealItems) {
+      signature += item.id;
+    }
+    return [signature];
+  }
 }
 
-class OnSpotDealItem extends MenuItem {
-  static const String _IdKey = 'Id',
-      _CodeKey = 'Code',
-      _CatIdKey = 'CategoryId',
-      _NameKey = 'Name',
-      _PriceKey = 'Price',
-      _TaxAmountKey = 'TaxAmount',
-      _QuantityKey = 'Quantity',
-      _CommentKey = 'Comment',
-      _ImageKey = 'Image',
-      _ChoiceKey = 'Choice';
+class OnSpotDealItem extends Item with EquatableMixin {
+  static const String _ChoiceKey = 'Choice';
 
   final double choice;
 
@@ -143,11 +261,12 @@ class OnSpotDealItem extends MenuItem {
       String code,
       String categoryId,
       String name,
-      String price,
-      String taxAmount,
+      double price,
+      double taxAmount,
       double quantity,
       this.choice,
-      String image})
+      String image,
+      bool selected})
       : super(
             id: id,
             code: code,
@@ -156,30 +275,49 @@ class OnSpotDealItem extends MenuItem {
             price: price,
             taxAmount: taxAmount,
             quantity: quantity,
-            image: image);
+            image: image,
+            selected: selected);
 
   OnSpotDealItem.fromMap(Map<String, dynamic> map)
       : choice = map[_ChoiceKey],
         super(
-          id: map[_IdKey],
-          code: map[_CodeKey],
-          categoryId: map[_CatIdKey],
-          name: map[_NameKey],
-          price: map[_PriceKey],
-          taxAmount: map[_TaxAmountKey],
-          quantity: double.parse(map[_QuantityKey]),
-          image: map[_ImageKey],
+          id: map[Item.IdKey],
+          code: map[Item.CodeKey],
+          categoryId: map[Item.CatIdKey],
+          name: map[Item.NameKey],
+          price: map[Item.PriceKey],
+          taxAmount: map[Item.TaxAmountKey],
+          quantity: map[Item.QuantityKey],
+          selected: map[Item.SelectedKey],
+          image: map[Item.ImageKey],
         );
+
+  OnSpotDealItem.fromItem(OnSpotDealItem item)
+      : this.choice = item.choice,
+        super(
+            id: item.id,
+            code: item.code,
+            categoryId: item.categoryId,
+            name: item.name,
+            price: item.price,
+            taxAmount: item.taxAmount,
+            quantity: 0,
+            image: item.image,
+            selected: item.selected);
 
   @override
   Map<String, dynamic> toMap() => {
-        _IdKey: id,
-        _CodeKey: code,
-        _CatIdKey: categoryId,
-        _NameKey: name,
-        _PriceKey: price,
-        _QuantityKey: quantity,
-        _CommentKey: comment ?? '',
+        Item.IdKey: id,
+        Item.CodeKey: code,
+        Item.CatIdKey: categoryId,
+        Item.NameKey: name,
+        Item.PriceKey: price,
+        Item.QuantityKey: quantity,
+        Item.CommentKey: comment ?? '',
         _ChoiceKey: choice,
+        Item.SelectedKey: selected,
       };
+
+  @override
+  List<Object> get props => [id, code, quantity];
 }

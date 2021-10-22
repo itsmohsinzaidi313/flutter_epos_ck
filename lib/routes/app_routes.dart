@@ -23,7 +23,6 @@ class AppRoutes {
   POSBloc _posBloc;
   PaymentBloc _paymentBloc;
   ReportBloc _reportBloc;
-  final Order _customerOrder = Order();
 
   AppRoutes() {
     _loginBloc = LoginBloc();
@@ -35,7 +34,7 @@ class AppRoutes {
 
   Route onGeneratedRoute(RouteSettings routeSettings) {
     switch (routeSettings.name) {
-      case '/':
+      case '/splash':
         return MaterialPageRoute(builder: (context) => SplashScreen());
         break;
       case '/login':

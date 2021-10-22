@@ -94,16 +94,16 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
             customerOrder.orderType = (takeAway.index + 1).toString();
             yield OrderTypeState(type: takeAway);
           } else if (event is CustomerChanged) {
-            customerOrder.customer = event.customerName;
+            customerOrder.customer.name = event.customerName;
           } else if (event is ContactChanged) {
-            customerOrder.contact = event.contact;
+            customerOrder.customer.contact = event.contact;
           } else if (event is Submit) {
             if (customerOrder.customer == null ||
-                customerOrder.customer.isEmpty) {
+                customerOrder.customer.name.isEmpty) {
               yield InvalidCustomer(
                   message: 'Please enter customer name.', type: takeAway);
-            } else if (customerOrder.contact == null ||
-                customerOrder.contact.isEmpty) {
+            } else if (customerOrder.customer.contact == null ||
+                customerOrder.customer.contact.isEmpty) {
               yield InvalidContact(
                   message: 'Please enter contact number.', type: takeAway);
             } else {
@@ -111,15 +111,15 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
                   customerOrder: customerOrder, type: takeAway);
             }
           } else if (event is SearchCustomer) {
-            if (customerOrder.contact.isEmpty) {
+            if (customerOrder.customer.contact.isEmpty) {
               yield InvalidContact(
                   type: takeAway, message: 'Please enter contact number');
             } else {
-              final list = await getCustomers(customerOrder.contact);
+              final list = await getCustomers(customerOrder.customer.contact);
               if (list.isNotEmpty) {
                 Customer customer = list.first;
-                customerOrder.customer = customer.name;
-                customerOrder.contact = customer.contact;
+                customerOrder.customer.name = customer.name;
+                customerOrder.customer.contact = customer.contact;
                 yield CustomerFound(
                     type: takeAway,
                     customer: customer,
@@ -137,23 +137,23 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
             customerOrder.orderType = (delivery.index + 1).toString();
             yield OrderTypeState(type: delivery);
           } else if (event is CustomerChanged) {
-            customerOrder.customer = event.customerName;
+            customerOrder.customer.name = event.customerName;
           } else if (event is ContactChanged) {
-            customerOrder.contact = event.contact;
+            customerOrder.customer.contact = event.contact;
           } else if (event is AddressChanged) {
-            customerOrder.address = event.address;
+            customerOrder.customer.address = event.address;
           } else if (event is SearchCustomer) {
-            if (customerOrder.contact == null &&
-                customerOrder.contact.isEmpty) {
+            if (customerOrder.customer.contact == null &&
+                customerOrder.customer.contact.isEmpty) {
               yield InvalidContact(
                   type: delivery, message: 'Please enter contact number');
             } else {
-              final list = await getCustomers(customerOrder.contact);
+              final list = await getCustomers(customerOrder.customer.contact);
               if (list.isNotEmpty) {
                 Customer customer = list.first;
-                customerOrder.customer = customer.name;
-                customerOrder.contact = customer.contact;
-                customerOrder.address = customer.address;
+                customerOrder.customer.name = customer.name;
+                customerOrder.customer.contact = customer.contact;
+                customerOrder.customer.address = customer.address;
                 yield CustomerFound(
                     type: delivery,
                     customer: customer,
@@ -165,15 +165,15 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
             }
           } else if (event is Submit) {
             if (customerOrder.customer == null ||
-                customerOrder.customer.isEmpty) {
+                customerOrder.customer.name.isEmpty) {
               yield InvalidCustomer(
                   message: 'Please enter customer name.', type: delivery);
-            } else if (customerOrder.contact == null ||
-                customerOrder.contact.isEmpty) {
+            } else if (customerOrder.customer.contact == null ||
+                customerOrder.customer.contact.isEmpty) {
               yield InvalidContact(
                   message: 'Please enter contact number.', type: delivery);
-            } else if (customerOrder.address == null ||
-                customerOrder.address.isEmpty) {
+            } else if (customerOrder.customer.address == null ||
+                customerOrder.customer.address.isEmpty) {
               yield InvalidAddress(
                   message: 'Please enter address', type: delivery);
             } else {
@@ -216,11 +216,11 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
   }
 
   Future<List<Customer>> getCustomers(String contact) async {
-    final response =
-        await CustomerRepo.repo.customer(contact: customerOrder.contact);
+    final response = await CustomerRepo.repo
+        .customer(contact: customerOrder.customer.contact);
     if (response.statusCode == HttpStatus.ok) {
       return (jsonDecode(response.body) as List<dynamic>)
-          .map((e) => Customer.fromJson(e))
+          .map((e) => Customer.fromMap(e))
           .toList();
     }
     return [];

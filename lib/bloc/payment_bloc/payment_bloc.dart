@@ -2,7 +2,7 @@ import 'dart:async';
 import 'package:meta/meta.dart';
 import 'package:bloc/bloc.dart';
 import 'package:pos_app/models/customer_order.dart';
-import 'package:pos_app/models/menu_item.dart';
+import 'package:pos_app/models/item.dart';
 
 part 'payment_event.dart';
 part 'payment_state.dart';
@@ -25,7 +25,7 @@ class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
       customerOrder = event.customerOrder;
     } else if (event is PaymentBuild) {
       yield CartItems(
-          list: customerOrder.cartItems,
+          list: customerOrder.items,
           totalAmount: customerOrder.subTotal,
           totalTaxAmount: customerOrder.totalTaxedAmount);
       yield PaymentType(
@@ -43,25 +43,25 @@ class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
           .where((element) => element.id == '${event.itemId}')
           .first);
       yield CartItems(
-          list: customerOrder.cartItems,
+          list: customerOrder.items,
           totalAmount: customerOrder.subTotal,
           totalTaxAmount: customerOrder.totalTaxedAmount);
     } else if (event is ReduceItem) {
       customerOrder.reduceCartItem(event.itemId, removeZeroQuantity: false);
       yield CartItems(
-          list: customerOrder.cartItems,
+          list: customerOrder.items,
           totalAmount: customerOrder.subTotal,
           totalTaxAmount: customerOrder.totalTaxedAmount);
     } else if (event is RemoveItem) {
       customerOrder.removeCartItem(event.itemId);
       yield CartItems(
-          list: customerOrder.cartItems,
+          list: customerOrder.items,
           totalAmount: customerOrder.subTotal,
           totalTaxAmount: customerOrder.totalTaxedAmount);
     } else if (event is AddComment) {
       customerOrder.addItemComment(event.itemId, event.comment);
       yield CartItems(
-          list: customerOrder.cartItems,
+          list: customerOrder.items,
           totalAmount: customerOrder.subTotal,
           totalTaxAmount: customerOrder.totalTaxedAmount);
     } else if (event is PaymentChanged) {

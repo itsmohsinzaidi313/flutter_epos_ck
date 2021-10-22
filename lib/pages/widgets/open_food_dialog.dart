@@ -1,16 +1,16 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
-import 'package:pos_app/models/menu_item.dart';
+import 'package:pos_app/models/item.dart';
 import 'package:pos_app/shared/config.dart';
 
 const double _WIDTH_FACTOR = 0.6;
-Future<MenuItem> openFoodDialog(BuildContext context, String categoryId) async {
+Future<Item> openFoodDialog(BuildContext context, String categoryId) async {
   final nameCntrlr = TextEditingController(text: '');
   final priceCntrlr = TextEditingController(text: '0');
   final qtyCntrlr = TextEditingController(text: '0');
   final taxCntrlr = TextEditingController(text: '13');
-  return await showDialog<MenuItem>(
+  return await showDialog<Item>(
     barrierDismissible: false,
     context: context,
     builder: (context) {
@@ -106,18 +106,18 @@ Future<MenuItem> openFoodDialog(BuildContext context, String categoryId) async {
                                 (_checkItemQuantity(qtyCntrlr.text) == null) &&
                                 _checkItemTax(taxCntrlr.text) == null) {
                               Navigator.of(context).pop(
-                                MenuItem(
+                                Item(
                                   id: Random.secure()
                                       .nextInt(1000000)
                                       .toString(),
-                                  code: MenuItem.OPENFOOD_CODE.toString(),
+                                  code: Item.OPENFOOD_CODE.toString(),
                                   name: nameCntrlr.text,
-                                  price: priceCntrlr.text,
+                                  price: double.tryParse(priceCntrlr.text) ?? 0,
                                   quantity: double.parse(qtyCntrlr.text),
                                   categoryId: categoryId,
-                                  taxAmount: _taxAmount(
+                                  taxAmount: double.tryParse(_taxAmount(
                                           priceCntrlr.text, taxCntrlr.text)
-                                      .toStringAsFixed(2),
+                                      .toStringAsFixed(2)) ?? 0,
                                 ),
                               );
                             }

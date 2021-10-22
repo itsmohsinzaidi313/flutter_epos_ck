@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:http/http.dart';
-import 'package:pos_app/models/menu_item.dart';
+import 'package:pos_app/models/item.dart';
 import 'package:pos_app/shared/app_library.dart';
 import 'package:pos_app/shared/config.dart';
 
@@ -24,7 +24,7 @@ class MenuRepo {
     return _menuResponseCache;
   }
 
-  Future<List<MenuItem>> searchItems(String phrase) async {
+  Future<List<Item>> searchItems(String phrase) async {
     final response = await getMenu();
     if (response.statusCode == HttpStatus.ok) {
       return ((jsonDecode(response.body) as Map<String, dynamic>)['Items']
@@ -33,11 +33,11 @@ class MenuRepo {
                   .toString()
                   .toLowerCase()
                   .contains(phrase.toLowerCase()))
-              .map((e) => MenuItem.fromMap(e))
+              .map((e) => Item.fromMap(e))
               .toList() ??
-          <MenuItem>[];
+          <Item>[];
     } else {
-      return <MenuItem>[];
+      return <Item>[];
     }
   }
 }

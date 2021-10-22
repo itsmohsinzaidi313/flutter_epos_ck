@@ -7,8 +7,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pos_app/bloc/pos_bloc/pos_bloc.dart';
+import 'package:pos_app/models/deals.dart';
 import 'package:pos_app/models/items_category.dart';
-import 'package:pos_app/models/menu_item.dart';
+import 'package:pos_app/models/item.dart';
 import 'package:pos_app/repositories/menu_repository.dart';
 import 'package:pos_app/shared/app_theme.dart';
 import 'package:pos_app/shared/config.dart';
@@ -16,9 +17,15 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:pos_app/pages/widgets/app_widgets.dart';
 
-class PosScreen extends StatelessWidget {
+class PosScreen extends StatefulWidget {
   // final subTotal = TextEditingController();
   // final taxAmount = TextEditingController();
+  @override
+  State<PosScreen> createState() => _PosScreenState();
+}
+
+class _PosScreenState extends State<PosScreen>
+    with SingleTickerProviderStateMixin {
   String subTotal = '';
   String taxAmount = '';
   String totalAmount = '';
@@ -30,189 +37,225 @@ class PosScreen extends StatelessWidget {
   final TextStyle textStyle = TextStyle(
     color: Colors.black,
   );
-  final _listKey = GlobalKey<AnimatedListState>();
-  final _cartKey = GlobalKey<AnimatedListState>();
+
   @override
   Widget build(BuildContext context) {
     passEvent(context, POSBuild());
     return BlocListener<POSBloc, POSState>(
-        listener: (context, state) async {
-          if (state is SubmissionInvalid) {
-            AppTheme.snackbar(context, state.message);
-          } else if (state is SubmissionValid) {
-          } else if (state is CartItems) {
-            subTotal = state.subTotal;
-            taxAmount = state.taxAmount;
-            totalAmount = ((double.tryParse(state.subTotal) ?? 0) +
-                    (double.tryParse(state.taxAmount) ?? 0))
-                .toStringAsFixed(2);
-          } else if (state is POSLoading) {
-            AppTheme.snackbar(context, state.message);
-          } else if (state is POSError) {
-            await AppTheme.showAlertDialogOK(context,
-                message: state.message,
-                title: 'Error',
-                onOK: () => Navigator.of(context).pop());
-          } else if (state is OrderPostFailed) {
-            await AppTheme.showAlertDialogOK(context,
-                message: state.message,
-                title: 'Failed',
-                onOK: () => Navigator.of(context).pop());
-          } else if (state is OrderPosted) {
-            AppTheme.snackbar(context, state.message);
+      listener: (context, state) async {
+        if (state is SubmissionInvalid) {
+          AppTheme.snackbar(context, state.message);
+        } else if (state is SubmissionValid) {
+        } else if (state is CartItems) {
+          subTotal = state.subTotal;
+          taxAmount = state.taxAmount;
+          totalAmount = ((double.tryParse(state.subTotal) ?? 0) +
+                  (double.tryParse(state.taxAmount) ?? 0))
+              .toStringAsFixed(2);
+        } else if (state is POSLoading) {
+          AppTheme.snackbar(context, state.message);
+        } else if (state is POSError) {
+          await AppTheme.showAlertDialogOK(context,
+              message: state.message,
+              title: 'Error',
+              onOK: () => Navigator.of(context).pop());
+        } else if (state is OrderPostFailed) {
+          await AppTheme.showAlertDialogOK(context,
+              message: state.message,
+              title: 'Failed',
+              onOK: () => Navigator.of(context).pop());
+        } else if (state is OrderPosted) {
+          AppTheme.snackbar(context, state.message);
 
-            Navigator.of(context)
-                .pushNamedAndRemoveUntil('/menu', (route) => false);
-          } else if (state is OrderUpdated) {
-            AppTheme.snackbar(context, state.message);
-            Navigator.of(context).pop();
-          }
-        },
-        child: Scaffold(
-          backgroundColor: Colors.grey[200],
-          appBar: PreferredSize(
-            preferredSize: Size(double.maxFinite, double.maxFinite),
-            child: CustomAppBar(
-              appBarTitle: 'Choose you items',
-              searchBar: autoCompleteSearchBar(context),
-              radioButtons: SizedBox(),
-              onBackPressed: () => Navigator.pop(context),
-            ),
+          Navigator.of(context)
+              .pushNamedAndRemoveUntil('/menu', (route) => false);
+        } else if (state is OrderUpdated) {
+          AppTheme.snackbar(context, state.message);
+          Navigator.of(context).pop();
+        }
+      },
+      child: Scaffold(
+        backgroundColor: Colors.grey[200],
+        appBar: PreferredSize(
+          preferredSize: Size(double.maxFinite, double.maxFinite),
+          child: CustomAppBar(
+            appBarTitle: 'Choose you items',
+            searchBar: autoCompleteSearchBar(context),
+            radioButtons: SizedBox(),
+            onBackPressed: () => Navigator.pop(context),
           ),
-          // AppTheme.appBarNormal(
-          //   context: context,
-          //   appBarTitle: 'Menu',
-          //   appBarElevation: 0.0,
-          //   appBarBgColor: AppTheme.appBarColor,
-          // ),
-          body: Stack(
-            children: [
-              Container(
-                child: Column(
-                  children: [
-                    // Top bar for table and waiters
-                    // Container(
-                    //   color: Colors.red,
-                    //   child: Row(
-                    //     children: [
-                    //       Flexible(
-                    //         flex: 1,
-                    //         child: ListTile(
-                    //           leading: Container(
-                    //             padding: EdgeInsets.all(5),
-                    //             decoration: BoxDecoration(
-                    //               color: Colors.red,
-                    //               shape: BoxShape.rectangle,
-                    //               borderRadius: BorderRadius.circular(10),
-                    //             ),
-                    //             child: Text(
-                    //               '',
-                    //               style: TextStyle(
-                    //                   color: Colors.grey[600],
-                    //                   fontWeight: FontWeight.bold),
-                    //             ),
-                    //           ),
-                    //           title: Container(
-                    //             padding: EdgeInsets.all(5),
-                    //             decoration: BoxDecoration(
-                    //               color: Colors.red,
-                    //               shape: BoxShape.rectangle,
-                    //               borderRadius: BorderRadius.circular(10),
-                    //             ),
-                    //             child: Center(
-                    //               child: Text('',
-                    //                   style: TextStyle(
-                    //                       color: Colors.grey[600],
-                    //                       fontWeight: FontWeight.bold)),
-                    //             ),
-                    //           ),
-                    //           trailing: Container(
-                    //             padding: EdgeInsets.all(5),
-                    //             decoration: BoxDecoration(
-                    //               color: Colors.red,
-                    //               shape: BoxShape.rectangle,
-                    //               borderRadius: BorderRadius.circular(10),
-                    //             ),
-                    //             child: Text('',
-                    //                 style: TextStyle(
-                    //                     color: Colors.grey[600],
-                    //                     fontWeight: FontWeight.bold)),
-                    //           ),
-                    //         ),
-                    //       ),
-                    //     ],
-                    //   ),
-                    // ),
-                    Expanded(
-                      child: Row(
-                        children: [
-                          Flexible(
-                            flex: 2,
-                            child: Column(
-                              children: [
-                                Container(
-                                  padding: EdgeInsets.symmetric(vertical: 8.0),
-                                  child: Text(
-                                    'Categories'.toUpperCase(),
-                                    style: GoogleFonts.staatliches(
-                                      color: Colors.grey[500],
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      letterSpacing: 5.0,
-                                    ),
+        ),
+        // AppTheme.appBarNormal(
+        //   context: context,
+        //   appBarTitle: 'Menu',
+        //   appBarElevation: 0.0,
+        //   appBarBgColor: AppTheme.appBarColor,
+        // ),
+        body: Stack(
+          children: [
+            Container(
+              child: Column(
+                children: [
+                  // Top bar for table and waiters
+                  // Container(
+                  //   color: Colors.red,
+                  //   child: Row(
+                  //     children: [
+                  //       Flexible(
+                  //         flex: 1,
+                  //         child: ListTile(
+                  //           leading: Container(
+                  //             padding: EdgeInsets.all(5),
+                  //             decoration: BoxDecoration(
+                  //               color: Colors.red,
+                  //               shape: BoxShape.rectangle,
+                  //               borderRadius: BorderRadius.circular(10),
+                  //             ),
+                  //             child: Text(
+                  //               '',
+                  //               style: TextStyle(
+                  //                   color: Colors.grey[600],
+                  //                   fontWeight: FontWeight.bold),
+                  //             ),
+                  //           ),
+                  //           title: Container(
+                  //             padding: EdgeInsets.all(5),
+                  //             decoration: BoxDecoration(
+                  //               color: Colors.red,
+                  //               shape: BoxShape.rectangle,
+                  //               borderRadius: BorderRadius.circular(10),
+                  //             ),
+                  //             child: Center(
+                  //               child: Text('',
+                  //                   style: TextStyle(
+                  //                       color: Colors.grey[600],
+                  //                       fontWeight: FontWeight.bold)),
+                  //             ),
+                  //           ),
+                  //           trailing: Container(
+                  //             padding: EdgeInsets.all(5),
+                  //             decoration: BoxDecoration(
+                  //               color: Colors.red,
+                  //               shape: BoxShape.rectangle,
+                  //               borderRadius: BorderRadius.circular(10),
+                  //             ),
+                  //             child: Text('',
+                  //                 style: TextStyle(
+                  //                     color: Colors.grey[600],
+                  //                     fontWeight: FontWeight.bold)),
+                  //           ),
+                  //         ),
+                  //       ),
+                  //     ],
+                  //   ),
+                  // ),
+                  Expanded(
+                    child: Row(
+                      children: [
+                        Flexible(
+                          flex: 2,
+                          child: Column(
+                            children: [
+                              Container(
+                                padding: EdgeInsets.symmetric(vertical: 8.0),
+                                child: Text(
+                                  'Categories'.toUpperCase(),
+                                  style: GoogleFonts.staatliches(
+                                    color: Colors.grey[500],
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    letterSpacing: 5.0,
                                   ),
                                 ),
-                                Container(
-                                  height:
-                                      Config.getDeviceHeight(context) * 0.12,
+                              ),
+                              Container(
+                                height: Config.getDeviceHeight(context) * 0.12,
+                                padding: EdgeInsets.only(top: 5),
+                                // decoration: BoxDecoration(border: Border.all(width: 2)),
+                                child: BlocBuilder<POSBloc, POSState>(
+                                  buildWhen: (previous, current) {
+                                    if (current is CategoriesLoaded) {
+                                      return true;
+                                    } else {
+                                      return false;
+                                    }
+                                  },
+                                  builder: (context, state) {
+                                    List<Category> list = [];
+                                    Future f = Future(() {});
+                                    if (state is CategoriesLoaded) {
+                                      //   state.list.forEach((element) {
+                                      //     f = f.then((value) => Future.delayed(
+                                      //             Duration(milliseconds: 50),
+                                      //             () {
+                                      //           list.add(element);
+                                      //           _listKey.currentState
+                                      //               .insertItem(
+                                      //                   list.length - 1);
+                                      //         }));
+                                      //   });
+                                      // }
+                                      // Tween<Offset> _offset = Tween(
+                                      //     begin: Offset(0, -1),
+                                      //     end: Offset(0, 0));
+                                      // return AnimatedList(
+                                      //   key: _listKey,
+                                      //   scrollDirection: Axis.horizontal,
+                                      //   initialItemCount: list.length,
+                                      //   itemBuilder:
+                                      //       (context, index, animation) =>
+                                      //           SlideTransition(
+                                      //     position: animation.drive(_offset),
+                                      //     child: categoryButton(
+                                      //       context,
+                                      //       list,
+                                      //       index,
+                                      //     ),
+                                      //   ),
+                                      // );
+
+                                      return ListView(
+                                        scrollDirection: Axis.horizontal,
+                                        children: getCategoryWidgets(
+                                            context, state.list),
+                                      );
+                                    } else {
+                                      return AppTheme.progIndicator;
+                                    }
+                                  },
+                                ),
+                              ),
+                              Container(
+                                padding: EdgeInsets.symmetric(vertical: 8.0),
+                                child: Text(
+                                  'Items'.toUpperCase(),
+                                  style: GoogleFonts.staatliches(
+                                    color: Colors.grey[500],
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    letterSpacing: 5.0,
+                                  ),
+                                ),
+                              ),
+                              Flexible(
+                                flex: 2,
+                                child: Container(
                                   padding: EdgeInsets.only(top: 5),
                                   // decoration: BoxDecoration(border: Border.all(width: 2)),
                                   child: BlocBuilder<POSBloc, POSState>(
                                     buildWhen: (previous, current) {
-                                      if (current is CategoriesLoaded) {
+                                      if (current is ItemsLoaded) {
                                         return true;
                                       } else {
                                         return false;
                                       }
                                     },
                                     builder: (context, state) {
-                                      List<Category> list = [];
-                                      Future f = Future(() {});
-                                      if (state is CategoriesLoaded) {
-                                        //   state.list.forEach((element) {
-                                        //     f = f.then((value) => Future.delayed(
-                                        //             Duration(milliseconds: 50),
-                                        //             () {
-                                        //           list.add(element);
-                                        //           _listKey.currentState
-                                        //               .insertItem(
-                                        //                   list.length - 1);
-                                        //         }));
-                                        //   });
-                                        // }
-                                        // Tween<Offset> _offset = Tween(
-                                        //     begin: Offset(0, -1),
-                                        //     end: Offset(0, 0));
-                                        // return AnimatedList(
-                                        //   key: _listKey,
-                                        //   scrollDirection: Axis.horizontal,
-                                        //   initialItemCount: list.length,
-                                        //   itemBuilder:
-                                        //       (context, index, animation) =>
-                                        //           SlideTransition(
-                                        //     position: animation.drive(_offset),
-                                        //     child: categoryButton(
-                                        //       context,
-                                        //       list,
-                                        //       index,
-                                        //     ),
-                                        //   ),
-                                        // );
-
-                                        return ListView(
-                                          scrollDirection: Axis.horizontal,
-                                          children: getCategoryWidgets(
-                                              context, state.list),
+                                      if (state is ItemsLoaded) {
+                                        return GridView.count(
+                                          crossAxisCount: 4,
+                                          children: _getItemsWidgets(context,
+                                              state.items, state.categories),
                                         );
                                       } else {
                                         return AppTheme.progIndicator;
@@ -220,223 +263,89 @@ class PosScreen extends StatelessWidget {
                                     },
                                   ),
                                 ),
-                                Container(
-                                  padding: EdgeInsets.symmetric(vertical: 8.0),
-                                  child: Text(
-                                    'Items'.toUpperCase(),
-                                    style: GoogleFonts.staatliches(
-                                      color: Colors.grey[500],
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                      letterSpacing: 5.0,
-                                    ),
-                                  ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Expanded(
+                          child: Container(
+                            height: Config.getDeviceHeight(context),
+                            margin: EdgeInsets.all(8.0),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[100],
+                              borderRadius: BorderRadius.circular(5),
+                              shape: BoxShape.rectangle,
+                              border: Border(
+                                left: BorderSide(
+                                  color: Colors.grey[300],
+                                  width: 2,
                                 ),
-                                Flexible(
-                                  flex: 2,
-                                  child: Container(
-                                      padding: EdgeInsets.only(top: 5),
-                                      // decoration: BoxDecoration(border: Border.all(width: 2)),
-                                      child: BlocBuilder<POSBloc, POSState>(
-                                        buildWhen: (previous, current) {
-                                          if (current is ItemsLoaded) {
-                                            return true;
-                                          } else {
-                                            return false;
-                                          }
-                                        },
-                                        builder: (context, state) {
-                                          if (state is ItemsLoaded) {
-                                            return GridView.count(
-                                              crossAxisCount: 4,
-                                              children: getItemsWidgets(
-                                                  context, state.list),
-                                            );
-                                          } else {
-                                            return AppTheme.progIndicator;
-                                          }
-                                        },
-                                      )),
+                                right: BorderSide(
+                                  color: Colors.grey[300],
+                                  width: 2,
                                 ),
-                              ],
+                                bottom: BorderSide(
+                                  color: Colors.grey[300],
+                                  width: 2,
+                                ),
+                                top: BorderSide(
+                                  color: Colors.grey[300],
+                                  width: 2,
+                                ),
+                              ),
+                            ),
+                            child: BlocBuilder<POSBloc, POSState>(
+                              buildWhen: (previous, current) {
+                                if (current is CartItems) {
+                                  return true;
+                                } else {
+                                  return false;
+                                }
+                              },
+                              builder: (context, state) {
+                                if (state is CartItems) {
+                                  return _getCartWidget(context, state.list);
+                                } else {
+                                  return AppTheme.progIndicator;
+                                }
+                              },
                             ),
                           ),
-                          Expanded(
-                            child: Container(
-                                height: Config.getDeviceHeight(context),
-                                margin: EdgeInsets.all(8.0),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey[100],
-                                  borderRadius: BorderRadius.circular(5),
-                                  shape: BoxShape.rectangle,
-                                  border: Border(
-                                    left: BorderSide(
-                                      color: Colors.grey[300],
-                                      width: 2,
-                                    ),
-                                    right: BorderSide(
-                                      color: Colors.grey[300],
-                                      width: 2,
-                                    ),
-                                    bottom: BorderSide(
-                                      color: Colors.grey[300],
-                                      width: 2,
-                                    ),
-                                    top: BorderSide(
-                                      color: Colors.grey[300],
-                                      width: 2,
-                                    ),
-                                  ),
-                                ),
-                                child: BlocBuilder<POSBloc, POSState>(
-                                  buildWhen: (previous, current) {
-                                    if (current is CartItems) {
-                                      return true;
-                                    } else {
-                                      return false;
-                                    }
-                                  },
-                                  builder: (context, state) {
-                                    if (state is CartItems) {
-                                      if (state.list.length < 1) {
-                                        return Container(
-                                          alignment: Alignment.bottomCenter,
-                                          decoration: BoxDecoration(
-                                            image: DecorationImage(
-                                              fit: BoxFit.cover,
-                                              // scale: 10,
-                                              image: AssetImage(
-                                                'assets/empty_cart.png',
-                                              ),
-                                            ),
-                                          ),
-                                        );
-                                      } else {
-                                        return Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Padding(
-                                              padding:
-                                                  const EdgeInsets.all(8.0),
-                                              child: Row(
-                                                children: [
-                                                  Expanded(
-                                                    child: Column(
-                                                      children: [
-                                                        Text(
-                                                          'Subtotal'
-                                                              .toUpperCase(),
-                                                          style: titleStyle,
-                                                        ),
-                                                        Text(
-                                                          subTotal,
-                                                          style: textStyle,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  Expanded(
-                                                    child: Column(
-                                                      children: [
-                                                        Text(
-                                                          'Tax'.toUpperCase(),
-                                                          style: titleStyle,
-                                                        ),
-                                                        Text(
-                                                          taxAmount,
-                                                          style: textStyle,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                  Expanded(
-                                                    child: Column(
-                                                      children: [
-                                                        Text(
-                                                          'Total'.toUpperCase(),
-                                                          style: titleStyle,
-                                                        ),
-                                                        Text(
-                                                          totalAmount,
-                                                          style: textStyle,
-                                                        ),
-                                                      ],
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                            ),
-                                            Divider(),
-                                            Expanded(
-                                              child: ListView(
-                                                children: getCartItemsWidgets(
-                                                    context, state.list),
-                                              ),
-                                            ),
-                                          ],
-                                        );
-                                      }
-                                    } else {
-                                      return AppTheme.progIndicator;
-                                    }
-                                  },
-                                )),
-                          ),
-                        ],
-                      ),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              DraggableFloatingActionButton(
-                backgroundColor: Colors.red,
-                elevation: 5,
-                tooltip: 'Submit Order',
-                appContext: context,
-                appBar: AppTheme.appBarNormal(
-                  context: context,
-                  appBarTitle: 'Menu',
-                  appBarElevation: 0.0,
-                  appBarBgColor: AppTheme.appBarColor,
-                ),
-                offset: Offset(
-                  Config.getDeviceWidth(context) * 0.91,
-                  Config.getDeviceHeight(context) * 0.72,
-                ),
-                child: Icon(
-                  Icons.done_rounded,
-                  size: 35,
-                  color: Colors.white,
-                ),
-                onPressed: () => passEvent(context, PostOrder()),
+            ),
+            DraggableFloatingActionButton(
+              backgroundColor: Colors.red,
+              elevation: 5,
+              tooltip: 'Submit Order',
+              appContext: context,
+              appBar: AppTheme.appBarNormal(
+                context: context,
+                appBarTitle: 'Menu',
+                appBarElevation: 0.0,
+                appBarBgColor: AppTheme.appBarColor,
               ),
-            ],
-          ),
-        ));
-  }
-
-  Future<bool> _onWillPop(BuildContext context) async {
-    bool type = await AppTheme.showAlertDialogYNFutureReturn(
-      context,
-      title: 'Question?',
-      message: 'Are you sure?',
+              offset: Offset(
+                Config.getDeviceWidth(context) * 0.91,
+                Config.getDeviceHeight(context) * 0.72,
+              ),
+              child: Icon(
+                Icons.done_rounded,
+                size: 35,
+                color: Colors.white,
+              ),
+              onPressed: () => passEvent(context, PostOrder()),
+            ),
+          ],
+        ),
+      ),
     );
-
-    if (type) {
-      if (true) {
-        Navigator.pop(context);
-        return true;
-      } else {
-        Navigator.pop(context);
-        return false;
-      }
-    } else {
-      return false;
-    }
   }
 
-  // CREATES CATEGORY WIDGETS
   List<Widget> getCategoryWidgets(
           BuildContext context, List<Category> lstCategory) =>
       lstCategory
@@ -496,9 +405,9 @@ class PosScreen extends StatelessWidget {
           .toList() ??
       [AppTheme.progIndicator];
 
-  // CREATE ITEMS WIDGETS
-  List<Widget> getItemsWidgets(BuildContext context, List<MenuItem> lstItem) =>
-      lstItem
+  List<Widget> _getItemsWidgets(
+          BuildContext context, List<Item> items, List<Category> categories) =>
+      items
           .map(
             (item) => Card(
               shape: RoundedRectangleBorder(
@@ -507,184 +416,130 @@ class PosScreen extends StatelessWidget {
               elevation: 3,
               // color: Colors.redAccent,
               child: InkWell(
-                  onTap: () {
-                    if (item.code == MenuItem.OPENFOOD_CODE.toString()) {
+                  onTap: () async {
+                    if (item.code == Item.OPENFOOD_CODE.toString()) {
                       openFoodDialog(context, item.categoryId).then((openItem) {
                         if (openItem != null) {
                           passEvent(context, AddOpenItem(openItem: openItem));
                         }
                       });
+                    } else if (item is OnSpotDeal) {
+                      final list = categories.where((element) {
+                        bool match = false;
+                        for (var i in item.dealItems) {
+                          i.selected = false;
+                          i.quantity = 0;
+                          if (i.categoryId == element.id) {
+                            element.choiceLimit = i.choice;
+                            match = true;
+                          }
+                        }
+                        return match;
+                      }).toList();
+                      final deal = await showOnSpotDealDialog(
+                          categories: list, context: context, onSpotDeal: item);
+                      if (deal != null && deal.quantity > 0) {
+                        passEvent(
+                          context,
+                          AddOnSpotDeal(
+                            deal: deal,
+                          ),
+                        );
+                      }
+                      // Navigator.of(context).push(new MaterialPageRoute(
+                      //   builder: (context) => OnSpotDealPage(
+                      //     categories: list,
+                      //     deal: item,
+                      //   ),
+                      // ));
                     } else {
                       passEvent(
                         context,
                         AddItem(
-                          code: int.parse(item.code),
+                          code: item.code,
                           itemId: int.parse(item.id),
                         ),
                       );
                     }
                   },
-                  child: itemButton2(context, item)),
+                  child: itemButton2(context: context, item: item)),
             ),
           )
           .toList() ??
       [AppTheme.progIndicator];
 
-  // CREATES CART ITEMS
-  List<Widget> getCartItemsWidgets(
-          BuildContext context, List<MenuItem> lstItem) =>
-      lstItem.map((item) {
-        final controller =
-            TextEditingController(text: item.quantity.toString());
-        controller.selection = TextSelection(
-            baseOffset: item.quantity.toString().length,
-            extentOffset: item.quantity.toString().length);
-        return Card(
-          elevation: 4,
-          child: ListTile(
-            // leading: CircleAvatar(
-            //   backgroundColor: Colors.yellow.shade700,
-            //   radius: 16,
-            //   child: CircleAvatar(
-            //     radius: 14,
-            //     backgroundImage: AssetImage('assets/no_image1.jpg'),
-            //   ),
-            // ),
-            title: Text(
-              item.name.toUpperCase(),
-              style: GoogleFonts.ubuntuCondensed(
-                color: Colors.black87,
-                fontSize: 14,
-                fontWeight: FontWeight.w600,
-                letterSpacing: 0.8,
-                wordSpacing: 0.5,
+  Widget _getCartWidget(BuildContext context, List<Item> items) => cartWidget(
+        context: context,
+        subTotal: subTotal,
+        taxAmount: taxAmount,
+        totalAmount: totalAmount,
+        items: items,
+        onReduceItem: (item) {
+          if (item is OnSpotDeal) {
+            ReduceOnSpotDeal(deal: item);
+          } else {
+            passEvent(
+              context,
+              ReduceItem(
+                code: item.code,
+                itemId: int.parse(item.id),
               ),
-            ),
-            subtitle: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  height: 8,
-                ),
-                Text(
-                  ' ${double.parse(item.price).toInt().toString()} x ${item.quantity} '
-                  '= ${(double.parse(item.price).toInt() * item.quantity).toString()}',
-                  style: TextStyle(
-                    color: Colors.grey.shade800,
-                    fontSize: 12,
-                  ),
-                ),
-                Row(
-                  children: [
-                    IconButton(
-                      icon: Icon(
-                        Icons.remove,
-                        color: Colors.red,
-                      ),
-                      onPressed: () => passEvent(
-                          context,
-                          ReduceItem(
-                              code: int.parse(item.code),
-                              itemId: int.parse(item.id))),
-                    ),
-                    // Text(
-                    //   item.quantity.toString(),
-                    //   style: TextStyle(
-                    //     color: Colors.grey.shade900,
-                    //     fontSize: 12,
-                    //     fontWeight: FontWeight.bold,
-                    //   ),
-                    // ),
-                    Container(
-                      width: Config.getDeviceWidth(context) * 0.05,
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: TextField(
-                              onSubmitted: (value) => context
-                                  .read<POSBloc>()
-                                  .add(
-                                    ItemQuantityChanged(
-                                      code: int.tryParse(item.code),
-                                      itemId: int.parse(item.id),
-                                      quantity: double.tryParse(value) ?? 0.0,
-                                    ),
-                                  ),
-                              decoration: InputDecoration(
-                                labelText: 'Quantity',
-                              ),
-                              controller: controller,
-                              style: TextStyle(
-                                color: Colors.grey.shade900,
-                                fontSize: 12,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    IconButton(
-                      icon: Icon(
-                        Icons.add,
-                        color: Colors.red,
-                      ),
-                      onPressed: () => passEvent(
-                        context,
-                        AddItem(
-                          code: int.parse(item.code),
-                          itemId: int.parse(item.id),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            isThreeLine: true,
-            trailing: SizedBox(
-              width: 96,
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: Icon(
-                      Icons.edit,
-                      color: Colors.red.shade800,
-                      size: 22,
-                    ),
-                    onPressed: () async {
-                      String comments =
-                          await openItemCommentDialog(context, item.name);
-                      passEvent(
-                          context,
-                          AddComment(
-                              code: int.parse(item.code),
-                              itemId: int.parse(item.id),
-                              comment: comments));
-                    },
-                  ),
-                  IconButton(
-                    icon: Icon(
-                      Icons.delete_forever,
-                      color: Colors.yellow.shade800,
-                      size: 22,
-                    ),
-                    onPressed: () => passEvent(
-                      context,
-                      RemoveItem(
-                        code: int.parse(item.code),
-                        itemId: int.parse(item.id),
-                      ),
-                    ),
-                  ),
-                ],
+            );
+          }
+        },
+        onAddItem: (item) {
+          if (item is OnSpotDeal) {
+            passEvent(context, AddOnSpotDeal(deal: item));
+          } else {
+            passEvent(
+              context,
+              AddItem(
+                code: item.code,
+                itemId: int.parse(item.id),
               ),
-            ),
-          ),
-        );
-      }).toList() ??
-      [];
+            );
+          }
+        },
+        onQuantityChanged: (item, value) {
+          if (item is OnSpotDeal) {
+            passEvent(
+                context,
+                OnSpotDealQuantityChanged(
+                    deal: item, quantity: int.tryParse(value) ?? 0.0));
+          } else {
+            passEvent(
+              context,
+              ItemQuantityChanged(
+                code: item.code,
+                itemId: int.parse(item.id),
+                quantity: double.tryParse(value) ?? 0.0,
+              ),
+            );
+          }
+        },
+        onRemoveItem: (item) {
+          if (item is OnSpotDeal) {
+            passEvent(context, RemoveOnSpotDeal(deal: item));
+          } else {
+            passEvent(
+              context,
+              RemoveItem(
+                code: item.code,
+                itemId: int.parse(item.id),
+              ),
+            );
+          }
+        },
+        onItemCommentPressed: (item) async {
+          String comments = await openItemCommentDialog(context, item.name);
+          passEvent(
+              context,
+              AddComment(
+                  code: item.code,
+                  itemId: int.parse(item.id),
+                  comment: comments));
+        },
+      );
 
   void passEvent(BuildContext context, POSEvents event) =>
       context.read<POSBloc>().add(event);
@@ -720,8 +575,8 @@ class PosScreen extends StatelessWidget {
       onSuggestionSelected: (suggestion) => passEvent(
         context,
         AddItem(
-          code: int.parse((suggestion as MenuItem).code),
-          itemId: int.parse((suggestion as MenuItem).id),
+          code: (suggestion as Item).code,
+          itemId: int.parse((suggestion as Item).id),
         ),
       ),
       noItemsFoundBuilder: (context) => ListTile(
@@ -731,7 +586,7 @@ class PosScreen extends StatelessWidget {
   }
 }
 
-Future<List<MenuItem>> itemsSearch(String phrase) async {
-  if (phrase == '') return <MenuItem>[];
+Future<List<Item>> itemsSearch(String phrase) async {
+  if (phrase == '') return <Item>[];
   return MenuRepo.repo.searchItems(phrase);
 }

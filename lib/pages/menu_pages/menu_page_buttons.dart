@@ -36,7 +36,7 @@ class MenuPageButtons {
                 if (response.statusCode == HttpStatus.ok) {
                   final ordersList =
                       (jsonDecode(response.body) as List<dynamic>)
-                              .map((e) => Order.fromJson(e))
+                              .map((e) => Order.fromMap(e))
                               .toList() ??
                           <Order>[];
                   if (ordersList.isEmpty) return;
@@ -219,8 +219,8 @@ class MenuPageButtons {
     if (orderNo != '' && name != '' && contact != '') {
       Order order = await _getOrder(context, orderNo);
       if (order != null) {
-        order.customer = name;
-        order.contact = contact;
+        order.customer.name = name;
+        order.customer.contact = contact;
         Navigator.of(context).pushNamed('/feedback', arguments: order);
       }
     }
@@ -231,7 +231,7 @@ class MenuPageButtons {
       orderNo: orderNo,
     );
     if (response.statusCode == HttpStatus.ok) {
-      return Order.fromJson(jsonDecode(response.body));
+      return Order.fromMap(jsonDecode(response.body));
     } else {
       AppTheme.snackbar(context, 'No order found');
       return null;

@@ -1,6 +1,6 @@
 
-import 'package:pos_app/models/menu_item.dart';
+import 'package:pos_app/models/item.dart';
 
 class RestaurantMenu {
-  List<MenuItem> menuItems = [];
+  List<Item> menuItems = [];
 }

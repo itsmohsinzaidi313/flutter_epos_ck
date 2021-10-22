@@ -1,10 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:pos_app/bloc/pos_bloc/pos_bloc.dart';
-import 'package:pos_app/models/menu_item.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pos_app/models/item.dart';
+import 'package:pos_app/shared/config.dart';
 
-Widget cartMenuItem(BuildContext context, List<MenuItem> items, int index, Animation<double> animation) => Card(
+Widget cartItemTile(
+    {BuildContext context,
+    Item item,
+    void Function() onTap,
+    void Function() onAddItem,
+    void Function() onReduceItem,
+    void Function() onRemoveItem,
+    void Function(String) onQuantityChanged,
+    void Function() onItemCommentPressed}) {
+  final controller = TextEditingController(text: item.quantity.toString());
+  return InkWell(
+    onTap: onTap,
+    child: Card(
       elevation: 4,
       child: ListTile(
         // leading: CircleAvatar(
@@ -16,7 +27,7 @@ Widget cartMenuItem(BuildContext context, List<MenuItem> items, int index, Anima
         //   ),
         // ),
         title: Text(
-          items[index].name.toUpperCase(),
+          item.name.toUpperCase(),
           style: GoogleFonts.ubuntuCondensed(
             color: Colors.black87,
             fontSize: 14,
@@ -33,8 +44,8 @@ Widget cartMenuItem(BuildContext context, List<MenuItem> items, int index, Anima
               height: 8,
             ),
             Text(
-              ' ${double.parse(items[index].price).toInt().toString()} x ${items[index].quantity} '
-              '= ${(double.parse(items[index].price).toInt() * items[index].quantity).toString()}',
+              ' ${item.price.toInt().toString()} x ${item.quantity} '
+              '= ${(item.price.toInt() * item.quantity).toString()}',
               style: TextStyle(
                 color: Colors.grey.shade800,
                 fontSize: 12,
@@ -47,18 +58,35 @@ Widget cartMenuItem(BuildContext context, List<MenuItem> items, int index, Anima
                     Icons.remove,
                     color: Colors.red,
                   ),
-                  onPressed: () {
-                    context
-                        .read<POSBloc>()
-                        .add(ReduceItem(code: int.parse(items[index].code), itemId: int.parse(items[index].id),),);
-                  },
+                  onPressed: onReduceItem,
                 ),
-                Text(
-                  items[index].quantity.toString(),
-                  style: TextStyle(
-                    color: Colors.grey.shade900,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
+                // Text(
+                //   item.quantity.toString(),
+                //   style: TextStyle(
+                //     color: Colors.grey.shade900,
+                //     fontSize: 12,
+                //     fontWeight: FontWeight.bold,
+                //   ),
+                // ),
+                Container(
+                  width: Config.getDeviceWidth(context) * 0.05,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          onSubmitted: onQuantityChanged,
+                          decoration: InputDecoration(
+                            labelText: 'Quantity',
+                          ),
+                          controller: controller,
+                          style: TextStyle(
+                            color: Colors.grey.shade900,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 IconButton(
@@ -66,9 +94,7 @@ Widget cartMenuItem(BuildContext context, List<MenuItem> items, int index, Anima
                     Icons.add,
                     color: Colors.red,
                   ),
-                  onPressed: () => context
-                      .read<POSBloc>()
-                      .add(AddItem(code: int.parse(items[index].code), itemId: int.parse(items[index].id),),),
+                  onPressed: onAddItem,
                 ),
               ],
             ),
@@ -85,34 +111,7 @@ Widget cartMenuItem(BuildContext context, List<MenuItem> items, int index, Anima
                   color: Colors.red.shade800,
                   size: 22,
                 ),
-                onPressed: () async {
-                  String comments = items[index].comment;
-
-                  await showDialog(
-                    context: context,
-                    builder: (context) => AlertDialog(
-                        title: Text('Comments'),
-                        content: ListTile(
-                          leading: Icon(
-                            Icons.edit,
-                            color: Colors.redAccent,
-                          ),
-                          title: TextField(
-                            controller: TextEditingController(text: comments),
-                            onChanged: (value) => comments = value,
-                          ),
-                        ),
-                        actions: [
-                          TextButton(
-                            onPressed: () => Navigator.of(context).pop(),
-                            child: Text('Ok'),
-                          ),
-                        ]),
-                  );
-                  items[index].comment = comments;
-                  context.read<POSBloc>().add(AddComment(
-                      code: int.parse(items[index].code), itemId: int.parse(items[index].id), comment: comments));
-                },
+                onPressed: onItemCommentPressed,
               ),
               IconButton(
                 icon: Icon(
@@ -120,12 +119,12 @@ Widget cartMenuItem(BuildContext context, List<MenuItem> items, int index, Anima
                   color: Colors.yellow.shade800,
                   size: 22,
                 ),
-                onPressed: () => context
-                    .read<POSBloc>()
-                    .add(RemoveItem(code: int.parse(items[index].id), itemId: int.parse(items[index].id),),),
+                onPressed: onRemoveItem,
               ),
             ],
           ),
         ),
       ),
-    );
+    ),
+  );
+}

@@ -79,8 +79,8 @@ class FeedbackScreen extends StatelessWidget {
               onPressed: () async {
                 final feedback = CustomerFeedback();
                 feedback.orderKey = order.id;
-                feedback.name = order.customer;
-                feedback.contact = order.contact;
+                feedback.name = order.customer.name;
+                feedback.contact = order.customer.contact;
                 feedback.remarks = remarksController.text;
                 feedback.questions = [];
                 feedback.items = [];

@@ -17,8 +17,9 @@ class CategoriesLoaded extends POSState {
 }
 
 class ItemsLoaded extends POSState {
-  final List<MenuItem> list;
-  ItemsLoaded({this.list});
+  final List<Item> items;
+  final List<Category> categories;
+  ItemsLoaded({this.items, this.categories});
   // @override
   // List<Object> get props => [list];
 }
@@ -27,7 +28,7 @@ class CartItems extends POSState {
   final String totalAmount;
   final String taxAmount;
   final String subTotal;
-  final List<MenuItem> list;
+  final List<Item> list;
   CartItems({this.list, this.totalAmount, this.taxAmount, this.subTotal});
 
   // @override
@@ -36,7 +37,7 @@ class CartItems extends POSState {
 
 class SubmissionValid extends POSState {
   final Order customerOrder;
-  final List<MenuItem> listItems;
+  final List<Item> listItems;
   SubmissionValid({@required this.customerOrder, @required this.listItems});
 }
 
@@ -68,4 +69,14 @@ class POSError extends POSState {
 class POSLoading extends POSState {
   final String message;
   POSLoading({this.message});
+}
+
+class ItemAdded extends POSState {
+  final Item item;
+  ItemAdded({this.item});
+}
+
+class ItemRemoved extends POSState {
+  final Item item;
+  ItemRemoved({this.item});
 }

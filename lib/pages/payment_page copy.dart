@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pos_app/bloc/payment_bloc/payment_bloc.dart';
-import 'package:pos_app/models/menu_item.dart';
+import 'package:pos_app/models/item.dart';
 import 'package:pos_app/shared/config.dart';
 import '../shared/app_theme.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -304,7 +304,7 @@ class PaymentScreen extends StatelessWidget {
   }
 
   List<Widget> getCartItemsNewWidgets(
-          BuildContext context, List<MenuItem> lstItem) =>
+          BuildContext context, List<Item> lstItem) =>
       lstItem
           .map((item) => Card(
                 elevation: 4,
@@ -335,8 +335,8 @@ class PaymentScreen extends StatelessWidget {
                         height: 8,
                       ),
                       Text(
-                        ' ${double.parse(item.price).toInt().toString()} x ${item.quantity} '
-                        '= ${(double.parse(item.price).toInt() * item.quantity).toString()}',
+                        ' ${item.price.toInt().toString()} x ${item.quantity} '
+                        '= ${(item.price.toInt() * item.quantity).toString()}',
                         style: TextStyle(
                           color: Colors.grey.shade800,
                           fontSize: 12,

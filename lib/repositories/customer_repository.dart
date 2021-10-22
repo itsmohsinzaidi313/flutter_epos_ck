@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:meta/meta.dart';
 import 'package:http/http.dart';
 import 'package:pos_app/shared/app_library.dart';
@@ -19,7 +21,7 @@ class CustomerRepo {
   Future<Response> postCustomer({@required Customer customer}) async =>
       await post(await Config.getCustomerApi,
               headers: {'Content-type': 'application/json'},
-              body: '"${customer.toJson.replaceAll('"', '\\"')}"')
+              body: jsonEncode(customer.toMap()))
           .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
               onTimeout: () => Lib.timeout)
           .onError((error, stackTrace) =>

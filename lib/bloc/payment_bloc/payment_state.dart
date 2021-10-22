@@ -20,7 +20,7 @@ class PaymentType extends PaymentState {
 }
 
 class CartItems extends PaymentState {
-  final List<MenuItem> list;
+  final List<Item> list;
   CartItems({this.list, @required totalAmount, @required totalTaxAmount})
       : super(totalAmount: totalAmount, totalTaxAmount: totalTaxAmount);
 }
