@@ -21,7 +21,7 @@ class CustomerRepo {
   Future<Response> postCustomer({@required Customer customer}) async =>
       await post(await Config.getCustomerApi,
               headers: {'Content-type': 'application/json'},
-              body: jsonEncode(customer.toMap()))
+              body: jsonEncode(customer.map))
           .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
               onTimeout: () => Lib.timeout)
           .onError((error, stackTrace) =>

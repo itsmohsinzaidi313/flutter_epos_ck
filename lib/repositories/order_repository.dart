@@ -34,7 +34,7 @@ class OrderRepo {
   Future<Response> updateOrder({@required Order customerOrder}) async {
     log(await Config.ordersApi, name: 'updateOrder');
     log(jsonEncode(customerOrder.map), name: 'updateOrder');
-    return Lib.timeout;
+    // return Lib.timeout;
     return await put(await Config.ordersApi,
             headers: {'Content-type': 'application/json'},
             body: jsonEncode(customerOrder.map))

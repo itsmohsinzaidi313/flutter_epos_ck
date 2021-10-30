@@ -1,9 +1,9 @@
 import 'dart:developer';
 
+import 'package:equatable/equatable.dart';
 import 'package:pos_app/bloc/payment_bloc/payment_bloc.dart';
 import 'package:pos_app/models/customer.dart';
 import 'package:pos_app/models/deals.dart';
-import 'package:pos_app/models/menu.dart';
 import 'package:pos_app/models/item.dart';
 import 'package:pos_app/shared/app_library.dart';
 
@@ -64,8 +64,9 @@ class Order {
         time = map[_OrderTimeKey],
         date = map[_OrderDateKey],
         tiltId = map[_TiltIdKey] {
-    items.addAll(
-        (map[_ItemsKey] as List<dynamic>).map((e) => Item.fromMap(e)).toList());
+    items.addAll((map[_ItemsKey] as List<dynamic>)
+        .map((e) => MenuItem.fromMap(e))
+        .toList());
     items.addAll((map[_FixedDealKey] as List<dynamic>)
         .map((e) => FixedDeal.fromMap(e))
         .toList());
@@ -78,8 +79,6 @@ class Order {
     List<dynamic> itemsList = [];
     List<dynamic> fixedDealList = [];
     List<dynamic> onSpotDealsList = [];
-
-    POSMenu menu = POSMenu();
 
     for (var item in items) {
       if (item is MenuItem) {
@@ -94,7 +93,7 @@ class Order {
       _ItemsKey: itemsList,
       _FixedDealKey: fixedDealList,
       _OnSpotDealKey: onSpotDealsList,
-      _CustomerKey: customer?.toMap(),
+      _CustomerKey: customer?.map,
       _OrderIdKey: id ?? '0',
       _WaiterKey: waiterId ?? '0',
       _TableKey: tableId ?? '0',
@@ -187,19 +186,60 @@ class Order {
     discountedAmount = '';
   }
 
-  void copyOrder(Order order) {
-    items = order.items;
-    id = order.id;
-    waiterId = order.waiterId;
-    tableId = order.tableId;
-    covers = order.covers;
-    cardNumber = order.cardNumber;
-    customer = order.customer;
-    orderType = order.orderType;
-    userId = order.userId;
-    orderNo = order.orderNo;
-    time = order.time;
-    date = order.date;
-    discountedAmount = order.discountedAmount;
-  }
+  // void copyOrder(Order order) {
+  //   reset();
+  //   for (var item in order.items) {
+  //     if (item is FixedDeal) {
+  //       items.add(FixedDeal(
+  //           categoryId: item.categoryId,
+  //           code: item.code,
+  //           comment: item.comment,
+  //           dealItems: item.dealItems,
+  //           id: item.id,
+  //           image: item.image,
+  //           name: item.name,
+  //           price: item.price,
+  //           quantity: item.quantity,
+  //           selected: item.selected,
+  //           taxAmount: item.taxAmount));
+  //     } else if (item is OnSpotDeal) {
+  //       items.add(OnSpotDeal(
+  //           id: item.id,
+  //           categoryId: item.categoryId,
+  //           code: item.code,
+  //           dealItems: item.dealItems,
+  //           image: item.image,
+  //           name: item.name,
+  //           price: item.price,
+  //           quantity: item.quantity,
+  //           selected: item.selected,
+  //           taxAmount: item.taxAmount,
+  //           uniqueDealId: item.uniqueDealId));
+  //     } else if (item is Item) {
+  //       items.add(MenuItem(
+  //           id: item.id,
+  //           code: item.code,
+  //           categoryId: item.categoryId,
+  //           comment: item.comment,
+  //           image: item.image,
+  //           name: item.name,
+  //           price: item.price,
+  //           quantity: item.quantity,
+  //           selected: item.selected,
+  //           taxAmount: item.taxAmount));
+  //     }
+  //   }
+  //   id = order.id;
+  //   waiterId = order.waiterId;
+  //   tableId = order.tableId;
+  //   covers = order.covers;
+  //   cardNumber = order.cardNumber;
+  //   customer = order.customer;
+  //   orderType = order.orderType;
+  //   userId = order.userId;
+  //   orderNo = order.orderNo;
+  //   time = order.time;
+  //   date = order.date;
+  //   discountedAmount = order.discountedAmount;
+  // }
 }

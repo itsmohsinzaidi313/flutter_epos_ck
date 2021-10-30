@@ -12,3 +12,5 @@ export 'on_spot_deal_dialog.dart';
 export 'cart_item_tile.dart';
 export 'cart_widget.dart';
 export 'deal_detail.dart';
+export 'waiters_grid.dart';
+export 'tables_grid.dart';

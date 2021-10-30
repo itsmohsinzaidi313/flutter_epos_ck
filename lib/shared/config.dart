@@ -50,9 +50,9 @@ class Config {
       '${await _apiCommon}/Status?key=$_key';
 
   static AndroidDeviceInfo _deviceData;
-  static AndroidDeviceInfo get deviceData {
+  static Future<AndroidDeviceInfo> get deviceData async {
     if (_deviceData == null) {
-      DeviceInfoPlugin().androidInfo.then((value) => _deviceData = value);
+      _deviceData = await DeviceInfoPlugin().androidInfo;
     }
     return _deviceData;
   }

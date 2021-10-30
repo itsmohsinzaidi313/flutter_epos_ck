@@ -80,3 +80,8 @@ class ItemRemoved extends POSState {
   final Item item;
   ItemRemoved({this.item});
 }
+
+class POSMenuLoaded extends POSState {
+  final POSMenu menu;
+  POSMenuLoaded({this.menu});
+}

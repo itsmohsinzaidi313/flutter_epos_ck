@@ -9,7 +9,7 @@ class LoginRepo {
   Future<Response> login(
           {@required String username, @required String password}) async =>
       await get(
-              '${await Config.getLoginApi}&username=$username&password=$password&deviceId=${Config.deviceData}')
+              '${await Config.getLoginApi}&username=$username&password=$password&deviceId=${(await Config.deviceData).androidId}')
           .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
               onTimeout: () => Lib.timeout)
           .onError((error, stackTrace) =>

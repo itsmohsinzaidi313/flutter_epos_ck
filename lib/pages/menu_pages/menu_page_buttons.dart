@@ -39,7 +39,10 @@ class MenuPageButtons {
                               .map((e) => Order.fromMap(e))
                               .toList() ??
                           <Order>[];
-                  if (ordersList.isEmpty) return;
+                  if (ordersList.isEmpty) {
+                    AppTheme.snackbar(context, 'No orders avalible');
+                    return;
+                  }
                   Navigator.of(context)
                       .pushNamed('/orders', arguments: ordersList);
                 } else {

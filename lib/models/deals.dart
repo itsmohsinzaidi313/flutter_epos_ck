@@ -100,7 +100,7 @@ class FixedDeal extends Item with EquatableMixin {
 
   FixedDeal.fromMap(Map<String, dynamic> map)
       : this.dealItems = (map[_ItemsKey] as List<dynamic>)
-            .map((e) => Item.fromMap(e))
+            .map((e) => MenuItem.fromMap(e))
             .toList(),
         super(
             id: map[Item.IdKey],
@@ -224,7 +224,7 @@ class OnSpotDeal extends Item with EquatableMixin {
 
   @override
   Map<String, dynamic> toMap() => {
-        _UniqueDealId: uniqueDealId,
+        _UniqueDealId: uniqueDealId == '' ? _signature : uniqueDealId,
         Item.IdKey: id,
         Item.CodeKey: code,
         Item.CatIdKey: categoryId,
@@ -236,18 +236,25 @@ class OnSpotDeal extends Item with EquatableMixin {
         Item.SelectedKey: selected,
         _DealItemsKey: dealItems.map((e) => e.toMap()).toList(),
       };
-  static String signature = '';
+  String get _signature {
+    String _ = '';
+    _ += id;
+    _ += dealItems.length.toString();
+    for (var item in dealItems) {
+      _ += item.id;
+    }
+    return _;
+  }
 
   @override
   List<Object> get props {
-    signature = '';
-    signature += id;
-    signature += name;
-    signature += dealItems.length.toString();
+    String _ = '';
+    _ += id;
+    _ += dealItems.length.toString();
     for (var item in dealItems) {
-      signature += item.id;
+      _ += item.id;
     }
-    return [signature];
+    return uniqueDealId == '' ? [_] : [uniqueDealId];
   }
 }
 

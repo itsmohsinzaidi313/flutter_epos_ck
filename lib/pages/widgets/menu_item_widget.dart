@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pos_app/models/item.dart';
@@ -115,84 +117,213 @@ Widget itemButton1(BuildContext context, Item item) => Stack(
     );
 
 Widget itemButton2(
-        {BuildContext context,
-        Item item,
-        String subtitle,
-        bool showSubtitle = false,
-        bool isSelectable = false,
-        bool selected = false,
-        bool}) =>
-    Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: Stack(
-        children: [
-          Positioned(
-            bottom: 10,
-            right: 10,
-            child: isSelectable
-                ? Center(
-                    child: selected
-                        ? Icon(
-                            Icons.check_circle_rounded,
-                            color: Colors.red,
-                          )
-                        : Icon(
-                            Icons.check_circle_outline_outlined,
-                            color: Colors.grey[400],
-                          ),
-                  )
-                : Container(),
-          ),
-          Column(
-            children: [
-              Expanded(
-                flex: 2,
-                child: Text(
-                  item.name.toUpperCase(),
-                  textAlign: TextAlign.center,
-                  style: GoogleFonts.ubuntuCondensed(
-                    color: Colors.grey.shade800,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: 0,
-                    wordSpacing: 0.5,
-                  ),
-                ),
-              ),
-              showSubtitle
-                  ? Expanded(
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            subtitle,
-                            style: GoogleFonts.ubuntuCondensed(
-                              color: Colors.amber.shade800,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              wordSpacing: 1.0,
+    {BuildContext context,
+    Item item,
+    bool showSubtitle = false,
+    String subtitle,
+    bool isSelectable = false,
+    bool selected = false,
+    void Function() onTap}) {
+  return Card(
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(10),
+    ),
+    elevation: 3,
+    child: InkWell(
+      onTap: onTap,
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Stack(
+          children: [
+            Positioned(
+              bottom: 10,
+              right: 10,
+              child: isSelectable
+                  ? Center(
+                      child: selected
+                          ? Icon(
+                              Icons.check_circle_rounded,
+                              color: Colors.red,
+                            )
+                          : Icon(
+                              Icons.check_circle_outline_outlined,
+                              color: Colors.grey[400],
                             ),
-                          ),
-                        ],
-                      ),
                     )
                   : Container(),
-              Divider(
-                color: Colors.amber.shade800,
-              ),
-              Expanded(
-                child: Text(
-                  'PKR ${item.price}',
-                  style: GoogleFonts.ubuntuCondensed(
-                    color: Colors.red.shade500,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    wordSpacing: 1.0,
+            ),
+            Column(
+              children: [
+                Expanded(
+                  flex: 2,
+                  child: Text(
+                    item.name.toUpperCase(),
+                    textAlign: TextAlign.center,
+                    style: GoogleFonts.ubuntuCondensed(
+                      color: Colors.grey.shade800,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 0,
+                      wordSpacing: 0.5,
+                    ),
                   ),
                 ),
+                showSubtitle
+                    ? Expanded(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              subtitle,
+                              style: GoogleFonts.ubuntuCondensed(
+                                color: Colors.amber.shade800,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                wordSpacing: 1.0,
+                              ),
+                            ),
+                          ],
+                        ),
+                      )
+                    : Container(),
+                Divider(
+                  color: Colors.amber.shade800,
+                ),
+                Expanded(
+                  child: Text(
+                    'PKR ${item.price}',
+                    style: GoogleFonts.ubuntuCondensed(
+                      color: Colors.red.shade500,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      wordSpacing: 1.0,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    ),
+  );
+}
+
+class ItemButton extends StatefulWidget {
+  final Item item;
+  final String subtitle;
+  final bool showSubtitle;
+  final bool isSelectable;
+  final FutureOr<bool> Function(FutureOr<bool> selected) onSelected;
+  final void Function() onTap;
+  ItemButton(
+      {Key key,
+      this.item,
+      this.subtitle,
+      this.showSubtitle = false,
+      this.isSelectable = false,
+      this.onSelected,
+      this.onTap})
+      : super(key: key);
+
+  @override
+  _ItemButtonState createState() => _ItemButtonState();
+}
+
+class _ItemButtonState extends State<ItemButton> {
+  FutureOr<bool> _selected = false;
+  void onSelected() {
+    if (widget.isSelectable) {
+      setState(() {
+        _selected = widget.onSelected(_selected);
+      });
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10),
+      ),
+      elevation: 3,
+      child: InkWell(
+        onTap: widget.isSelectable ? onSelected : widget.onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Stack(
+            children: [
+              Positioned(
+                bottom: 10,
+                right: 10,
+                child: widget.isSelectable
+                    ? Center(
+                        child: _selected
+                            ? Icon(
+                                Icons.check_circle_rounded,
+                                color: Colors.red,
+                              )
+                            : Icon(
+                                Icons.check_circle_outline_outlined,
+                                color: Colors.grey[400],
+                              ),
+                      )
+                    : Container(),
+              ),
+              Column(
+                children: [
+                  Expanded(
+                    flex: 2,
+                    child: Text(
+                      widget.item.name.toUpperCase(),
+                      textAlign: TextAlign.center,
+                      style: GoogleFonts.ubuntuCondensed(
+                        color: Colors.grey.shade800,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0,
+                        wordSpacing: 0.5,
+                      ),
+                    ),
+                  ),
+                  widget.showSubtitle
+                      ? Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                widget.subtitle,
+                                style: GoogleFonts.ubuntuCondensed(
+                                  color: Colors.amber.shade800,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  wordSpacing: 1.0,
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : Container(),
+                  Divider(
+                    color: Colors.amber.shade800,
+                  ),
+                  Expanded(
+                    child: Text(
+                      'PKR ${widget.item.price}',
+                      style: GoogleFonts.ubuntuCondensed(
+                        color: Colors.red.shade500,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        wordSpacing: 1.0,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),
-        ],
+        ),
       ),
     );
+  }
+}

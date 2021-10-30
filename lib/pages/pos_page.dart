@@ -96,59 +96,6 @@ class _PosScreenState extends State<PosScreen>
             Container(
               child: Column(
                 children: [
-                  // Top bar for table and waiters
-                  // Container(
-                  //   color: Colors.red,
-                  //   child: Row(
-                  //     children: [
-                  //       Flexible(
-                  //         flex: 1,
-                  //         child: ListTile(
-                  //           leading: Container(
-                  //             padding: EdgeInsets.all(5),
-                  //             decoration: BoxDecoration(
-                  //               color: Colors.red,
-                  //               shape: BoxShape.rectangle,
-                  //               borderRadius: BorderRadius.circular(10),
-                  //             ),
-                  //             child: Text(
-                  //               '',
-                  //               style: TextStyle(
-                  //                   color: Colors.grey[600],
-                  //                   fontWeight: FontWeight.bold),
-                  //             ),
-                  //           ),
-                  //           title: Container(
-                  //             padding: EdgeInsets.all(5),
-                  //             decoration: BoxDecoration(
-                  //               color: Colors.red,
-                  //               shape: BoxShape.rectangle,
-                  //               borderRadius: BorderRadius.circular(10),
-                  //             ),
-                  //             child: Center(
-                  //               child: Text('',
-                  //                   style: TextStyle(
-                  //                       color: Colors.grey[600],
-                  //                       fontWeight: FontWeight.bold)),
-                  //             ),
-                  //           ),
-                  //           trailing: Container(
-                  //             padding: EdgeInsets.all(5),
-                  //             decoration: BoxDecoration(
-                  //               color: Colors.red,
-                  //               shape: BoxShape.rectangle,
-                  //               borderRadius: BorderRadius.circular(10),
-                  //             ),
-                  //             child: Text('',
-                  //                 style: TextStyle(
-                  //                     color: Colors.grey[600],
-                  //                     fontWeight: FontWeight.bold)),
-                  //           ),
-                  //         ),
-                  //       ),
-                  //     ],
-                  //   ),
-                  // ),
                   Expanded(
                     child: Row(
                       children: [
@@ -181,39 +128,7 @@ class _PosScreenState extends State<PosScreen>
                                     }
                                   },
                                   builder: (context, state) {
-                                    List<Category> list = [];
-                                    Future f = Future(() {});
                                     if (state is CategoriesLoaded) {
-                                      //   state.list.forEach((element) {
-                                      //     f = f.then((value) => Future.delayed(
-                                      //             Duration(milliseconds: 50),
-                                      //             () {
-                                      //           list.add(element);
-                                      //           _listKey.currentState
-                                      //               .insertItem(
-                                      //                   list.length - 1);
-                                      //         }));
-                                      //   });
-                                      // }
-                                      // Tween<Offset> _offset = Tween(
-                                      //     begin: Offset(0, -1),
-                                      //     end: Offset(0, 0));
-                                      // return AnimatedList(
-                                      //   key: _listKey,
-                                      //   scrollDirection: Axis.horizontal,
-                                      //   initialItemCount: list.length,
-                                      //   itemBuilder:
-                                      //       (context, index, animation) =>
-                                      //           SlideTransition(
-                                      //     position: animation.drive(_offset),
-                                      //     child: categoryButton(
-                                      //       context,
-                                      //       list,
-                                      //       index,
-                                      //     ),
-                                      //   ),
-                                      // );
-
                                       return ListView(
                                         scrollDirection: Axis.horizontal,
                                         children: getCategoryWidgets(
@@ -409,60 +324,53 @@ class _PosScreenState extends State<PosScreen>
           BuildContext context, List<Item> items, List<Category> categories) =>
       items
           .map(
-            (item) => Card(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
-              ),
-              elevation: 3,
-              // color: Colors.redAccent,
-              child: InkWell(
-                  onTap: () async {
-                    if (item.code == Item.OPENFOOD_CODE.toString()) {
-                      openFoodDialog(context, item.categoryId).then((openItem) {
-                        if (openItem != null) {
-                          passEvent(context, AddOpenItem(openItem: openItem));
-                        }
-                      });
-                    } else if (item is OnSpotDeal) {
-                      final list = categories.where((element) {
-                        bool match = false;
-                        for (var i in item.dealItems) {
-                          i.selected = false;
-                          i.quantity = 0;
-                          if (i.categoryId == element.id) {
-                            element.choiceLimit = i.choice;
-                            match = true;
-                          }
-                        }
-                        return match;
-                      }).toList();
-                      final deal = await showOnSpotDealDialog(
-                          categories: list, context: context, onSpotDeal: item);
-                      if (deal != null && deal.quantity > 0) {
-                        passEvent(
-                          context,
-                          AddOnSpotDeal(
-                            deal: deal,
-                          ),
-                        );
-                      }
-                      // Navigator.of(context).push(new MaterialPageRoute(
-                      //   builder: (context) => OnSpotDealPage(
-                      //     categories: list,
-                      //     deal: item,
-                      //   ),
-                      // ));
-                    } else {
-                      passEvent(
-                        context,
-                        AddItem(
-                          code: item.code,
-                          itemId: int.parse(item.id),
-                        ),
-                      );
+            (item) => ItemButton(
+              item: item,
+              onTap: () async {
+                if (item.code == Item.OPENFOOD_CODE.toString()) {
+                  openFoodDialog(context, item.categoryId).then((openItem) {
+                    if (openItem != null) {
+                      passEvent(context, AddOpenItem(openItem: openItem));
                     }
-                  },
-                  child: itemButton2(context: context, item: item)),
+                  });
+                } else if (item is OnSpotDeal) {
+                  final list = categories.where((element) {
+                    bool match = false;
+                    for (var i in item.dealItems) {
+                      if (i.choice == 0.0) {
+                        i.selected = true;
+                      } else {
+                        i.selected = false;
+                      }
+                      i.quantity = 0;
+                      if (i.categoryId == element.id) {
+                        element.choiceLimit = i.choice;
+                        match = true;
+                      }
+                    }
+                    return match;
+                  }).toList();
+                  final deal = await showOnSpotDealDialog(
+                      categories: list, context: context, onSpotDeal: item);
+                  if (deal != null && deal.quantity > 0) {
+                    passEvent(
+                      context,
+                      AddOnSpotDeal(
+                        deal: deal,
+                      ),
+                    );
+                  }
+                } else {
+                  passEvent(
+                    context,
+                    AddItem(
+                      code: item.code,
+                      itemId: int.parse(item.id),
+                    ),
+                  );
+                }
+                return true;
+              },
             ),
           )
           .toList() ??
@@ -476,7 +384,7 @@ class _PosScreenState extends State<PosScreen>
         items: items,
         onReduceItem: (item) {
           if (item is OnSpotDeal) {
-            ReduceOnSpotDeal(deal: item);
+            passEvent(context, ReduceOnSpotDeal(deal: item));
           } else {
             passEvent(
               context,

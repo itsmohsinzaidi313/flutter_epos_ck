@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:http/http.dart';
+import 'package:pos_app/models/deals.dart';
 import 'package:pos_app/models/item.dart';
 import 'package:pos_app/shared/app_library.dart';
 import 'package:pos_app/shared/config.dart';

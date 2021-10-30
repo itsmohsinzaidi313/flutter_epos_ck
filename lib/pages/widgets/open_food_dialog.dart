@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:pos_app/models/deals.dart';
 import 'package:pos_app/models/item.dart';
 import 'package:pos_app/shared/config.dart';
 
@@ -106,7 +107,7 @@ Future<Item> openFoodDialog(BuildContext context, String categoryId) async {
                                 (_checkItemQuantity(qtyCntrlr.text) == null) &&
                                 _checkItemTax(taxCntrlr.text) == null) {
                               Navigator.of(context).pop(
-                                Item(
+                                MenuItem(
                                   id: Random.secure()
                                       .nextInt(1000000)
                                       .toString(),

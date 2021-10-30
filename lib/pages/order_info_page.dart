@@ -215,7 +215,27 @@ class DineInLayout extends StatelessWidget {
                       }
                     },
                     builder: (context, state) {
-                      return gridLayoutController(state);
+                      if (state is WaitersState) {
+                        return WaitersGrid(
+                          listWaiters: state.waiters,
+                          onTap: (context, waiter) => passEvent(
+                            context,
+                            WaiterChanged(
+                              type: orderType,
+                              waiter: waiter,
+                            ),
+                          ),
+                        );
+                      } else if (state is TablesState) {
+                        return TablesGrid(
+                            listTables: state.tables,
+                            onTap: (context, table) => passEvent(
+                                  context,
+                                  TableChanged(type: orderType, table: table),
+                                ));
+                      } else {
+                        return Container();
+                      }
                     },
                   )),
             ),
@@ -224,155 +244,6 @@ class DineInLayout extends StatelessWidget {
       ),
     );
   }
-
-  Widget gridLayoutController(OrderInfoState state) {
-    if (state is WaitersState) {
-      return waitersGridView(state.waiters);
-    } else if (state is TablesState) {
-      return tablesGridView(state.tables);
-    } else {
-      return waitersGridView([]);
-    }
-  }
-
-  Widget waitersGridView(List<Waiter> listWaiters) => GridView.builder(
-        itemCount: listWaiters.length,
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 4,
-        ),
-        itemBuilder: (context, index) => Container(
-          child: Card(
-            color: listWaiters[index].selected
-                ? Colors.redAccent[200]
-                : Colors.white,
-            child: InkWell(
-              child: Stack(
-                children: [
-                  Positioned(
-                    bottom: 2,
-                    left: 2,
-                    child: Text(
-                      listWaiters[index].name.toUpperCase(),
-                      style: GoogleFonts.ubuntuCondensed(
-                        color: listWaiters[index].selected
-                            ? Colors.black
-                            : Colors.grey[800],
-                        fontSize: 14,
-                        letterSpacing: 1.0,
-                        wordSpacing: 1.0,
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    top: 0,
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    child: Container(
-                      margin: EdgeInsets.all(20),
-                      child: Image(
-                        image: AssetImage('assets/waiter.png'),
-                        fit: BoxFit.scaleDown,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              onTap: () {
-                passEvent(
-                  context,
-                  WaiterChanged(
-                    type: orderType,
-                    waiter: listWaiters[index],
-                  ),
-                );
-              },
-            ),
-          ),
-        ),
-      );
-
-  Widget tablesGridView(List<t.Tables> listTables) => GridView.builder(
-        itemCount: listTables.length,
-        gridDelegate:
-            SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4),
-        itemBuilder: (context, index) => Card(
-          elevation: 10,
-          color: listTables[index].selected
-              ? Colors.redAccent[200]
-              : Colors.grey.shade100,
-          child: InkWell(
-            child: Stack(
-              children: [
-                Positioned(
-                  top: 2,
-                  left: 2,
-                  child: Text(
-                    listTables[index].tableName,
-                    style: GoogleFonts.ubuntuCondensed(
-                      color: Colors.grey.shade900,
-                      fontSize: 16,
-                      letterSpacing: 1.0,
-                      wordSpacing: 1.0,
-                    ),
-                  ),
-                ),
-                Positioned(
-                  top: 0,
-                  bottom: 0,
-                  left: 0,
-                  right: 0,
-                  child: Container(
-                    margin: EdgeInsets.all(8),
-                    child: Image(
-                      image: AssetImage('assets/table.png'),
-                      fit: BoxFit.cover,
-                    ),
-                  ),
-                ),
-                Positioned(
-                  top: 2,
-                  right: 2,
-                  child: Container(
-                    padding: EdgeInsets.all(1),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.rectangle,
-                      borderRadius: BorderRadius.circular(2),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey,
-                          offset: Offset(-1, -1),
-                          blurRadius: 2,
-                          spreadRadius: 1,
-                        ),
-                        BoxShadow(
-                          color: Colors.grey,
-                          offset: Offset(1, 1),
-                          blurRadius: 2,
-                          spreadRadius: 1,
-                        ),
-                      ],
-                    ),
-                    child: listTables[index].reserved
-                        ? Icon(Icons.lock, color: Colors.black)
-                        : Icon(Icons.check,
-                            color: listTables[index].selected
-                                ? Colors.green
-                                : Colors.white),
-                  ),
-                ),
-              ],
-            ),
-            onTap: () {
-              passEvent(
-                context,
-                TableChanged(type: orderType, table: listTables[index]),
-              );
-            },
-          ),
-        ),
-      );
 
   void passEvent(BuildContext c, OrderInfoEvent event) =>
       c.read<OrderInfoBloc>().add(event);

@@ -54,7 +54,10 @@ class _OrdersScreenState extends State<OrdersScreen>
           await OrderRepo.repo.getOrders(tiltId: Config.user.tiltId);
       if (response.statusCode == HttpStatus.ok) {
         final list = (jsonDecode(response.body) as List<dynamic>) ?? [];
-        setState(() => ordersList = list.map((e) => Order.fromMap(e)).toList());
+        // ordersList = [];
+        setState(() {
+          return ordersList = list.map((e) => Order.fromMap(e)).toList();
+        });
       } else {
         AppTheme.snackbar(context, Lib.getMessage(response));
       }
@@ -97,29 +100,6 @@ class _OrdersScreenState extends State<OrdersScreen>
         child: TabBarView(
           controller: tabController,
           children: getTabWidgets(),
-          //     [
-          //   getOrdersList(
-          //       order: ordersList.where((e) {
-          //     if (e.orderType == '1')
-          //       return true;
-          //     else
-          //       return false;
-          //   }).toList()),
-          //   getOrdersList(
-          //       order: ordersList.where((e) {
-          //     if (e.orderType == '2')
-          //       return true;
-          //     else
-          //       return false;
-          //   }).toList()),
-          //   getOrdersList(
-          //       order: ordersList.where((e) {
-          //     if (e.orderType == '3')
-          //       return true;
-          //     else
-          //       return false;
-          //   }).toList()),
-          // ],
         ),
       ),
     );

@@ -3,9 +3,9 @@ import 'package:pos_app/models/item.dart';
 
 class POSMenu {
   final List<Category> listCategories;
-  final List<Item> listMenu;
+  final List<Item> listItems;
   POSMenu({
     this.listCategories,
-    this.listMenu,
+    this.listItems,
   });
 }

@@ -190,21 +190,29 @@ class _OnSpotDealPageState extends State<OnSpotDealPage> {
                                   .where((element) =>
                                       element.categoryId == selectedCategory.id)
                                   .map(
-                                    (e) => Card(
-                                      child: InkWell(
-                                        child: itemButton2(
-                                            context: context,
-                                            item: e,
-                                            subtitle:
-                                                '(${chosenItem(e.id, e).quantity.toInt()}|${categoryChoiceLimit(e.categoryId)})',
-                                            showSubtitle: true,
-                                            isSelectable: true,
-                                            selected:
-                                                chosenItem(e.id, e).selected),
-                                        onTap: () => setState(() => _addItem(
-                                            selectedCategory,
-                                            chosenItem(e.id, e))),
-                                      ),
+                                    (e) => itemButton2(
+                                      item: e,
+                                      selected: chosenItem(e.id, e).selected,
+                                      subtitle:
+                                          '(${chosenItem(e.id, e).quantity.toInt()}|${categoryChoiceLimit(e.categoryId)})',
+                                      showSubtitle: true,
+                                      isSelectable: true,
+                                      onTap: () {
+                                        if (e.choice != 0) {
+                                          setState(
+                                            () => _addItem(
+                                              selectedCategory,
+                                              chosenItem(e.id, e),
+                                            ),
+                                          );
+                                        } else {
+                                          AppTheme.snackbar(
+                                            context,
+                                            'This is a Fixed item. It cannot be removed.',
+                                            duration: 1,
+                                          );
+                                        }
+                                      },
                                     ),
                                   )
                                   .toList(),
