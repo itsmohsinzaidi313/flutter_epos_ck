@@ -16,7 +16,7 @@ class OrderRepo {
           .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
               onTimeout: () => Lib.timeout)
           .onError((error, stackTrace) =>
-              Lib.httpErrorResponseHandler(error: error));
+              Lib.httpErrorHandler(error: error));
 
   Future<Response> newOrder({@required Order customerOrder}) async {
     log(await Config.ordersApi, name: 'newOrder');
@@ -28,7 +28,7 @@ class OrderRepo {
         .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
             onTimeout: () => Lib.timeout)
         .onError(
-            (error, stackTrace) => Lib.httpErrorResponseHandler(error: error));
+            (error, stackTrace) => Lib.httpErrorHandler(error: error));
   }
 
   Future<Response> updateOrder({@required Order customerOrder}) async {
@@ -41,6 +41,6 @@ class OrderRepo {
         .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
             onTimeout: () => Lib.timeout)
         .onError(
-            (error, stackTrace) => Lib.httpErrorResponseHandler(error: error));
+            (error, stackTrace) => Lib.httpErrorHandler(error: error));
   }
 }

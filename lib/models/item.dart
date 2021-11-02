@@ -9,7 +9,7 @@ class Item {
       CommentKey = 'Comment',
       ImageKey = 'image',
       SelectedKey = 'Selected';
-  static const int OPENFOOD_CODE = 151605140604;
+  static const int openFoodCode = 151605140604;
 
   final String id, code, categoryId, name, image;
   double price, taxAmount, quantity;

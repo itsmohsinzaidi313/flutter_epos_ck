@@ -6,12 +6,12 @@ import 'login_page.dart';
 import '../shared/config.dart';
 import 'login_page.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashPage extends StatefulWidget {
   @override
-  _SplashScreenState createState() => _SplashScreenState();
+  _SplashPageState createState() => _SplashPageState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
+class _SplashPageState extends State<SplashPage> {
   final globalScaffoldKey = GlobalKey<ScaffoldState>();
 
   @override

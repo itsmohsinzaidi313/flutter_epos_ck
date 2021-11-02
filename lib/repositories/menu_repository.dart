@@ -20,7 +20,7 @@ class MenuRepo {
           .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
               onTimeout: () => Lib.timeout)
           .onError((error, stackTrace) =>
-              Lib.httpErrorResponseHandler(error: error));
+              Lib.httpErrorHandler(error: error));
     }
     return _menuResponseCache;
   }

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'package:pos_app/models/customer_order.dart';
+import 'package:pos_app/models/menu.dart';
 import 'package:pos_app/routes/app_routes.dart';
-import 'pages/splash_page.dart';
+import 'package:provider/provider.dart';
 import './shared/config.dart';
 
 void main() {
@@ -11,8 +13,14 @@ void main() {
   SystemChrome.setPreferredOrientations(
           [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight])
       .then((_) {
-    runApp(App(
-      appRoutes: AppRoutes(),
+    runApp(MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => Order()),
+        ChangeNotifierProvider(create: (_) => POSMenu()),
+      ],
+      child: App(
+        appRoutes: AppRoutes(),
+      ),
     ));
   });
 }

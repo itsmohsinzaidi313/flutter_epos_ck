@@ -1,13 +1,16 @@
 import 'dart:developer';
 
 import 'package:equatable/equatable.dart';
+import 'package:flutter/material.dart';
 import 'package:pos_app/bloc/payment_bloc/payment_bloc.dart';
 import 'package:pos_app/models/customer.dart';
+import 'package:pos_app/models/customer_table.dart';
 import 'package:pos_app/models/deals.dart';
 import 'package:pos_app/models/item.dart';
+import 'package:pos_app/models/waiter.dart';
 import 'package:pos_app/shared/app_library.dart';
 
-class Order {
+class Order extends ChangeNotifier {
   static const String _OrderIdKey = 'Id',
       _MenuKey = 'Menu',
       _ItemsKey = 'Items',
@@ -31,7 +34,6 @@ class Order {
       userId,
       orderType,
       orderNo,
-      covers,
       time,
       date,
       tax,
@@ -39,6 +41,7 @@ class Order {
       discountedAmount,
       payment,
       cardNumber;
+  int covers;
   Customer customer = Customer();
   PAYMENTMODE paymentmode;
   bool editOrder = false;
@@ -56,7 +59,7 @@ class Order {
       : id = map[_OrderIdKey].toString(),
         waiterId = map[_WaiterKey],
         tableId = map[_TableKey],
-        covers = map[_CoversKey].toString(),
+        covers = map[_CoversKey],
         customer = Customer.fromMap(map[_CustomerKey]),
         orderType = map[_OrderTypeKey],
         userId = map[_UserIdKey],
@@ -107,49 +110,114 @@ class Order {
   }
 
   void addCartItem(Item item) {
-    if (items == null) items = [];
-    bool itemExists = false;
-    for (var i = 0; i < items.length; i++) {
-      if (items[i].id == item.id) {
-        items[i].quantity++;
-        itemExists = true;
-        break;
+    items = items ?? [];
+
+    if (item is OnSpotDeal) {
+      var deal = item;
+      bool itemExists = false;
+      for (var i in items) {
+        if (i is OnSpotDeal && i == deal) {
+          itemExists = true;
+          i.quantity++;
+          break;
+        }
+      }
+      if (!itemExists) {
+        items.add(OnSpotDeal.fromOnSpotDeal(deal));
+      }
+    } else {
+      bool itemExists = false;
+      for (var i = 0; i < items.length; i++) {
+        if (items[i].id == item.id) {
+          items[i].quantity++;
+          itemExists = true;
+          break;
+        }
+      }
+      if (!itemExists) {
+        if (item is MenuItem) {
+          items.add(MenuItem.fromMenuItem(item));
+        } else if (item is FixedDeal) {
+          items.add(FixedDeal.fromDeal(item));
+        }
       }
     }
-    if (!itemExists) {
-      if (item is MenuItem) {
-        items.add(MenuItem.fromMenuItem(item));
-      } else if (item is FixedDeal) {
-        items.add(FixedDeal.fromDeal(item));
+    notifyListeners();
+  }
+
+  void reduceCartItem(Item item, {bool removeZeroQuantity = true}) {
+    items = items ?? [];
+
+    if (item is OnSpotDeal) {
+      var deal = item;
+      for (var i in items) {
+        if (i is OnSpotDeal && i == deal && i.quantity > 0) {
+          i.quantity--;
+        }
+        if (i.quantity < 1 && removeZeroQuantity) {
+          items.removeAt(items.indexOf(i));
+        }
+        break;
+      }
+    } else {
+      for (var i = 0; i < items.length; i++) {
+        if (items[i].id == '${item.id}') {
+          if (items[i].quantity > 0) {
+            items[i].quantity--;
+          }
+          if (items[i].quantity < 1 && removeZeroQuantity) {
+            items.removeAt(items.indexOf(items[i]));
+          }
+          break;
+        }
+      }
+    }
+    notifyListeners();
+  }
+
+  void addItemComment(Item item, String comment) {
+    if (item is OnSpotDeal) {
+      var deal = item;
+      items
+          .where((element) => element is OnSpotDeal && element == deal)
+          .first
+          .comment = comment;
+    } else {
+      items.where((element) => element.id == item.id).first.comment = comment;
+    }
+    notifyListeners();
+  }
+
+  void setItemQuantity(Item item, String quantity) {
+    if (item is OnSpotDeal) {
+      var deal = item;
+      items
+          .where((element) => element is OnSpotDeal && element == deal)
+          .first
+          .quantity = double.tryParse(quantity) ?? 0.0;
+    } else {
+      items.where((element) => element.id == item.id).first.quantity =
+          double.tryParse(quantity) ?? 0.0;
+    }
+    notifyListeners();
+  }
+
+  void removeItem(Item item) {
+    items = items ?? <Item>[];
+    for (var i in items) {
+      if (item is OnSpotDeal) {
+        if (i == item) {
+          items.removeAt(items.indexOf(i));
+          break;
+        }
+      } else {
+        if (i.id == item.id) {
+          items.removeAt(items.indexOf(i));
+          break;
+        }
       }
     }
   }
-
-  void reduceCartItem(int itemId, {bool removeZeroQuantity = true}) {
-    if (items == null) items = [];
-    for (var i = 0; i < items.length; i++) {
-      if (items[i].id == '$itemId') {
-        if (items[i].quantity > 0) {
-          items[i].quantity--;
-        }
-        if (items[i].quantity < 1 && removeZeroQuantity) {
-          removeCartItem(itemId);
-        }
-        break;
-      }
-    }
-  }
-
-  void removeCartItem(int itemId) =>
-      items.removeAt(items.indexWhere((element) => element.id == '$itemId'));
-
-  void addItemComment(int itemId, String comment) =>
-      items.where((element) => element.id == itemId.toString()).first.comment =
-          comment;
-
-  void setItemQuantity(int itemId, double quantity) =>
-      items.where((element) => element.id == itemId.toString()).first.quantity =
-          quantity;
 
   String get subTotal {
     double amount = 0;
@@ -159,7 +227,7 @@ class Order {
     return amount.toStringAsFixed(2);
   }
 
-  String get totalTaxedAmount {
+  String get totalTaxAmount {
     double amount = 0;
     for (var item in items) {
       amount += item.taxAmount * item.quantity;
@@ -167,7 +235,7 @@ class Order {
     return amount.toStringAsFixed(2);
   }
 
-  String get totalTax => ((double.tryParse(totalTaxedAmount) ?? 0) -
+  String get totalTax => ((double.tryParse(totalTaxAmount) ?? 0) -
           (double.tryParse(subTotal) ?? 0))
       .toStringAsFixed(2);
 
@@ -176,7 +244,7 @@ class Order {
     id = '';
     waiterId = '';
     tableId = '';
-    covers = '';
+    covers = 0;
     cardNumber = '';
     orderType = '';
     userId = '';
@@ -184,62 +252,33 @@ class Order {
     time = '';
     date = '';
     discountedAmount = '';
+    notifyListeners();
   }
 
-  // void copyOrder(Order order) {
-  //   reset();
-  //   for (var item in order.items) {
-  //     if (item is FixedDeal) {
-  //       items.add(FixedDeal(
-  //           categoryId: item.categoryId,
-  //           code: item.code,
-  //           comment: item.comment,
-  //           dealItems: item.dealItems,
-  //           id: item.id,
-  //           image: item.image,
-  //           name: item.name,
-  //           price: item.price,
-  //           quantity: item.quantity,
-  //           selected: item.selected,
-  //           taxAmount: item.taxAmount));
-  //     } else if (item is OnSpotDeal) {
-  //       items.add(OnSpotDeal(
-  //           id: item.id,
-  //           categoryId: item.categoryId,
-  //           code: item.code,
-  //           dealItems: item.dealItems,
-  //           image: item.image,
-  //           name: item.name,
-  //           price: item.price,
-  //           quantity: item.quantity,
-  //           selected: item.selected,
-  //           taxAmount: item.taxAmount,
-  //           uniqueDealId: item.uniqueDealId));
-  //     } else if (item is Item) {
-  //       items.add(MenuItem(
-  //           id: item.id,
-  //           code: item.code,
-  //           categoryId: item.categoryId,
-  //           comment: item.comment,
-  //           image: item.image,
-  //           name: item.name,
-  //           price: item.price,
-  //           quantity: item.quantity,
-  //           selected: item.selected,
-  //           taxAmount: item.taxAmount));
-  //     }
-  //   }
-  //   id = order.id;
-  //   waiterId = order.waiterId;
-  //   tableId = order.tableId;
-  //   covers = order.covers;
-  //   cardNumber = order.cardNumber;
-  //   customer = order.customer;
-  //   orderType = order.orderType;
-  //   userId = order.userId;
-  //   orderNo = order.orderNo;
-  //   time = order.time;
-  //   date = order.date;
-  //   discountedAmount = order.discountedAmount;
-  // }
+  void setTable({Tables table}) {
+    this.tableId = table.id;
+    notifyListeners();
+  }
+
+  void setWaiter({Waiter waiter}) {
+    this.waiterId = waiter.id;
+    notifyListeners();
+  }
+
+  void setCustomer(
+      {Customer customer, String contact, String name, String address}) {
+    if (this.customer == null) {
+      this.customer = Customer();
+    }
+    if (customer != null) this.customer = customer;
+    if (contact != null) this.customer.contact = contact;
+    if (name != null) this.customer.name = name;
+    if (address != null) this.customer.address = address;
+    notifyListeners();
+  }
+
+  void setCovers({int covers = 0}) {
+    this.covers = covers ?? 0;
+    notifyListeners();
+  }
 }

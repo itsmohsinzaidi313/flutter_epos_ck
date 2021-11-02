@@ -21,7 +21,7 @@ class Lib {
       }),
       HttpStatus.requestTimeout);
 
-  static Response httpErrorResponseHandler(
+  static Response httpErrorHandler(
       {Exception error, String caller = ''}) {
     log('Error: ${error.toString()}', error: error, name: caller);
     final message = {'Status': false, 'Message': error.toString(), 'Data': 0};

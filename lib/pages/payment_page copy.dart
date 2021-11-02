@@ -6,7 +6,7 @@ import 'package:pos_app/shared/config.dart';
 import '../shared/app_theme.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-class PaymentScreen extends StatelessWidget {
+class PaymentPage extends StatelessWidget {
   final Color cashColor = Colors.grey, percentageColor = Colors.grey;
   final List<String> paymentMethodList = ['Cash', 'Credit'];
   final paymentController = TextEditingController();

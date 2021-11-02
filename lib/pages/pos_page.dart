@@ -1,34 +1,25 @@
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:draggable_floating_button/draggable_floating_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:pos_app/bloc/pos_bloc/pos_bloc.dart';
+import 'package:pos_app/models/customer_order.dart';
 import 'package:pos_app/models/deals.dart';
-import 'package:pos_app/models/items_category.dart';
 import 'package:pos_app/models/item.dart';
+import 'package:pos_app/models/menu.dart';
+import 'package:pos_app/pages/backend/pos_backend.dart';
 import 'package:pos_app/repositories/menu_repository.dart';
 import 'package:pos_app/shared/app_theme.dart';
 import 'package:pos_app/shared/config.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:pos_app/pages/widgets/app_widgets.dart';
+import 'package:provider/provider.dart';
 
-class PosScreen extends StatefulWidget {
-  // final subTotal = TextEditingController();
-  // final taxAmount = TextEditingController();
-  @override
-  State<PosScreen> createState() => _PosScreenState();
-}
-
-class _PosScreenState extends State<PosScreen>
-    with SingleTickerProviderStateMixin {
-  String subTotal = '';
-  String taxAmount = '';
-  String totalAmount = '';
+class PosPage extends StatelessWidget {
   final _autoCompleteController = TextEditingController(text: '');
   final TextStyle titleStyle = TextStyle(
     color: Colors.black,
@@ -40,230 +31,144 @@ class _PosScreenState extends State<PosScreen>
 
   @override
   Widget build(BuildContext context) {
-    passEvent(context, POSBuild());
-    return BlocListener<POSBloc, POSState>(
-      listener: (context, state) async {
-        if (state is SubmissionInvalid) {
-          AppTheme.snackbar(context, state.message);
-        } else if (state is SubmissionValid) {
-        } else if (state is CartItems) {
-          subTotal = state.subTotal;
-          taxAmount = state.taxAmount;
-          totalAmount = ((double.tryParse(state.subTotal) ?? 0) +
-                  (double.tryParse(state.taxAmount) ?? 0))
-              .toStringAsFixed(2);
-        } else if (state is POSLoading) {
-          AppTheme.snackbar(context, state.message);
-        } else if (state is POSError) {
-          await AppTheme.showAlertDialogOK(context,
-              message: state.message,
-              title: 'Error',
-              onOK: () => Navigator.of(context).pop());
-        } else if (state is OrderPostFailed) {
-          await AppTheme.showAlertDialogOK(context,
-              message: state.message,
-              title: 'Failed',
-              onOK: () => Navigator.of(context).pop());
-        } else if (state is OrderPosted) {
-          AppTheme.snackbar(context, state.message);
-
-          Navigator.of(context)
-              .pushNamedAndRemoveUntil('/menu', (route) => false);
-        } else if (state is OrderUpdated) {
-          AppTheme.snackbar(context, state.message);
-          Navigator.of(context).pop();
-        }
-      },
-      child: Scaffold(
-        backgroundColor: Colors.grey[200],
-        appBar: PreferredSize(
-          preferredSize: Size(double.maxFinite, double.maxFinite),
-          child: CustomAppBar(
-            appBarTitle: 'Choose you items',
-            searchBar: autoCompleteSearchBar(context),
-            radioButtons: SizedBox(),
-            onBackPressed: () => Navigator.pop(context),
-          ),
+    return Scaffold(
+      backgroundColor: Colors.grey[200],
+      appBar: PreferredSize(
+        preferredSize: Size(double.maxFinite, double.maxFinite),
+        child: CustomAppBar(
+          appBarTitle: 'Choose you items',
+          searchBar: autoCompleteSearchBar(context),
+          radioButtons: SizedBox(),
+          onBackPressed: () => Navigator.pop(context),
         ),
-        // AppTheme.appBarNormal(
-        //   context: context,
-        //   appBarTitle: 'Menu',
-        //   appBarElevation: 0.0,
-        //   appBarBgColor: AppTheme.appBarColor,
-        // ),
-        body: Stack(
-          children: [
-            Container(
-              child: Column(
-                children: [
-                  Expanded(
-                    child: Row(
-                      children: [
-                        Flexible(
-                          flex: 2,
-                          child: Column(
-                            children: [
-                              Container(
-                                padding: EdgeInsets.symmetric(vertical: 8.0),
-                                child: Text(
-                                  'Categories'.toUpperCase(),
-                                  style: GoogleFonts.staatliches(
-                                    color: Colors.grey[500],
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    letterSpacing: 5.0,
-                                  ),
+      ),
+      body: Stack(
+        children: [
+          Container(
+            child: Column(
+              children: [
+                Expanded(
+                  child: Row(
+                    children: [
+                      Flexible(
+                        flex: 2,
+                        child: Column(
+                          children: [
+                            Container(
+                              padding: EdgeInsets.symmetric(vertical: 8.0),
+                              child: Text(
+                                'Categories'.toUpperCase(),
+                                style: GoogleFonts.staatliches(
+                                  color: Colors.grey[500],
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  letterSpacing: 5.0,
                                 ),
                               ),
-                              Container(
-                                height: Config.getDeviceHeight(context) * 0.12,
+                            ),
+                            Container(
+                              height: Config.getDeviceHeight(context) * 0.12,
+                              padding: EdgeInsets.only(top: 5),
+                              // decoration: BoxDecoration(border: Border.all(width: 2)),
+                              child: Consumer<POSMenu>(
+                              ),
+                            ),
+                            Container(
+                              padding: EdgeInsets.symmetric(vertical: 8.0),
+                              child: Text(
+                                'Items'.toUpperCase(),
+                                style: GoogleFonts.staatliches(
+                                  color: Colors.grey[500],
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                  letterSpacing: 5.0,
+                                ),
+                              ),
+                            ),
+                            Flexible(
+                              flex: 2,
+                              child: Container(
                                 padding: EdgeInsets.only(top: 5),
                                 // decoration: BoxDecoration(border: Border.all(width: 2)),
-                                child: BlocBuilder<POSBloc, POSState>(
-                                  buildWhen: (previous, current) {
-                                    if (current is CategoriesLoaded) {
-                                      return true;
-                                    } else {
-                                      return false;
-                                    }
-                                  },
-                                  builder: (context, state) {
-                                    if (state is CategoriesLoaded) {
-                                      return ListView(
-                                        scrollDirection: Axis.horizontal,
-                                        children: getCategoryWidgets(
-                                            context, state.list),
-                                      );
-                                    } else {
-                                      return AppTheme.progIndicator;
-                                    }
-                                  },
-                                ),
-                              ),
-                              Container(
-                                padding: EdgeInsets.symmetric(vertical: 8.0),
-                                child: Text(
-                                  'Items'.toUpperCase(),
-                                  style: GoogleFonts.staatliches(
-                                    color: Colors.grey[500],
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                    letterSpacing: 5.0,
+                                child: GridView.count(
+                                  crossAxisCount: 4,
+                                  children: _getItemsWidgets(
+                                    context,
                                   ),
                                 ),
                               ),
-                              Flexible(
-                                flex: 2,
-                                child: Container(
-                                  padding: EdgeInsets.only(top: 5),
-                                  // decoration: BoxDecoration(border: Border.all(width: 2)),
-                                  child: BlocBuilder<POSBloc, POSState>(
-                                    buildWhen: (previous, current) {
-                                      if (current is ItemsLoaded) {
-                                        return true;
-                                      } else {
-                                        return false;
-                                      }
-                                    },
-                                    builder: (context, state) {
-                                      if (state is ItemsLoaded) {
-                                        return GridView.count(
-                                          crossAxisCount: 4,
-                                          children: _getItemsWidgets(context,
-                                              state.items, state.categories),
-                                        );
-                                      } else {
-                                        return AppTheme.progIndicator;
-                                      }
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
-                        Expanded(
-                          child: Container(
-                            height: Config.getDeviceHeight(context),
-                            margin: EdgeInsets.all(8.0),
-                            decoration: BoxDecoration(
-                              color: Colors.grey[100],
-                              borderRadius: BorderRadius.circular(5),
-                              shape: BoxShape.rectangle,
-                              border: Border(
-                                left: BorderSide(
-                                  color: Colors.grey[300],
-                                  width: 2,
-                                ),
-                                right: BorderSide(
-                                  color: Colors.grey[300],
-                                  width: 2,
-                                ),
-                                bottom: BorderSide(
-                                  color: Colors.grey[300],
-                                  width: 2,
-                                ),
-                                top: BorderSide(
-                                  color: Colors.grey[300],
-                                  width: 2,
-                                ),
+                      ),
+                      Expanded(
+                        child: Container(
+                          height: Config.getDeviceHeight(context),
+                          margin: EdgeInsets.all(8.0),
+                          decoration: BoxDecoration(
+                            color: Colors.grey[100],
+                            borderRadius: BorderRadius.circular(5),
+                            shape: BoxShape.rectangle,
+                            border: Border(
+                              left: BorderSide(
+                                color: Colors.grey[300],
+                                width: 2,
+                              ),
+                              right: BorderSide(
+                                color: Colors.grey[300],
+                                width: 2,
+                              ),
+                              bottom: BorderSide(
+                                color: Colors.grey[300],
+                                width: 2,
+                              ),
+                              top: BorderSide(
+                                color: Colors.grey[300],
+                                width: 2,
                               ),
                             ),
-                            child: BlocBuilder<POSBloc, POSState>(
-                              buildWhen: (previous, current) {
-                                if (current is CartItems) {
-                                  return true;
-                                } else {
-                                  return false;
-                                }
-                              },
-                              builder: (context, state) {
-                                if (state is CartItems) {
-                                  return _getCartWidget(context, state.list);
-                                } else {
-                                  return AppTheme.progIndicator;
-                                }
-                              },
-                            ),
                           ),
+                          child: _getCartWidget(context),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
-            DraggableFloatingActionButton(
-              backgroundColor: Colors.red,
-              elevation: 5,
-              tooltip: 'Submit Order',
-              appContext: context,
-              appBar: AppTheme.appBarNormal(
-                context: context,
-                appBarTitle: 'Menu',
-                appBarElevation: 0.0,
-                appBarBgColor: AppTheme.appBarColor,
-              ),
-              offset: Offset(
-                Config.getDeviceWidth(context) * 0.91,
-                Config.getDeviceHeight(context) * 0.72,
-              ),
-              child: Icon(
-                Icons.done_rounded,
-                size: 35,
-                color: Colors.white,
-              ),
-              onPressed: () => passEvent(context, PostOrder()),
+          ),
+          DraggableFloatingActionButton(
+            backgroundColor: Colors.red,
+            elevation: 5,
+            tooltip: 'Submit Order',
+            appContext: context,
+            appBar: AppTheme.appBarNormal(
+              context: context,
+              appBarTitle: 'Menu',
+              appBarElevation: 0.0,
+              appBarBgColor: AppTheme.appBarColor,
             ),
-          ],
-        ),
+            offset: Offset(
+              Config.getDeviceWidth(context) * 0.91,
+              Config.getDeviceHeight(context) * 0.72,
+            ),
+            child: Icon(
+              Icons.done_rounded,
+              size: 35,
+              color: Colors.white,
+            ),
+            onPressed: () =>
+                POSBackend.instance.postOrder(context.read<Order>()),
+          ),
+        ],
       ),
     );
   }
 
-  List<Widget> getCategoryWidgets(
-          BuildContext context, List<Category> lstCategory) =>
-      lstCategory
+  List<Widget> getCategoryWidgets(BuildContext context) =>
+      context
+          .watch<POSMenu>()
+          .listCategories
           .map((category) => Card(
                 elevation: 2,
                 shape: RoundedRectangleBorder(
@@ -273,10 +178,9 @@ class _PosScreenState extends State<PosScreen>
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: InkWell(
-                    onTap: () => passEvent(
-                      context,
-                      CategoryChanged(categoryId: category.id),
-                    ),
+                    onTap: () {
+                      context.read<POSMenu>().setSelectedCategory(category);
+                    },
                     child: Row(
                       children: [
                         CircleAvatar(
@@ -320,21 +224,22 @@ class _PosScreenState extends State<PosScreen>
           .toList() ??
       [AppTheme.progIndicator];
 
-  List<Widget> _getItemsWidgets(
-          BuildContext context, List<Item> items, List<Category> categories) =>
-      items
+  List<Widget> _getItemsWidgets(BuildContext context) =>
+      context
+          .watch<POSMenu>()
+          .listItems
           .map(
             (item) => ItemButton(
               item: item,
               onTap: () async {
-                if (item.code == Item.OPENFOOD_CODE.toString()) {
-                  openFoodDialog(context, item.categoryId).then((openItem) {
-                    if (openItem != null) {
-                      passEvent(context, AddOpenItem(openItem: openItem));
-                    }
-                  });
+                if (item.code == Item.openFoodCode.toString()) {
+                  var openItem = await openFoodDialog(context, item.categoryId);
+                  if (openItem != null) {
+                    context.read<Order>().addCartItem(openItem);
+                  }
                 } else if (item is OnSpotDeal) {
-                  final list = categories.where((element) {
+                  final list =
+                      context.read<POSMenu>().listCategories.where((element) {
                     bool match = false;
                     for (var i in item.dealItems) {
                       if (i.choice == 0.0) {
@@ -353,21 +258,10 @@ class _PosScreenState extends State<PosScreen>
                   final deal = await showOnSpotDealDialog(
                       categories: list, context: context, onSpotDeal: item);
                   if (deal != null && deal.quantity > 0) {
-                    passEvent(
-                      context,
-                      AddOnSpotDeal(
-                        deal: deal,
-                      ),
-                    );
+                    context.read<Order>().addCartItem(deal);
                   }
                 } else {
-                  passEvent(
-                    context,
-                    AddItem(
-                      code: item.code,
-                      itemId: int.parse(item.id),
-                    ),
-                  );
+                  context.read<Order>().addCartItem(item);
                 }
                 return true;
               },
@@ -376,81 +270,23 @@ class _PosScreenState extends State<PosScreen>
           .toList() ??
       [AppTheme.progIndicator];
 
-  Widget _getCartWidget(BuildContext context, List<Item> items) => cartWidget(
-        context: context,
-        subTotal: subTotal,
-        taxAmount: taxAmount,
-        totalAmount: totalAmount,
-        items: items,
-        onReduceItem: (item) {
-          if (item is OnSpotDeal) {
-            passEvent(context, ReduceOnSpotDeal(deal: item));
-          } else {
-            passEvent(
-              context,
-              ReduceItem(
-                code: item.code,
-                itemId: int.parse(item.id),
-              ),
-            );
-          }
-        },
-        onAddItem: (item) {
-          if (item is OnSpotDeal) {
-            passEvent(context, AddOnSpotDeal(deal: item));
-          } else {
-            passEvent(
-              context,
-              AddItem(
-                code: item.code,
-                itemId: int.parse(item.id),
-              ),
-            );
-          }
-        },
-        onQuantityChanged: (item, value) {
-          if (item is OnSpotDeal) {
-            passEvent(
-                context,
-                OnSpotDealQuantityChanged(
-                    deal: item, quantity: int.tryParse(value) ?? 0.0));
-          } else {
-            passEvent(
-              context,
-              ItemQuantityChanged(
-                code: item.code,
-                itemId: int.parse(item.id),
-                quantity: double.tryParse(value) ?? 0.0,
-              ),
-            );
-          }
-        },
-        onRemoveItem: (item) {
-          if (item is OnSpotDeal) {
-            passEvent(context, RemoveOnSpotDeal(deal: item));
-          } else {
-            passEvent(
-              context,
-              RemoveItem(
-                code: item.code,
-                itemId: int.parse(item.id),
-              ),
-            );
-          }
-        },
-        onItemCommentPressed: (item) async {
-          String comments = await openItemCommentDialog(context, item.name);
-          passEvent(
-              context,
-              AddComment(
-                  code: item.code,
-                  itemId: int.parse(item.id),
-                  comment: comments));
-        },
-      );
-
-  void passEvent(BuildContext context, POSEvents event) =>
-      context.read<POSBloc>().add(event);
+  Widget _getCartWidget(BuildContext context) {
+    return cartWidget(
+      context: context,
+      subTotal: context.watch<Order>().subTotal,
+      taxAmount: context.watch<Order>().totalTax,
+      totalAmount: context.watch<Order>().totalTaxAmount,
+      items: context.watch<Order>().items,
+      onReduceItem: context.read<Order>().reduceCartItem,
+      onAddItem: context.read<Order>().addCartItem,
+      onQuantityChanged: context.read<Order>().setItemQuantity,
+      onRemoveItem: context.read<Order>().removeItem,
+      onItemCommentPressed: (item) async {
+        String comments = await openItemCommentDialog(context, item.name);
+        context.read<Order>().addItemComment(item, comments);
+      },
+    );
+  }
 
   Widget autoCompleteSearchBar(BuildContext context) {
     return TypeAheadField(
@@ -480,13 +316,8 @@ class _PosScreenState extends State<PosScreen>
           ),
         );
       },
-      onSuggestionSelected: (suggestion) => passEvent(
-        context,
-        AddItem(
-          code: (suggestion as Item).code,
-          itemId: int.parse((suggestion as Item).id),
-        ),
-      ),
+      onSuggestionSelected: (suggestion) =>
+          context.read<Order>().addCartItem(suggestion),
       noItemsFoundBuilder: (context) => ListTile(
         title: Text('No Item Found!'),
       ),

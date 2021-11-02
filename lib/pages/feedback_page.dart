@@ -10,7 +10,7 @@ import 'package:pos_app/shared/app_theme.dart';
 import 'package:pos_app/shared/config.dart';
 import 'package:pos_app/repositories/feedback_repository.dart';
 
-class FeedbackScreen extends StatelessWidget {
+class FeedbackPage extends StatelessWidget {
   final Order order;
   final List<String> ratingAnswer = [
     'BAD',
@@ -19,7 +19,7 @@ class FeedbackScreen extends StatelessWidget {
     'GOOD',
     'EXCELLENT'
   ];
-  FeedbackScreen({this.order});
+  FeedbackPage({this.order});
 
   List<Container> feedbackItemsWidgets;
   List<Container> feedbackQuestionsWidgets;

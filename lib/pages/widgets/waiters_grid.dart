@@ -4,7 +4,7 @@ import 'package:pos_app/models/waiter.dart';
 
 class WaitersGrid extends StatefulWidget {
   final List<Waiter> listWaiters;
-  final void Function(BuildContext context, Waiter waiter) onTap;
+  final void Function(Waiter waiter) onTap;
   WaitersGrid({this.listWaiters, this.onTap});
   @override
   _WaitersGridState createState() => _WaitersGridState();
@@ -57,7 +57,7 @@ class _WaitersGridState extends State<WaitersGrid> {
               ],
             ),
             onTap: () {
-              widget.onTap(context, widget.listWaiters[index]);
+              widget.onTap(widget.listWaiters[index]);
             },
           ),
         ),

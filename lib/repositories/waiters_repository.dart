@@ -7,9 +7,9 @@ import 'package:http/http.dart';
 class WaiterRepo {
   static WaiterRepo repo = WaiterRepo._internal();
   WaiterRepo._internal();
-  Future<Response> waiters() async => await get(await Config.getWaitersApi)
+  Future<Response> getWaiters() async => await get(await Config.getWaitersApi)
       .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
           onTimeout: () => Lib.timeout)
       .onError(
-          (error, stackTrace) => Lib.httpErrorResponseHandler(error: error));
+          (error, stackTrace) => Lib.httpErrorHandler(error: error));
 }

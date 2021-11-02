@@ -69,14 +69,14 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
                   type: event.orderType, message: 'This table is reserved');
             }
           } else if (event is CoversChanged) {
-            customerOrder.covers = event.covers.toString();
+            customerOrder.covers = int.tryParse(event.covers) ?? 0;
           } else if (event is Submit) {
             if (customerOrder.waiterId == null ||
                 customerOrder.waiterId.isEmpty) {
               yield InvalidWaiter(
                   message: 'Please select waiter.', type: dineIn);
             } else if (customerOrder.covers == null ||
-                customerOrder.covers.isEmpty) {
+                customerOrder.covers == 0) {
               yield InvalidCovers(
                   message: 'Please enter covers.', type: dineIn);
             } else if (customerOrder.tableId == null ||
@@ -194,7 +194,7 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
   }
 
   Future<List<Tables>> getTables() async {
-    final response = await TablesRepo.repo.tables();
+    final response = await TablesRepo.repo.getTables();
     if (response.statusCode == HttpStatus.ok) {
       return (jsonDecode(response.body) as List<dynamic>)
           .map((e) => Tables.fromJson(e))
@@ -205,7 +205,7 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
   }
 
   Future<List<Waiter>> getWaiters() async {
-    final response = await WaiterRepo.repo.waiters();
+    final response = await WaiterRepo.repo.getWaiters();
     if (response.statusCode == HttpStatus.ok) {
       return (jsonDecode(response.body) as List<dynamic>)
           .map((e) => Waiter.fromJson(e))

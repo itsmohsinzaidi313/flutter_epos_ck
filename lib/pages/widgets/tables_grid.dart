@@ -4,7 +4,7 @@ import 'package:pos_app/models/customer_table.dart';
 
 class TablesGrid extends StatefulWidget {
   final List<Tables> listTables;
-  final void Function(BuildContext context, Tables table) onTap;
+  final void Function(Tables table) onTap;
   const TablesGrid({this.listTables, this.onTap});
 
   @override
@@ -87,7 +87,7 @@ class _TablesGridState extends State<TablesGrid> {
             ],
           ),
           onTap: () {
-            widget.onTap(context, widget.listTables[index]);
+            widget.onTap(widget.listTables[index]);
           },
         ),
       ),

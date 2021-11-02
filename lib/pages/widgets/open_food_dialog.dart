@@ -111,7 +111,7 @@ Future<Item> openFoodDialog(BuildContext context, String categoryId) async {
                                   id: Random.secure()
                                       .nextInt(1000000)
                                       .toString(),
-                                  code: Item.OPENFOOD_CODE.toString(),
+                                  code: Item.openFoodCode.toString(),
                                   name: nameCntrlr.text,
                                   price: double.tryParse(priceCntrlr.text) ?? 0,
                                   quantity: double.parse(qtyCntrlr.text),

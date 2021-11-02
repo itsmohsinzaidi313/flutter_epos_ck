@@ -124,7 +124,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
             onTimeout: () => Lib.timeout)
         .onError(
-            (error, stackTrace) => Lib.httpErrorResponseHandler(error: error));
+            (error, stackTrace) => Lib.httpErrorHandler(error: error));
     if (response.statusCode == HttpStatus.ok) {
       yield ValidIpAddress(message: 'Server ip address saved');
     } else {

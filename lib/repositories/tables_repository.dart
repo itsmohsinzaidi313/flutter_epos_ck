@@ -5,9 +5,9 @@ import 'package:http/http.dart';
 class TablesRepo {
   static TablesRepo repo = TablesRepo._internal();
   TablesRepo._internal();
-  Future<Response> tables() async => await get(await Config.getTablesApi)
+  Future<Response> getTables() async => await get(await Config.getTablesApi)
       .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
           onTimeout: () => Lib.timeout)
       .onError(
-          (error, stackTrace) => Lib.httpErrorResponseHandler(error: error));
+          (error, stackTrace) => Lib.httpErrorHandler(error: error));
 }

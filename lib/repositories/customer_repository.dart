@@ -16,7 +16,7 @@ class CustomerRepo {
           .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
               onTimeout: () => Lib.timeout)
           .onError((error, stackTrace) =>
-              Lib.httpErrorResponseHandler(error: error));
+              Lib.httpErrorHandler(error: error));
 
   Future<Response> postCustomer({@required Customer customer}) async =>
       await post(await Config.getCustomerApi,
@@ -25,5 +25,5 @@ class CustomerRepo {
           .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
               onTimeout: () => Lib.timeout)
           .onError((error, stackTrace) =>
-              Lib.httpErrorResponseHandler(error: error));
+              Lib.httpErrorHandler(error: error));
 }

@@ -9,25 +9,25 @@ import 'package:pos_app/shared/app_library.dart';
 import 'package:pos_app/shared/app_theme.dart';
 import 'package:pos_app/shared/config.dart';
 
-class OrdersScreen extends StatefulWidget {
+class OrdersPage extends StatefulWidget {
   final List<Order> ordersList;
-  OrdersScreen({@required this.ordersList});
+  OrdersPage({@required this.ordersList});
 
   final enablePayment = false;
   final enableOrderDelete = false;
 
   @override
-  _OrdersScreenState createState() =>
-      _OrdersScreenState(ordersList: ordersList);
+  _OrdersPageState createState() =>
+      _OrdersPageState(ordersList: ordersList);
 }
 
-class _OrdersScreenState extends State<OrdersScreen>
+class _OrdersPageState extends State<OrdersPage>
     with SingleTickerProviderStateMixin {
   List<Order> ordersList;
   List<Tab> tabs;
   TabController tabController;
 
-  _OrdersScreenState({@required this.ordersList}) {
+  _OrdersPageState({@required this.ordersList}) {
     tabs = [];
     Tab dineInTab = Tab(
       child: Text('DINE IN'),
@@ -177,7 +177,7 @@ class _OrdersScreenState extends State<OrdersScreen>
                   // Divider(),
                   boxTile(
                       title: 'AMOUNT',
-                      description: order.totalTaxedAmount,
+                      description: order.totalTaxAmount,
                       fontWeight: FontWeight.bold),
                   Divider(),
                   boxTile(title: 'TIME', description: '${order.time}'),

@@ -10,5 +10,5 @@ class UsersRepo {
       await get(await Config.getUsersApi).timeout(Duration(seconds: Config.SERVER_TIMEOUT),
           onTimeout: () => Lib.timeout)
       .onError(
-          (error, stackTrace) => Lib.httpErrorResponseHandler(error: error));
+          (error, stackTrace) => Lib.httpErrorHandler(error: error));
 }

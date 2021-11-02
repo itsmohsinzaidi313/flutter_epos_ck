@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pos_app/bloc/login_bloc/login_bloc.dart';
@@ -6,8 +5,8 @@ import 'package:pos_app/bloc/order_info_bloc/order_info_bloc.dart';
 import 'package:pos_app/bloc/payment_bloc/payment_bloc.dart';
 import 'package:pos_app/bloc/pos_bloc/pos_bloc.dart';
 import 'package:pos_app/bloc/report_bloc/report_bloc.dart';
-import 'package:pos_app/bloc/tabed_pos_page.dart';
 import 'package:pos_app/models/customer_order.dart';
+import 'package:pos_app/models/menu.dart';
 import 'package:pos_app/pages/feedback_page.dart';
 import 'package:pos_app/pages/login_page.dart';
 import 'package:pos_app/pages/menu_pages/menu_page.dart';
@@ -36,13 +35,13 @@ class AppRoutes {
   Route onGeneratedRoute(RouteSettings routeSettings) {
     switch (routeSettings.name) {
       case '/splash':
-        return MaterialPageRoute(builder: (context) => SplashScreen());
+        return MaterialPageRoute(builder: (context) => SplashPage());
         break;
       case '/login':
         return MaterialPageRoute(
           builder: (context) => BlocProvider.value(
             value: _loginBloc,
-            child: LoginScreen(),
+            child: LoginPage(),
           ),
         );
         break;
@@ -50,7 +49,7 @@ class AppRoutes {
         return MaterialPageRoute(
           builder: (context) => BlocProvider.value(
             value: _loginBloc,
-            child: MenuScreen(),
+            child: MenuPage(),
           ),
         );
         break;
@@ -59,17 +58,16 @@ class AppRoutes {
         return MaterialPageRoute(
           builder: (context) => BlocProvider.value(
             value: _orderInfoBloc,
-            child: OrderInfoScreen(),
+            child: OrderInfoPage(),
           ),
         );
         break;
       case '/pos':
-        _posBloc
-            .add(LoadPOSOrder(customerOrder: routeSettings.arguments as Order));
         return MaterialPageRoute(
           builder: (context) => BlocProvider.value(
             value: _posBloc,
-            child: PosScreen(),
+            child: PosPage(
+            ),
           ),
         );
         break;
@@ -79,19 +77,19 @@ class AppRoutes {
         return MaterialPageRoute(
           builder: (context) => BlocProvider.value(
             value: _paymentBloc,
-            child: PaymentScreen(),
+            child: PaymentPage(),
           ),
         );
         break;
       case '/orders':
         return MaterialPageRoute(
           builder: (context) =>
-              OrdersScreen(ordersList: routeSettings.arguments),
+              OrdersPage(ordersList: routeSettings.arguments),
         );
         break;
       case '/feedback':
         return MaterialPageRoute(
-          builder: (context) => FeedbackScreen(
+          builder: (context) => FeedbackPage(
             order: routeSettings.arguments,
           ),
         );

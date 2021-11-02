@@ -37,7 +37,7 @@ class POSBloc extends Bloc<POSEvents, POSState> {
         yield CartItems(
           list: _order.items,
           subTotal: _order.subTotal,
-          totalAmount: _order.totalTaxedAmount,
+          totalAmount: _order.totalTaxAmount,
           taxAmount: _order.totalTax,
         );
       } else if (event is CategoryChanged) {
@@ -62,7 +62,7 @@ class POSBloc extends Bloc<POSEvents, POSState> {
                 .where((e) => e.categoryId == event.categoryId)
                 .toList());
       } else if (event is AddItem) {
-        if (event.code == Item.OPENFOOD_CODE.toString()) {
+        if (event.code == Item.openFoodCode.toString()) {
           _order.addCartItem(
             Item(
               code: event.code,
@@ -77,7 +77,7 @@ class POSBloc extends Bloc<POSEvents, POSState> {
         yield CartItems(
           list: _order.items,
           subTotal: _order.subTotal,
-          totalAmount: _order.totalTaxedAmount,
+          totalAmount: _order.totalTaxAmount,
           taxAmount: _order.totalTax,
         );
       } else if (event is ReduceItem) {
@@ -85,23 +85,23 @@ class POSBloc extends Bloc<POSEvents, POSState> {
           double qty = 0;
           _order.items.forEach((element) => qty += element.quantity);
           if (qty > 1) {
-            _order.reduceCartItem(event.itemId);
+            // _order.reduceCartItem(event.itemId);
           } else {
             yield SubmissionInvalid(
                 message: 'There should be atleast on item in cart');
           }
         } else {
-          _order.reduceCartItem(event.itemId);
+          // _order.reduceCartItem(event.itemId);
         }
         yield CartItems(
           list: _order.items,
           subTotal: _order.subTotal,
-          totalAmount: _order.totalTaxedAmount,
+          totalAmount: _order.totalTaxAmount,
           taxAmount: _order.totalTax,
         );
       } else if (event is ItemQuantityChanged) {
         if (event.quantity > 0) {
-          _order.setItemQuantity(event.itemId, event.quantity);
+          // _order.setItemQuantity(event.itemId, event.quantity);
         } else {
           yield SubmissionInvalid(
               message: 'Quantity should be greater than zero(0)');
@@ -109,24 +109,24 @@ class POSBloc extends Bloc<POSEvents, POSState> {
         yield CartItems(
           list: _order.items,
           subTotal: _order.subTotal,
-          totalAmount: _order.totalTaxedAmount,
+          totalAmount: _order.totalTaxAmount,
           taxAmount: _order.totalTax,
         );
       } else if (event is RemoveItem) {
         if (_order.editOrder) {
           if (_order.items.length > 1) {
-            _order.removeCartItem(event.itemId);
+            // _order.removeCartItem(event.itemId);
           } else {
             yield SubmissionInvalid(
                 message: 'There should be atleast one item in cart');
           }
         } else {
-          _order.removeCartItem(event.itemId);
+          // _order.removeCartItem(event.itemId);
         }
         yield CartItems(
           list: _order.items,
           subTotal: _order.subTotal,
-          totalAmount: _order.totalTaxedAmount,
+          totalAmount: _order.totalTaxAmount,
           taxAmount: _order.totalTax,
         );
       } else if (event is AddOpenItem) {
@@ -134,15 +134,15 @@ class POSBloc extends Bloc<POSEvents, POSState> {
         yield CartItems(
           list: _order.items,
           subTotal: _order.subTotal,
-          totalAmount: _order.totalTaxedAmount,
+          totalAmount: _order.totalTaxAmount,
           taxAmount: _order.totalTax,
         );
       } else if (event is AddComment) {
-        _order.addItemComment(event.itemId, event.comment);
+        // _order.addItemComment(event.itemId, event.comment);
         yield CartItems(
           list: _order.items,
           subTotal: _order.subTotal,
-          totalAmount: _order.totalTaxedAmount,
+          totalAmount: _order.totalTaxAmount,
           taxAmount: _order.totalTax,
         );
       } else if (event is PostOrder) {
@@ -201,26 +201,11 @@ class POSBloc extends Bloc<POSEvents, POSState> {
         yield CartItems(
           list: _order.items,
           subTotal: _order.subTotal,
-          totalAmount: _order.totalTaxedAmount,
+          totalAmount: _order.totalTaxAmount,
           taxAmount: _order.totalTax,
         );
       } else if (event is ReduceOnSpotDeal) {
-        for (var item in _order.items) {
-          if (item is OnSpotDeal) {
-            if (item == event.deal) {
-              item.quantity--;
-              if (item.quantity < 1) {
-                this.add(RemoveOnSpotDeal(deal: event.deal));
-              }
-              yield CartItems(
-                list: _order.items,
-                subTotal: _order.subTotal,
-                totalAmount: _order.totalTaxedAmount,
-                taxAmount: _order.totalTax,
-              );
-            }
-          }
-        }
+        
       } else if (event is RemoveOnSpotDeal) {
         OnSpotDeal deal = OnSpotDeal();
         bool found = false;
@@ -232,7 +217,7 @@ class POSBloc extends Bloc<POSEvents, POSState> {
               yield CartItems(
                 list: _order.items,
                 subTotal: _order.subTotal,
-                totalAmount: _order.totalTaxedAmount,
+                totalAmount: _order.totalTaxAmount,
                 taxAmount: _order.totalTax,
               );
             }
@@ -247,7 +232,7 @@ class POSBloc extends Bloc<POSEvents, POSState> {
               yield CartItems(
                 list: _order.items,
                 subTotal: _order.subTotal,
-                totalAmount: _order.totalTaxedAmount,
+                totalAmount: _order.totalTaxAmount,
                 taxAmount: _order.totalTax,
               );
             }
@@ -284,34 +269,15 @@ class POSBloc extends Bloc<POSEvents, POSState> {
     if (response.statusCode == HttpStatus.ok) {
       try {
         final json = jsonDecode(response.body);
-        final listCategories = (json['Categories'] as List<dynamic>)
-            .map((e) => Category.fromJson(e))
-            .toList();
-        final listItems = (json['Items'] as List<dynamic>)
-            .map((e) => MenuItem.fromMap(e))
-            .toList();
-        final listFixedDeals = (json['FixedDeals'] as List<dynamic>)
-            .map((e) => FixedDeal.fromMap(e))
-            .toList();
-        final listOnSpotDeals = (json['OnSpotDeals'] as List<dynamic>)
-            .map((e) => OnSpotDeal.fromMap(e))
-            .toList();
-        List<Item> listMenu = [];
-        listMenu.addAll(listItems);
-        listMenu.addAll(listFixedDeals);
-        listMenu.addAll(listOnSpotDeals);
-        this.menu = POSMenu(
-          listCategories: listCategories,
-          listItems: listMenu,
-        );
+        this.menu = POSMenu.fromMap(json);
         yield POSMenuLoaded(menu: menu);
-        yield CategoriesLoaded(list: listCategories);
+        yield CategoriesLoaded(list: menu.listCategories);
         yield ItemsLoaded(
             categories: menu.listCategories,
             items: this
                 .menu
                 .listItems
-                .where((e) => e.categoryId == listCategories.first.id)
+                .where((e) => e.categoryId == menu.listCategories.first.id)
                 .toList());
       } catch (e) {
         yield POSError(message: e.toString());
