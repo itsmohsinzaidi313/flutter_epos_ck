@@ -99,8 +99,13 @@ Widget cartWidget(
                     (e) => cartItemTile(
                       context: context,
                       item: e,
-                      onTap: () =>
-                          e is OnSpotDeal ? showDealDetail(context, e) : null,
+                      onTap: () {
+                        if (e is OnSpotDeal) {
+                          showDealDetail(context, e.name, e.dealItems);
+                        } else if (e is FixedDeal) {
+                          showDealDetail(context, e.name, e.dealItems);
+                        }
+                      },
                       onAddItem: () => onAddItem(e),
                       onItemCommentPressed: () => onItemCommentPressed(e),
                       onQuantityChanged: (value) => onQuantityChanged(e, value),
@@ -320,9 +325,7 @@ class _CartWidgetState extends State<CartWidget>
 
   void updateAnimatedList(List<Item> listItems) {
     for (var item in listItems) {
-      if (!itemExists(item)) {
-        
-      }
+      if (!itemExists(item)) {}
     }
   }
 

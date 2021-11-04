@@ -13,7 +13,7 @@ class Config {
 
   static const allowDineIn = true;
   static const allowTakeAway = true;
-  static const allowDelivery = false;
+  static const allowDelivery = true;
   // APIS
   static Future<String> get serverIp async {
     final pref = await SharedPreferences.getInstance();

@@ -264,16 +264,16 @@ class OnSpotDealItem extends Item with EquatableMixin {
   final double choice;
 
   OnSpotDealItem(
-      {String id,
-      String code,
-      String categoryId,
-      String name,
-      double price,
-      double taxAmount,
-      double quantity,
-      this.choice,
+      {String id = '0',
+      String code = '0',
+      String categoryId = '0',
+      String name = '',
+      double price = 0,
+      double taxAmount = 0,
+      double quantity = 0,
+      this.choice = 0,
       String image,
-      bool selected})
+      bool selected = false})
       : super(
             id: id,
             code: code,

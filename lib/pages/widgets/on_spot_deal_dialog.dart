@@ -10,10 +10,10 @@ final BorderRadius _borderRadius = BorderRadius.all(Radius.circular(32.0));
 Future<OnSpotDeal> showOnSpotDealDialog(
         {BuildContext context,
         List<Category> categories,
-        OnSpotDeal onSpotDeal}) =>
-    showDialog<OnSpotDeal>(
+        OnSpotDeal onSpotDeal}) async =>
+    await showDialog<OnSpotDeal>(
       context: context,
-      // barrierDismissible: false,
+      barrierDismissible: false,
       builder: (context) => Dialog(
         shape: RoundedRectangleBorder(borderRadius: _borderRadius),
         child: Container(
