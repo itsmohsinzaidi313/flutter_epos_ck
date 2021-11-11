@@ -18,7 +18,7 @@ part 'order_info_state.dart';
 
 class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
   OrderInfoBloc() : super(OrderInfoInitial(type: null));
-  Order customerOrder;
+  Order customerOrder = Order();
   List<Waiter> listWaiters = [];
   List<Tables> listTables = [];
   @override

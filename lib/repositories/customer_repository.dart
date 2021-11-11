@@ -12,7 +12,7 @@ class CustomerRepo {
   CustomerRepo._internal();
 
   Future<Response> customer({@required String contact}) async =>
-      await get('${await Config.getCustomerApi}?contact=$contact')
+      await get('${await Config.getCustomerApi}&contact=$contact')
           .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
               onTimeout: () => Lib.timeout)
           .onError((error, stackTrace) =>

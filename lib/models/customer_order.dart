@@ -39,18 +39,21 @@ class Order {
       discountedAmount,
       payment,
       cardNumber;
-  Customer customer = Customer();
+  Customer customer;
   PAYMENTMODE paymentmode;
   bool editOrder = false;
 
-  Order(
-      {this.id,
-      this.waiterId,
-      this.tableId,
-      this.covers,
-      this.customer,
-      this.orderType,
-      this.orderNo});
+  Order({
+    this.id,
+    this.waiterId,
+    this.tableId,
+    this.covers,
+    this.customer,
+    this.orderType,
+    this.orderNo,
+  }) {
+    customer = Customer();
+  }
 
   Order.fromMap(Map<String, dynamic> map)
       : id = map[_OrderIdKey].toString(),

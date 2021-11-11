@@ -11,9 +11,19 @@ void main() {
   SystemChrome.setPreferredOrientations(
           [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight])
       .then((_) {
-    runApp(App(
-      appRoutes: AppRoutes(),
-    ));
+    runApp(
+      LayoutBuilder(
+        builder: (context, constraints) {
+          print('BigWidth${constraints.biggest.width}');
+          print('BigHeight${constraints.biggest.height}');
+          print('SmallWidth${constraints.smallest.width}');
+          print('SmallHeight${constraints.smallest.height}');
+          return App(
+            appRoutes: AppRoutes(),
+          );
+        },
+      ),
+    );
   });
 }
 
