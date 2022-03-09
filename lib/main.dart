@@ -4,7 +4,6 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pos_app/bloc/verbose_bloc/verbose_bloc.dart';
 import 'package:pos_app/routes/app_routes.dart';
-import 'pages/splash_page.dart';
 import './shared/config.dart';
 
 void main() {
@@ -14,9 +13,6 @@ void main() {
           [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight])
       .then((_) {
     runApp(BlocProvider(
-      create: (context) => VerboseBloc(),
-      child: App(appRoutes: AppRoutes(),),
-    ));
   });
 }
 

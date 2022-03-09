@@ -48,6 +48,7 @@ class Config {
   static const int SERVER_TIMEOUT = 30; //SECONDS
   static const int SERVICE_CYCLE_DELAY = 5; //SECONDS
 
+  static const int serviceCycleDelay = 5;
   static double getDeviceWidth(BuildContext context) =>
       MediaQuery.of(context).size.width;
 
