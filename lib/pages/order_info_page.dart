@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pos_app/bloc/order_info_bloc/order_info_bloc.dart';
-import 'package:pos_app/models/waiter.dart';
 import 'package:pos_app/shared/app_theme.dart';
 import 'package:pos_app/shared/config.dart';
-import 'package:pos_app/models/customer_table.dart' as t;
-import 'package:google_fonts/google_fonts.dart';
 
 import 'widgets/app_widgets.dart';
 

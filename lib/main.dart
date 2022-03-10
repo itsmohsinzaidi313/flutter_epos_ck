@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:pos_app/routes/app_routes.dart';
-import 'pages/splash_page.dart';
 import './shared/config.dart';
 
 void main() {
@@ -11,19 +10,9 @@ void main() {
   SystemChrome.setPreferredOrientations(
           [DeviceOrientation.landscapeLeft, DeviceOrientation.landscapeRight])
       .then((_) {
-    runApp(
-      LayoutBuilder(
-        builder: (context, constraints) {
-          print('BigWidth${constraints.biggest.width}');
-          print('BigHeight${constraints.biggest.height}');
-          print('SmallWidth${constraints.smallest.width}');
-          print('SmallHeight${constraints.smallest.height}');
-          return App(
-            appRoutes: AppRoutes(),
-          );
-        },
-      ),
-    );
+    runApp(App(
+      appRoutes: AppRoutes(),
+    ));
   });
 }
 

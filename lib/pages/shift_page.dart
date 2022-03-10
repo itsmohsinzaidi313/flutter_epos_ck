@@ -1,7 +1,7 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import '../shared/config.dart';
+import 'package:pos_app/shared/config.dart';
 
 class ShiftScreen extends StatefulWidget {
   @override
@@ -10,7 +10,6 @@ class ShiftScreen extends StatefulWidget {
 
 class _ShiftScreen extends State<ShiftScreen> {
   String _dropdown = 'Morning';
-  bool _autoValidate = false;
   TextEditingController closingAmount = TextEditingController();
   TextEditingController openingAmount = TextEditingController();
   bool checkField = false;
@@ -74,7 +73,7 @@ class _ShiftScreen extends State<ShiftScreen> {
               ),
               child: Form(
                 key: _formKey,
-                autovalidate: _autoValidate,
+                // autovalidate: _autoValidate,
                 child: Column(
                   children: [
                     Container(
@@ -207,7 +206,7 @@ class _ShiftScreen extends State<ShiftScreen> {
               if (_formKey.currentState.validate()) {
                 _formKey.currentState.save();
               } else {
-                _autoValidate = true;
+                // _autoValidate = true;
               }
             });
           },

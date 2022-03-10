@@ -62,7 +62,7 @@ class Config {
   static const int SNACKBAR_TIMEOUT = 1;
   static const int SERVER_TIMEOUT = 15;
 
-  static const int serviceCycleDelay = 5; //SECONDS
+  static const int serviceCycleDelay = 5;
 
   static double getDeviceWidth(BuildContext context) =>
       MediaQuery.of(context).size.width;

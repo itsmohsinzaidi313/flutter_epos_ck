@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -21,11 +20,9 @@ class OrdersScreen extends StatefulWidget {
       _OrdersScreenState(ordersList: ordersList);
 }
 
-class _OrdersScreenState extends State<OrdersScreen>
-    with SingleTickerProviderStateMixin {
+class _OrdersScreenState extends State<OrdersScreen>{
   List<Order> ordersList;
   List<Tab> tabs;
-  TabController tabController;
 
   _OrdersScreenState({@required this.ordersList}) {
     tabs = [];
@@ -44,7 +41,6 @@ class _OrdersScreenState extends State<OrdersScreen>
     if (Config.allowTakeAway) tabs.add(tabsBuffer[1]);
     if (Config.allowDelivery) tabs.add(tabsBuffer[2]);
 
-    tabController = TabController(length: tabs.length, vsync: this);
   }
 
   void updateOrders() async {
@@ -68,38 +64,39 @@ class _OrdersScreenState extends State<OrdersScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.grey[200],
-      appBar: AppTheme.appBarNormal(
-          appBarTitle: 'Pending Orders',
-          appBarBgColor: AppTheme.appBarColor,
-          appBarElevation: 0.0,
-          context: context,
-          bottom: TabBar(
-            tabs: tabs,
-            controller: tabController,
+    return DefaultTabController(
+      length: tabs.length,
+      child: Scaffold(
+        backgroundColor: Colors.grey[200],
+        appBar: AppTheme.appBarNormal(
+            appBarTitle: 'Pending Orders',
+            appBarBgColor: AppTheme.appBarColor,
+            appBarElevation: 0.0,
+            context: context,
+            bottom: TabBar(
+              tabs: tabs,
+            ),
+            actions: [
+              ElevatedButton(
+                style: ButtonStyle(
+                  backgroundColor: MaterialStateProperty.all(Colors.amber),
+                ),
+                child: Row(
+                  children: [
+                    Icon(Icons.sync, color: Colors.red),
+                    Text(
+                      'Refresh',
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  ],
+                ),
+                onPressed: updateOrders,
+              )
+            ]),
+        body: Container(
+          child: TabBarView(
+            children: getTabWidgets(),
           ),
-          actions: [
-            ElevatedButton(
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(Colors.amber),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.sync, color: Colors.red),
-                  Text(
-                    'Refresh',
-                    style: TextStyle(color: Colors.red),
-                  ),
-                ],
-              ),
-              onPressed: updateOrders,
-            )
-          ]),
-      body: Container(
-        child: TabBarView(
-          controller: tabController,
-          children: getTabWidgets(),
         ),
       ),
     );
