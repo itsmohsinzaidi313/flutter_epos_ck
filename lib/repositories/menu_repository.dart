@@ -1,9 +1,7 @@
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:http/http.dart';
-import 'package:pos_app/models/deals.dart';
 import 'package:pos_app/models/item.dart';
 import 'package:pos_app/shared/app_library.dart';
 import 'package:pos_app/shared/config.dart';
@@ -16,7 +14,7 @@ class MenuRepo {
   Future<Response> getMenu() async {
     if (_menuResponseCache == null ||
         _menuResponseCache.statusCode != HttpStatus.ok) {
-      _menuResponseCache = await get('${await Config.getMenuApi}&phrase=*')
+      _menuResponseCache = await get('${Config.getMenuApi}&phrase=*')
           .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
               onTimeout: () => Lib.timeout)
           .onError((error, stackTrace) =>

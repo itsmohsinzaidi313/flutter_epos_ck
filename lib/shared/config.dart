@@ -25,29 +25,21 @@ class Config {
           fServerIp.then((serverIp) => pref.setString('ipAddress', serverIp)));
 
   static User user;
-  static Future<String> get _apiCommon async =>
-      'http://${await serverIp}/api/pos';
+
+  static String ipAddress = '';
+  static String get _apiCommon => 'http://$ipAddress/api/pos';
 
   static String get _key => md5.convert(utf8.encode(_AuthKey)).toString();
 
-  static Future<String> get getLoginApi async =>
-      '${await _apiCommon}/Login?key=$_key';
-  static Future<String> get getTablesApi async =>
-      '${await _apiCommon}/Table?key=$_key';
-  static Future<String> get getWaitersApi async =>
-      '${await _apiCommon}/Waiters?key=$_key';
-  static Future<String> get ordersApi async =>
-      '${await _apiCommon}/Order?key=$_key';
-  static Future<String> get getCustomerApi async =>
-      '${await _apiCommon}/Customer?key=$_key';
-  static Future<String> get getUsersApi async =>
-      '${await _apiCommon}/User?key=$_key';
-  static Future<String> get postFeedbackApi async =>
-      '${await _apiCommon}/Feedback?key=$_key';
-  static Future<String> get getMenuApi async =>
-      '${await _apiCommon}/Menu?key=$_key';
-  static Future<String> get serverStatusApi async =>
-      '${await _apiCommon}/Status?key=$_key';
+  static String get getLoginApi => '$_apiCommon/Login?key=$_key';
+  static String get getTablesApi => '$_apiCommon/Table?key=$_key';
+  static String get getWaitersApi => '$_apiCommon/Waiters?key=$_key';
+  static String get ordersApi => '$_apiCommon/Order?key=$_key';
+  static String get getCustomerApi => '$_apiCommon/Customer?key=$_key';
+  static String get getUsersApi => '$_apiCommon/User?key=$_key';
+  static String get postFeedbackApi => '$_apiCommon/Feedback?key=$_key';
+  static String get getMenuApi => '$_apiCommon/Menu?key=$_key';
+  static String get serverStatusApi => '$_apiCommon/Status?key=$_key';
 
   static AndroidDeviceInfo _deviceData;
   static Future<AndroidDeviceInfo> get deviceData async {

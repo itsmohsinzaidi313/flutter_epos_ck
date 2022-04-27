@@ -4,13 +4,13 @@ class Tables {
   static const String ReservedKey = 'reserved';
 
   String id;
-  String tableName;
+  String name;
   bool reserved;
   bool selected;
-  Tables({this.id, this.tableName, this.reserved, this.selected});
+  Tables({this.id, this.name, this.reserved, this.selected});
   Tables.fromJson(Map<String, dynamic> map)
       : id = map[IdKey],
-        tableName = map[TableNameKey],
+        name = map[TableNameKey],
         reserved = map[ReservedKey],
         selected = false;
 }

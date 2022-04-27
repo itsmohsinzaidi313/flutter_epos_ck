@@ -5,10 +5,10 @@ import 'package:progress_dialog/progress_dialog.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class AppTheme {
-  static final Color appBarColor = Colors.red;
-  static final Color dialogButtonColor = Colors.amberAccent;
-  static final Color listTextColor = Colors.amber[400];
-  static final Color appThemeColor = Colors.amber;
+  // static final Color appBarColor = Colors.red;
+  // static final Color dialogButtonColor = Colors.amberAccent;
+  // static final Color listTextColor = Colors.amber[400];
+  // static final Color appThemeColor = Colors.amber;
 
   static Widget get progIndicator => Center(
       child:
@@ -50,12 +50,10 @@ class AppTheme {
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Badge(
-              child: Icon(Icons.shopping_cart, color: Colors.white, size: 40),
+              child: Icon(Icons.shopping_cart, size: 40),
               badgeContent: Text(
                 badgeText,
-                style: TextStyle(color: Colors.white),
               ),
-              badgeColor: Colors.red,
               toAnimate: true,
               animationType: BadgeAnimationType.fade,
             ),
@@ -100,10 +98,9 @@ class AppTheme {
           barrierDismissible: barrier,
           builder: (BuildContext context) => AlertDialog(
                 title: Container(
-                    color: Colors.red,
                     child: Center(
-                      child: widget,
-                    )),
+                  child: widget,
+                )),
                 content: content,
                 actions: buttons,
                 shape: RoundedRectangleBorder(
@@ -143,7 +140,6 @@ class AppTheme {
   static circularProgressIndicator(Color color) {
     return Center(
       child: CircularProgressIndicator(
-        backgroundColor: Colors.amberAccent,
         valueColor: AlwaysStoppedAnimation<Color>(color),
       ),
     );
@@ -157,11 +153,8 @@ class AppTheme {
             title: text(text: title, fontWeight: FontWeight.bold, fontSize: 20),
             content: text(text: message),
             actions: [
-              TextButton(
-                  child: text(text: 'Yes', color: Colors.blue),
-                  onPressed: onYes),
-              TextButton(
-                  child: text(text: 'No', color: Colors.blue), onPressed: onNo)
+              TextButton(child: text(text: 'Yes'), onPressed: onYes),
+              TextButton(child: text(text: 'No'), onPressed: onNo)
             ],
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8))));
@@ -177,10 +170,10 @@ class AppTheme {
             content: text(text: message),
             actions: [
               TextButton(
-                  child: text(text: 'Yes', color: Colors.blue),
+                  child: text(text: 'Yes'),
                   onPressed: () => Navigator.of(context).pop<bool>(true)),
               TextButton(
-                  child: text(text: 'No', color: Colors.blue),
+                  child: text(text: 'No'),
                   onPressed: () => Navigator.of(context).pop<bool>(false))
             ],
             shape: RoundedRectangleBorder(
@@ -225,14 +218,33 @@ class AppTheme {
             ));
   }
 
-  static void snackbar(BuildContext context, String text,
-          {int duration = 2, Color textColor = Colors.white}) =>
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text(
-            text,
-            style: TextStyle(color: textColor),
-          ),
-          duration: Duration(seconds: duration)));
+  static void snackbar(
+    BuildContext context,
+    String text, {
+    int level = 0,
+    int duration = 2,
+  }) {
+    Color color = Colors.white;
+
+    switch (level) {
+      case -1:
+        color = Colors.red;
+        break;
+      case 0:
+        color = Theme.of(context).colorScheme.primary;
+        break;
+      default:
+        color = Colors.white;
+        break;
+    }
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        backgroundColor: Theme.of(context).colorScheme.background,
+        content: Text(
+          text,
+          style: TextStyle(color: color),
+        ),
+        duration: Duration(seconds: duration)));
+  }
 
   static void showProgressDialog(
     BuildContext context,

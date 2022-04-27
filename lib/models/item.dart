@@ -1,4 +1,6 @@
 class Item {
+  static const int OPENFOOD_CODE = 151605140604;
+
   static const String IdKey = 'Id',
       CodeKey = 'Code',
       CatIdKey = 'CategoryId',
@@ -9,7 +11,6 @@ class Item {
       CommentKey = 'Comment',
       ImageKey = 'image',
       SelectedKey = 'Selected';
-  static const int OPENFOOD_CODE = 151605140604;
 
   final String id, code, categoryId, name, image;
   double price, taxAmount, quantity;

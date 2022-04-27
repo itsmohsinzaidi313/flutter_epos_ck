@@ -7,7 +7,6 @@ import '../shared/app_theme.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class PaymentScreen extends StatelessWidget {
-  final Color cashColor = Colors.grey, percentageColor = Colors.grey;
   final List<String> paymentMethodList = ['Cash', 'Credit'];
   final paymentController = TextEditingController();
   final discountController = TextEditingController();
@@ -33,25 +32,15 @@ class PaymentScreen extends StatelessWidget {
       },
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: AppTheme.appBarColor,
           title: Text('Payment'.toUpperCase()),
           centerTitle: true,
           actions: [
             Container(
               width: Config.getDeviceWidth(context) * 0.2,
               child: ElevatedButton(
-                style: ButtonStyle(
-                    backgroundColor:
-                        MaterialStateProperty.all(Colors.yellow[700])),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('PAY', style: TextStyle(color: Colors.red)),
-                    Icon(
-                      Icons.done,
-                      color: Colors.red,
-                    )
-                  ],
+                  children: [Text('PAY'), Icon(Icons.done)],
                 ),
                 onPressed: () => passEvent(context, Submit()),
               ),
@@ -309,18 +298,9 @@ class PaymentScreen extends StatelessWidget {
           .map((item) => Card(
                 elevation: 4,
                 child: ListTile(
-                  // leading: CircleAvatar(
-                  //   backgroundColor: Colors.yellow.shade700,
-                  //   radius: 16,
-                  //   child: CircleAvatar(
-                  //     radius: 14,
-                  //     backgroundImage: AssetImage('assets/no_image1.jpg'),
-                  //   ),
-                  // ),
                   title: Text(
                     item.name.toUpperCase(),
                     style: GoogleFonts.ubuntuCondensed(
-                      color: Colors.black87,
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                       letterSpacing: 0.8,
@@ -447,14 +427,11 @@ class PaymentScreen extends StatelessWidget {
           child: ListTile(
             leading: Icon(
               Icons.credit_card,
-              color: Colors.yellow[700],
             ),
             title: TextField(
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
-                  border: OutlineInputBorder(
-                    borderSide: BorderSide(color: Colors.amberAccent, width: 1),
-                  ),
+                  border: OutlineInputBorder(),
                   hintText: 'Credit Number',
                   errorText: null),
             ),
@@ -469,14 +446,11 @@ class PaymentScreen extends StatelessWidget {
         child: Card(
           color: Colors.grey[100],
           child: ListTile(
-            leading: Icon(Icons.monetization_on, color: Colors.yellow[700]),
+            leading: Icon(Icons.monetization_on),
             title: TextField(
               keyboardType: TextInputType.number,
               readOnly: true,
               decoration: InputDecoration(
-                border: OutlineInputBorder(
-                  borderSide: BorderSide(color: Colors.amberAccent, width: 1),
-                ),
                 hintText: 'Amount',
                 errorText: null,
               ),

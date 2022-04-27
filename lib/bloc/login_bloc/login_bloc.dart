@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
+
 import 'package:bloc/bloc.dart';
 import 'package:http/http.dart';
 import 'package:meta/meta.dart';
@@ -10,6 +10,7 @@ import 'package:pos_app/repositories/login_repository.dart';
 import 'package:pos_app/shared/app_library.dart';
 import 'package:pos_app/shared/config.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 part 'login_bloc_event.dart';
 part 'login_bloc_state.dart';
 
@@ -42,49 +43,33 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
   ) async* {
     try {
       if (event is LoginInit) {
+        // TODO: Disable for production
+        // await (await SharedPreferences.getInstance()).clear();
+        Config.ipAddress = await Config.serverIp;
+
         yield LoginBlocInitial(
-            ipAddress: await Config.serverIp, message: 'Welcome.');
+          ipAddress: Config.ipAddress,
+          username: await _username,
+          password: await _password,
+        );
         if (await _loginStatus) {
           yield* attemptLogin(
               username: await _username, password: await _password);
         }
-        // final response = await UsersRepo.repo.users;
-        // if (response.status) {
-        //   yield UsersLoaded(
-        //       list: (response.data as List<dynamic>)
-        //           .map((e) => User.fromJson(e))
-        //           .toList());
-        // } else {}
       } else if (event is IpAddressChanged) {
         if (event.ipaddress == '') {
-          yield InvalidIpAddress(message: 'Ipaddress is required.');
+          yield ErrorState(message: 'Ipaddress is required.');
         } else {
-          Config.serverIp = Future.value(event.ipaddress);
+          yield LoadingState(message: 'Please wait...');
           yield* checkServerStatus(event.ipaddress);
         }
-      }
-      //else if (event is UsernameChanged) {
-      //   if (event.username == '') {
-      //     yield InvalidUsername(message: 'Username is required.');
-      //   } else {
-      //     _username = Future.value(event.username);
-      //     yield ValidUsername();
-      //   }
-      // } else if (event is PasswordChanged) {
-      //   if (event.password == '') {
-      //     yield InvalidPassword(message: 'Password is required.');
-      //   } else {
-      //     _password = Future.value(event.password);
-      //     yield ValidPassword();
-      //   }
-      // }
-      else if (event is LoginPressed) {
+      } else if (event is LoginPressed) {
         if (event.username == '' ||
             event.password == '' ||
             event.ipaddress == '') {
-          yield InvalidSubmission(message: 'Please check all fields.');
+          yield ErrorState(message: 'Please check all fields.');
         } else {
-          yield ValidSubmission(message: 'Login request sent.');
+          yield LoadingState(message: 'Please wait...');
           yield* attemptLogin(
               username: event.username, password: event.password);
         }
@@ -97,7 +82,7 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         } else {}
       }
     } catch (e) {
-      yield LoginFailed(message: e.toString());
+      yield ErrorState(message: e.toString());
     }
   }
 
@@ -106,31 +91,40 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
       final response =
           await LoginRepo.repo.login(username: username, password: password);
       if (response.statusCode == HttpStatus.ok) {
-        Config.user = User.fromJson(jsonDecode(response.body));
+        final user = User.fromJson(jsonDecode(response.body));
+        Config.user = user;
         _loginStatus = Future.value(true);
         this._username = Future.value(username);
         this._password = Future.value(password);
-        yield LoginSuccessful(message: 'Login successful.');
+        yield LoadedState(
+            message: 'Login successful.', allowLogin: true, user: user);
       } else {
-        yield LoginFailed(message: Lib.getMessage(response));
+        yield ErrorState(message: Lib.getMessage(response));
       }
     } catch (e) {
-      yield LoginFailed(message: e.toString());
+      yield ErrorState(message: e.toString());
     }
   }
 
   Stream<LoginState> checkServerStatus(String ipAddress) async* {
-    final response = await get(await Config.serverStatusApi)
+    Config.ipAddress = ipAddress;
+    final response = await get(Config.serverStatusApi)
         .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
             onTimeout: () => Lib.timeout)
         .onError(
             (error, stackTrace) => Lib.httpErrorResponseHandler(error: error));
     if (response.statusCode == HttpStatus.ok) {
-      yield ValidIpAddress(message: 'Server ip address saved');
+      Config.serverIp = Future<String>.value(ipAddress);
+      yield LoadedState(message: 'Server ip address saved');
+    } else if (response.statusCode == HttpStatus.requestTimeout) {
+      yield ErrorState(
+        message: (jsonDecode(response.body) as Map<String, dynamic>)['Message'],
+      );
     } else {
-      yield LoginFailed(
-          message:
-              'Server did not respond to request.\nPlease check the ip address or server configurations');
+      yield ErrorState(
+        message:
+            'Server did not respond to request.\nPlease check the ip address or server configurations',
+      );
     }
   }
 }

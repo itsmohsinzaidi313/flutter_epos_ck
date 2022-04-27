@@ -12,17 +12,16 @@ class OrderRepo {
 
   Future<Response> getOrders({String tiltId, String orderNo = '*'}) async =>
       await get(Uri.parse(
-              '${await Config.ordersApi}&tiltId=${tiltId ?? Config.user.tiltId}&orderNo=$orderNo'))
+              '${Config.ordersApi}&tiltId=${tiltId ?? Config.user.tiltId}&orderNo=$orderNo'))
           .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
               onTimeout: () => Lib.timeout)
           .onError((error, stackTrace) =>
               Lib.httpErrorResponseHandler(error: error));
 
   Future<Response> newOrder({@required Order customerOrder}) async {
-    log(await Config.ordersApi, name: 'newOrder');
-    log(jsonEncode(customerOrder.map), name: 'newOrder');
-    // return Lib.timeout;
-    return await post(await Config.ordersApi,
+    // log(Config.ordersApi, name: 'newOrder');
+    // log(jsonEncode(customerOrder.map), name: 'newOrder');
+    return await post(Config.ordersApi,
             headers: {'Content-type': 'application/json'},
             body: jsonEncode(customerOrder.map))
         .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
@@ -32,10 +31,10 @@ class OrderRepo {
   }
 
   Future<Response> updateOrder({@required Order customerOrder}) async {
-    log(await Config.ordersApi, name: 'updateOrder');
-    log(jsonEncode(customerOrder.map), name: 'updateOrder');
+    // log(Config.ordersApi, name: 'updateOrder');
+    // log(jsonEncode(customerOrder.map), name: 'updateOrder');
     // return Lib.timeout;
-    return await put(await Config.ordersApi,
+    return await put(Config.ordersApi,
             headers: {'Content-type': 'application/json'},
             body: jsonEncode(customerOrder.map))
         .timeout(Duration(seconds: Config.SERVER_TIMEOUT),

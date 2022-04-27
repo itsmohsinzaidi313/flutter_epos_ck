@@ -1,34 +1,19 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:pos_app/bloc/login_bloc/login_bloc.dart';
-import 'login_page.dart';
+import 'package:pos_app/pages/login_page/login_page.dart';
 import '../shared/config.dart';
-import 'login_page.dart';
 
-class SplashScreen extends StatefulWidget {
-  @override
-  _SplashScreenState createState() => _SplashScreenState();
-}
+class SplashPage extends StatelessWidget {
+  static const String path = 'splash_page';
 
-class _SplashScreenState extends State<SplashScreen> {
-  final globalScaffoldKey = GlobalKey<ScaffoldState>();
-
-  @override
-  void initState() {
-    super.initState();
-    Timer(Duration(seconds: 3), () => _whichScreenToGo());
-  }
-
-  void _whichScreenToGo() async {
-    Navigator.of(context).pushNamed('/login');
-  }
+  void _loadPage(BuildContext context) =>
+      Future<void>.delayed(const Duration(seconds: 2))
+          .then((value) => Navigator.of(context).pushNamed(LoginPage.path));
 
   @override
   Widget build(BuildContext context) {
+    _loadPage(context);
     return Scaffold(
-      backgroundColor: Colors.yellow[600],
-      key: globalScaffoldKey,
       body: Container(
         height: Config.getDeviceHeight(context),
         width: Config.getDeviceWidth(context),
@@ -42,7 +27,11 @@ class _SplashScreenState extends State<SplashScreen> {
                 width: Config.getDeviceWidth(context) * 0.5,
                 decoration: BoxDecoration(
                   image: DecorationImage(
-                    image: AssetImage('assets/splash_pic.png'),
+                    colorFilter: ColorFilter.mode(
+                      Colors.blue,
+                      BlendMode.colorBurn,
+                    ),
+                    image: AssetImage('assets/images/logo.ico'),
                     fit: BoxFit.contain,
                   ),
                 ),
@@ -52,7 +41,6 @@ class _SplashScreenState extends State<SplashScreen> {
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 30,
-                  color: Colors.red,
                   letterSpacing: 3.0,
                 ),
               ),

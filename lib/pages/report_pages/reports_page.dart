@@ -9,16 +9,8 @@ class ReportsPage extends StatelessWidget {
         appBarTitle: 'Reports',
         actions: [
           ElevatedButton(
-            style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(Colors.amber)),
             child: Row(
-              children: [
-                Icon(Icons.settings, color: Colors.red),
-                Text(
-                  'Settings',
-                  style: TextStyle(color: Colors.red),
-                )
-              ],
+              children: [Icon(Icons.settings), Text('Settings')],
             ),
             onPressed: () {},
           ),

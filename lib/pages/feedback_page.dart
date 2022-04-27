@@ -61,19 +61,10 @@ class FeedbackScreen extends StatelessWidget {
         centerTitle: true,
         actions: [
           ElevatedButton(
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.all(Colors.amber),
-              ),
               child: Row(
                 children: [
-                  Text(
-                    'Done',
-                    style: TextStyle(color: Colors.red),
-                  ),
-                  Icon(
-                    Icons.check,
-                    color: Colors.red,
-                  ),
+                  Text('Done'),
+                  Icon(Icons.check),
                 ],
               ),
               onPressed: () async {
@@ -183,13 +174,9 @@ class FeedbackScreen extends StatelessWidget {
         child: Card(
           child: Container(
             padding: const EdgeInsets.all(8.0),
-            color: Colors.red,
             child: Text(
               title,
-              style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 22),
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
             ),
           ),
         ),
@@ -214,8 +201,6 @@ class _FeedbackTileState extends State<FeedbackTile> {
     Icons.looks_4,
     Icons.looks_5,
   ];
-  Color color = Colors.yellow[800]; // Colors.red;
-  Color selectedColor = Colors.yellow[800];
   double iconSize = 40;
   IconData selectedStar = Icons.star_rate_rounded;
   IconData star = Icons.star_outline_rounded;
@@ -246,7 +231,6 @@ class _FeedbackTileState extends State<FeedbackTile> {
                 IconButton(
                     icon: Icon(
                       widget.selectedButton[0] ? selectedStar : star,
-                      color: color,
                       size: iconSize,
                     ),
                     onPressed: () {
@@ -255,7 +239,6 @@ class _FeedbackTileState extends State<FeedbackTile> {
                 IconButton(
                     icon: Icon(
                       widget.selectedButton[1] ? selectedStar : star,
-                      color: color,
                       size: iconSize,
                     ),
                     onPressed: () {
@@ -264,7 +247,6 @@ class _FeedbackTileState extends State<FeedbackTile> {
                 IconButton(
                     icon: Icon(
                       widget.selectedButton[2] ? selectedStar : star,
-                      color: color,
                       size: iconSize,
                     ),
                     onPressed: () {
@@ -273,7 +255,6 @@ class _FeedbackTileState extends State<FeedbackTile> {
                 IconButton(
                     icon: Icon(
                       widget.selectedButton[3] ? selectedStar : star,
-                      color: color,
                       size: iconSize,
                     ),
                     onPressed: () {
@@ -282,7 +263,6 @@ class _FeedbackTileState extends State<FeedbackTile> {
                 IconButton(
                     icon: Icon(
                       widget.selectedButton[4] ? selectedStar : star,
-                      color: color,
                       size: iconSize,
                     ),
                     onPressed: () {
