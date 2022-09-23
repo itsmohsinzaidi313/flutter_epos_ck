@@ -8,8 +8,8 @@ class DineInLayout extends StatefulWidget {
   final DineInViewType viewType;
 
   DineInLayout({
-    this.waiters,
-    this.tables,
+    required this.waiters,
+    required this.tables,
     this.viewType = DineInViewType.list,
   });
 
@@ -19,8 +19,8 @@ class DineInLayout extends StatefulWidget {
 
 class _DineInLayoutState extends State<DineInLayout>
     with TickerProviderStateMixin {
-  final orderType = ORDERTYPE.DINE_IN;
-  TabController _tabController;
+  final orderType = OrderType.dineIn;
+  late TabController _tabController;
   @override
   void initState() {
     super.initState();
@@ -48,8 +48,8 @@ class _DineInLayoutState extends State<DineInLayout>
                           hintText: 'e.g 3',
                           border: InputBorder.none,
                           errorText: null),
-                      onChanged: (value) => passEvent(context,
-                          CoversChanged(type: orderType, covers: value)),
+                      onChanged: (value) =>
+                          passEvent(context, CoversChanged(covers: value)),
                     ),
                   ),
                 ],
@@ -77,7 +77,7 @@ class _DineInLayoutState extends State<DineInLayout>
                       child: Text('Waiters'.toUpperCase()),
                     ),
                     Tab(
-                      child: Text('Waiters'.toUpperCase()),
+                      child: Text('Tables'.toUpperCase()),
                     ),
                   ],
                 ),
@@ -91,20 +91,14 @@ class _DineInLayoutState extends State<DineInLayout>
                                 listWaiters: widget.waiters,
                                 onTap: (context, waiter) => passEvent(
                                   context,
-                                  WaiterChanged(
-                                    type: orderType,
-                                    waiter: waiter,
-                                  ),
+                                  WaiterChanged(waiter: waiter),
                                 ),
                               )
                             : _WaitersList(
                                 waitersList: widget.waiters,
                                 onTap: (context, waiter) => passEvent(
                                   context,
-                                  WaiterChanged(
-                                    type: orderType,
-                                    waiter: waiter,
-                                  ),
+                                  WaiterChanged(waiter: waiter),
                                 ),
                               ),
                       ),
@@ -114,20 +108,14 @@ class _DineInLayoutState extends State<DineInLayout>
                                 listTables: widget.tables,
                                 onTap: (context, table) => passEvent(
                                   context,
-                                  TableChanged(
-                                    type: orderType,
-                                    table: table,
-                                  ),
+                                  TableChanged(table: table),
                                 ),
                               )
                             : _TablesList(
                                 listTables: widget.tables,
                                 onTap: (context, table) => passEvent(
                                   context,
-                                  TableChanged(
-                                    type: orderType,
-                                    table: table,
-                                  ),
+                                  TableChanged(table: table),
                                 ),
                               ),
                       ),

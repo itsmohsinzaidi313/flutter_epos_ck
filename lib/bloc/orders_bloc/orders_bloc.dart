@@ -10,23 +10,24 @@ part 'orders_bloc_event.dart';
 part 'orders_bloc_state.dart';
 
 class OrdersBloc extends Bloc<OrdersBlocEvent, OrdersBlocState> {
-  OrdersBloc() : super(InitialState());
-  @override
-  Stream<OrdersBlocState> mapEventToState(OrdersBlocEvent event) async* {
-    if (event is FetchOrders) {
-      yield LoadingState(message: genericLoadingMessage);
+  OrdersBloc() : super(InitialState()) {
+    on<FetchOrders>((event, emit) async {
+      emit(LoadingState(message: genericLoadingMessage));
       final response = await OrderRepo.repo.getOrders();
       if (response.statusCode == HttpStatus.ok) {
         final ordersList = (jsonDecode(response.body) as List<dynamic>)
-                .map((e) => Order.fromMap(e))
-                .toList() ??
-            <Order>[];
-            yield LoadingState(message: 'Orders updated');
-        yield LoadedState(ordersList: ordersList);
+            .map((e) => Order.fromMap(e))
+            .toList();
+        if (ordersList.isEmpty) {
+          emit(LoadingState(message: 'No orders available'));
+        } else {
+          emit(LoadingState(message: 'Orders updated'));
+        }
+        emit(LoadedState(ordersList: ordersList));
       } else {
-        yield ErrorState(
-            message: '$genericErrorMessage (${response.statusCode})');
+        emit(ErrorState(
+            message: '$genericErrorMessage (${response.statusCode})'));
       }
-    }
+    });
   }
 }

@@ -1,9 +1,9 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:bloc/bloc.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:pos_app/models/customer_order.dart';
 import 'package:pos_app/models/customer_table.dart';
@@ -12,214 +12,131 @@ import 'package:pos_app/repositories/customer_repository.dart';
 import 'package:pos_app/models/customer.dart';
 import 'package:pos_app/repositories/tables_repository.dart';
 import 'package:pos_app/repositories/waiters_repository.dart';
-import 'package:pos_app/shared/config.dart';
+import 'package:pos_app/shared/enums.dart';
 
 part 'order_info_event.dart';
 part 'order_info_state.dart';
 
 class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
-  OrderInfoBloc() : super(OrderInfoInitial(type: null));
-  Order customerOrder = Order();
+  Order order;
   List<Waiter> listWaiters = [];
   List<Tables> listTables = [];
-
-  @override
-  Stream<OrderInfoState> mapEventToState(
-    OrderInfoEvent event,
-  ) async* {
-    try {
-      if (event is OrderInfoBuild) {
-        customerOrder = Order();
-        listWaiters = await getWaiters();
-        listTables = await getTables();
-        customerOrder.userId = Config.user.id;
-        customerOrder.orderType = (ORDERTYPE.DINE_IN.index + 1).toString();
-        yield LoadedState(
-          tables: listTables,
-          waiters: listWaiters,
-          type: ORDERTYPE.DINE_IN,
-          customer: Customer(),
-        );
+  OrderInfoBloc({required this.order}) : super(OrderInfoInitial()) {
+    on<OrderInfoBuild>((event, emit) async {
+      listWaiters.clear();
+      listTables.clear();
+      emit(LoadingState());
+      listWaiters.addAll(await getWaiters());
+      listTables.addAll(await getTables());
+      emit(LoadedState(
+        tables: listTables,
+        waiters: listWaiters,
+        order: order,
+      ));
+    });
+    on<OrderTypeChanged>((event, emit) async {
+      order = Order.modify(order, orderType: event.orderType);
+      if (event.orderType == OrderType.dineIn) {
+        emit(LoadingState());
+        listWaiters.addAll(await getWaiters());
+        listTables.addAll(await getTables());
       }
-
-      switch (event.orderType) {
-        case ORDERTYPE.DINE_IN:
-          {
-            final dineIn = ORDERTYPE.DINE_IN;
-            if (event is OrderTypeChanged) {
-              customerOrder.orderType = (dineIn.index + 1).toString();
-            } else if (event is WaiterChanged) {
-              customerOrder.waiterId = event.waiter.id;
-              listWaiters.forEach((e) {
-                if (e.id == event.waiter.id) {
-                  e.selected = true;
-                } else {
-                  e.selected = false;
-                }
-              });
-            } else if (event is TableChanged) {
-              if (!event.table.reserved) {
-                customerOrder.tableId = event.table.id;
-                listTables.forEach((e) {
-                  if (e.id == event.table.id) {
-                    e.selected = true;
-                  } else {
-                    e.selected = false;
-                  }
-                });
-              } else {
-                yield ErrorState(
-                    type: event.orderType, message: 'This table is reserved');
-              }
-            } else if (event is CoversChanged) {
-              customerOrder.covers = event.covers.toString();
-            } else if (event is Submit) {
-              if (customerOrder.waiterId == null ||
-                  customerOrder.waiterId.isEmpty) {
-                yield ErrorState(
-                    message: 'Please select waiter.', type: dineIn);
-              } else if (customerOrder.covers == null ||
-                  customerOrder.covers.isEmpty) {
-                yield ErrorState(message: 'Please enter covers.', type: dineIn);
-              } else if (customerOrder.tableId == null ||
-                  customerOrder.tableId.isEmpty) {
-                yield ErrorState(message: 'Please select table.', type: dineIn);
-              } else {
-                yield LoadedState(
-                  validSubmission: true,
-                  customerOrder: customerOrder,
-                  type: dineIn,
-                );
-              }
-            } else {}
-            yield LoadedState(
-              tables: listTables,
-              waiters: listWaiters,
-              type: dineIn,
-              customer: Customer(),
-            );
-            break;
+      emit(LoadedState(
+        order: order,
+        waiters: listWaiters,
+        tables: listTables,
+      ));
+    });
+    on<WaiterChanged>((event, emit) {
+      try {
+        for (var i = 0; i < listWaiters.length; i++) {
+          if (listWaiters[i].id == event.waiter.id) {
+            listWaiters[i] = Waiter.modify(listWaiters[i], selected: true);
+          } else {
+            listWaiters[i] = Waiter.modify(listWaiters[i], selected: false);
           }
-        case ORDERTYPE.TAKE_AWAY:
-          {
-            final takeAway = ORDERTYPE.TAKE_AWAY;
-            if (event is OrderTypeChanged) {
-              customerOrder.orderType = (takeAway.index + 1).toString();
-              yield LoadedState(type: takeAway);
-            } else if (event is CustomerChanged) {
-              customerOrder.customer.name = event.customerName;
-            } else if (event is ContactChanged) {
-              customerOrder.customer.contact = event.contact;
-            } else if (event is Submit) {
-              if (customerOrder.customer == null ||
-                  customerOrder.customer.name.isEmpty) {
-                yield ErrorState(
-                    message: 'Please enter customer name.', type: takeAway);
-              } else if (customerOrder.customer.contact == null ||
-                  customerOrder.customer.contact.isEmpty) {
-                yield ErrorState(
-                    message: 'Please enter contact number.', type: takeAway);
-              } else {
-                yield LoadedState(
-                  validSubmission: true,
-                  customerOrder: customerOrder,
-                  type: takeAway,
-                );
-              }
-            } else if (event is SearchCustomer) {
-              if (customerOrder.customer.contact.isEmpty) {
-                yield ErrorState(
-                    type: takeAway, message: 'Please enter contact number');
-              } else {
-                final list = await getCustomers(customerOrder.customer.contact);
-                if (list.isNotEmpty) {
-                  Customer customer = list.first;
-                  customerOrder.customer.name = customer.name;
-                  customerOrder.customer.contact = customer.contact;
-                  yield LoadedState(
-                    waiters: [],
-                    tables: [],
-                    type: takeAway,
-                    customer: customer,
-                  );
-                } else {
-                  yield ErrorState(
-                      type: takeAway, message: 'Customer not found');
-                }
-              }
-            } else {}
+        }
+        order = Order.modify(order, waiter: event.waiter);
+      } catch (e) {
+        log('Error', error: e);
+      }
+      emit(LoadedState(
+        order: order,
+        waiters: listWaiters,
+        tables: listTables,
+      ));
+    });
+    on<TableChanged>((event, emit) {
+      if (!event.table.reserved) {
+        order = Order.modify(order, table: event.table);
+        for (var i = 0; i < listTables.length; i++) {
+          if (listTables[i].id == event.table.id) {
+            listTables[i] = Tables.modify(listTables[i], selected: true);
+          } else {
+            listTables[i] = Tables.modify(listTables[i], selected: false);
           }
-          break;
-        case ORDERTYPE.DELIVERY:
-          final delivery = ORDERTYPE.DELIVERY;
-          if (event is OrderTypeChanged) {
-            customerOrder.orderType = (delivery.index + 1).toString();
-            yield LoadedState(type: delivery);
-          } else if (event is CustomerChanged) {
-            customerOrder.customer.name = event.customerName;
-          } else if (event is ContactChanged) {
-            customerOrder.customer.contact = event.contact;
-          } else if (event is AddressChanged) {
-            customerOrder.customer.address = event.address;
-          } else if (event is SearchCustomer) {
-            if (customerOrder.customer.contact == null &&
-                customerOrder.customer.contact.isEmpty) {
-              yield ErrorState(
-                  type: delivery, message: 'Please enter contact number');
-            } else {
-              final list = await getCustomers(customerOrder.customer.contact);
-              if (list.isNotEmpty) {
-                Customer customer = list.first;
-                customerOrder.customer.name = customer.name;
-                customerOrder.customer.contact = customer.contact;
-                customerOrder.customer.address = customer.address;
-                yield LoadedState(
-                  tables: [],
-                  waiters: [],
-                  type: delivery,
-                  customer: customer,
-                );
-              } else {
-                yield ErrorState(type: delivery, message: 'Customer not found');
-              }
-            }
-          } else if (event is Submit) {
-            if (customerOrder.customer == null ||
-                customerOrder.customer.name.isEmpty) {
-              yield ErrorState(
-                  message: 'Please enter customer name.', type: delivery);
-            } else if (customerOrder.customer.contact == null ||
-                customerOrder.customer.contact.isEmpty) {
-              yield ErrorState(
-                  message: 'Please enter contact number.', type: delivery);
-            } else if (customerOrder.customer.address == null ||
-                customerOrder.customer.address.isEmpty) {
-              yield ErrorState(message: 'Please enter address', type: delivery);
-            } else {
-              yield LoadedState(
-                validSubmission: true,
-                customerOrder: customerOrder,
-                type: delivery,
-              );
-            }
-          } else {}
-          break;
-        default:
-          break;
+        }
+        emit(LoadedState(
+            order: order, tables: listTables, waiters: listWaiters));
+      } else {
+        emit(ErrorState(message: 'This table is reserved'));
       }
-      if (event is ResetOrderInfoOrder) {
-        customerOrder.reset();
+    });
+    on<CoversChanged>((event, emit) {
+      order = Order.modify(order, covers: event.covers);
+    });
+    on<NextPressed>((event, emit) {
+      if (order.customer.name.isEmpty &&
+          (<OrderType>[OrderType.takeAway, OrderType.delivery]
+              .contains(order.orderType))) {
+        emit(ErrorState(message: 'Please enter customer name.'));
+      } else if (order.customer.contact.isEmpty &&
+          (<OrderType>[OrderType.takeAway, OrderType.delivery]
+              .contains(order.orderType))) {
+        emit(ErrorState(message: 'Please enter contact number.'));
+      } else if (order.waiter.name.isEmpty &&
+          (<OrderType>[OrderType.dineIn].contains(order.orderType))) {
+        emit(ErrorState(message: 'Please select waiter.'));
+      } else if (order.table.name.isEmpty &&
+          (<OrderType>[OrderType.dineIn].contains(order.orderType))) {
+        emit(ErrorState(message: 'Please select table.'));
+      } else if (order.customer.address.isEmpty &&
+          (<OrderType>[OrderType.delivery].contains(order.orderType))) {
+        emit(ErrorState(message: 'Please enter address.'));
+      } else {
+        emit(LoadedState(
+          validSubmission: true,
+          order: order,
+        ));
       }
-    } catch (e) {
-      yield ErrorState(type: event.orderType, message: e.toString());
-    }
+    });
+    on<SearchCustomer>((event, emit) async {
+      if (order.customer.contact.isEmpty) {
+        emit(ErrorState(message: 'Please enter contact number'));
+      } else {
+        final list = await getCustomers(order.customer.contact);
+        if (list.isNotEmpty) {
+          order = Order.modify(order, customer: list.first);
+          emit(LoadedState(
+            tables: [],
+            waiters: [],
+            order: order,
+          ));
+        } else {
+          emit(ErrorState(message: 'Customer not found'));
+        }
+      }
+    });
+    on<ResetOrderInfoOrder>((event, emit) {
+      order.reset();
+    });
   }
 
   Future<List<Tables>> getTables() async {
     final response = await TablesRepo.repo.tables();
     if (response.statusCode == HttpStatus.ok) {
       return (jsonDecode(response.body) as List<dynamic>)
-          .map((e) => Tables.fromJson(e))
+          .map((e) => Tables.fromMap(e))
           .toList();
     } else {
       return [];
@@ -230,16 +147,16 @@ class OrderInfoBloc extends Bloc<OrderInfoEvent, OrderInfoState> {
     final response = await WaiterRepo.repo.waiters();
     if (response.statusCode == HttpStatus.ok) {
       return (jsonDecode(response.body) as List<dynamic>)
-          .map((e) => Waiter.fromJson(e))
+          .map((e) => Waiter.fromMap(e))
           .toList();
     } else {
       return [];
     }
   }
 
-  Future<List<Customer>> getCustomers(String contact) async {
-    final response = await CustomerRepo.repo
-        .customer(contact: customerOrder.customer.contact);
+  Future<List<Customer>> getCustomers(String? contact) async {
+    final response =
+        await CustomerRepo.repo.customer(contact: order.customer.contact);
     if (response.statusCode == HttpStatus.ok) {
       return (jsonDecode(response.body) as List<dynamic>)
           .map((e) => Customer.fromMap(e))

@@ -6,7 +6,7 @@ import 'package:pos_app/models/item.dart';
 import 'package:pos_app/shared/config.dart';
 
 const double _WIDTH_FACTOR = 0.6;
-Future<Item> openFoodDialog(BuildContext context, String categoryId) async {
+Future<Item?> openFoodDialog(BuildContext context, String categoryId) async {
   final nameCntrlr = TextEditingController(text: '');
   final priceCntrlr = TextEditingController(text: '0');
   final qtyCntrlr = TextEditingController(text: '0');
@@ -105,7 +105,7 @@ Future<Item> openFoodDialog(BuildContext context, String categoryId) async {
                                 (_checkItemQuantity(qtyCntrlr.text) == null) &&
                                 _checkItemTax(taxCntrlr.text) == null) {
                               Navigator.of(context).pop(
-                                MenuItem(
+                                FoodItem(
                                   id: Random.secure()
                                       .nextInt(1000000)
                                       .toString(),
@@ -143,7 +143,7 @@ Future<Item> openFoodDialog(BuildContext context, String categoryId) async {
   );
 }
 
-String _checkItemName(String text) {
+String? _checkItemName(String text) {
   if (text == null) {
     return 'Required';
   }
@@ -153,31 +153,31 @@ String _checkItemName(String text) {
   return null;
 }
 
-String _checkItemPrice(String text) {
+String? _checkItemPrice(String text) {
   if (double.tryParse(text) == null) {
     return 'Required';
   }
-  if (double.tryParse(text) <= 0) {
+  if (double.tryParse(text)! <= 0) {
     return 'Price cannot be zero or less';
   }
   return null;
 }
 
-String _checkItemQuantity(String text) {
+String? _checkItemQuantity(String text) {
   if (double.tryParse(text) == null) {
     return 'Required';
   }
-  if (double.tryParse(text) <= 0) {
+  if (double.tryParse(text)! <= 0) {
     return 'Quantity cannot be zero or less';
   }
   return null;
 }
 
-String _checkItemTax(String text) {
+String? _checkItemTax(String text) {
   if (double.tryParse(text) == null) {
     return 'Required';
   }
-  if (double.tryParse(text) <= 0) {
+  if (double.tryParse(text)! <= 0) {
     return 'Tax cannot be zero or less';
   }
   return null;

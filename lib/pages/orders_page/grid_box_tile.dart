@@ -1,11 +1,11 @@
 part of 'orders_page.dart';
 
 class _GridBoxTile extends StatelessWidget {
-  final String title;
-  final String description;
+  final String? title;
+  final String? description;
   final FontWeight fontWeight;
   const _GridBoxTile(
-      {Key key,
+      {Key? key,
       this.title,
       this.description,
       this.fontWeight = FontWeight.normal})
@@ -17,8 +17,8 @@ class _GridBoxTile extends StatelessWidget {
     return Row(
       children: [
         Text(
-          title,
-          style: gridTextStyle ?? '',
+          title!,
+          style: gridTextStyle,
         ),
         Expanded(child: SizedBox()),
         Text(

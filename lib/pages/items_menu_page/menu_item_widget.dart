@@ -3,19 +3,17 @@ part of 'items_menu_page.dart';
 class _ItemButton extends StatefulWidget {
   final Item item;
   final String subtitle;
-  final bool showSubtitle;
   final bool isSelectable;
-  final FutureOr<bool> Function(FutureOr<bool> selected) onSelected;
-  final void Function() onTap;
-  _ItemButton(
-      {Key key,
-      this.item,
-      this.subtitle,
-      this.showSubtitle = false,
-      this.isSelectable = false,
-      this.onSelected,
-      this.onTap})
-      : super(key: key);
+  final FutureOr<bool> Function(FutureOr<bool> selected)? onSelected;
+  final void Function()? onTap;
+  _ItemButton({
+    Key? key,
+    required this.item,
+    this.subtitle = '',
+    this.isSelectable = false,
+    this.onSelected,
+    this.onTap,
+  }) : super(key: key);
 
   @override
   _ItemButtonState createState() => _ItemButtonState();
@@ -26,7 +24,7 @@ class _ItemButtonState extends State<_ItemButton> {
   void onSelected() {
     if (widget.isSelectable) {
       setState(() {
-        _selected = widget.onSelected(_selected);
+        _selected = widget.onSelected!(_selected);
       });
     }
   }
@@ -49,7 +47,7 @@ class _ItemButtonState extends State<_ItemButton> {
                 right: 10,
                 child: widget.isSelectable
                     ? Center(
-                        child: _selected
+                        child: _selected as bool
                             ? Icon(Icons.check_circle_rounded)
                             : Icon(Icons.check_circle_outline_outlined),
                       )
@@ -70,7 +68,7 @@ class _ItemButtonState extends State<_ItemButton> {
                       ),
                     ),
                   ),
-                  widget.showSubtitle
+                  widget.subtitle.isNotEmpty
                       ? Expanded(
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,

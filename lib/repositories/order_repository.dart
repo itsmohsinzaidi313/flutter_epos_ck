@@ -10,36 +10,36 @@ class OrderRepo {
   static OrderRepo repo = OrderRepo._internal();
   OrderRepo._internal();
 
-  Future<Response> getOrders({String tiltId, String orderNo = '*'}) async =>
+  Future<Response> getOrders({String? deviceId, String orderNo = '*'}) async =>
       await get(Uri.parse(
-              '${Config.ordersApi}&tiltId=${tiltId ?? Config.user.tiltId}&orderNo=$orderNo'))
+              '${Config.ordersApi}&deviceId=${deviceId ?? (await Config.deviceData)!.androidId}&orderNo=$orderNo'))
           .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
               onTimeout: () => Lib.timeout)
-          .onError((error, stackTrace) =>
+          .onError((dynamic error, stackTrace) =>
               Lib.httpErrorResponseHandler(error: error));
 
-  Future<Response> newOrder({@required Order customerOrder}) async {
-    // log(Config.ordersApi, name: 'newOrder');
-    // log(jsonEncode(customerOrder.map), name: 'newOrder');
-    return await post(Config.ordersApi,
+  Future<Response> newOrder({required Order customerOrder}) async {
+    log(Config.ordersApi, name: 'newOrder');
+    log(jsonEncode(customerOrder.map), name: 'newOrder');
+    return await post(Uri.parse(Config.ordersApi),
             headers: {'Content-type': 'application/json'},
             body: jsonEncode(customerOrder.map))
         .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
             onTimeout: () => Lib.timeout)
         .onError(
-            (error, stackTrace) => Lib.httpErrorResponseHandler(error: error));
+            (dynamic error, stackTrace) => Lib.httpErrorResponseHandler(error: error));
   }
 
-  Future<Response> updateOrder({@required Order customerOrder}) async {
+  Future<Response> updateOrder({required Order customerOrder}) async {
     // log(Config.ordersApi, name: 'updateOrder');
     // log(jsonEncode(customerOrder.map), name: 'updateOrder');
     // return Lib.timeout;
-    return await put(Config.ordersApi,
+    return await put(Uri.parse(Config.ordersApi),
             headers: {'Content-type': 'application/json'},
             body: jsonEncode(customerOrder.map))
         .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
             onTimeout: () => Lib.timeout)
         .onError(
-            (error, stackTrace) => Lib.httpErrorResponseHandler(error: error));
+            (dynamic error, stackTrace) => Lib.httpErrorResponseHandler(error: error));
   }
 }

@@ -1,12 +1,12 @@
 part of 'items_menu_page.dart';
 
 class _ItemsSearchBar extends StatelessWidget {
-  final TextEditingController autoCompleteController;
-  final Function(String value) suggestionsCallback;
-  final Function(dynamic value) onSuggestionSelected;
+  final TextEditingController? autoCompleteController;
+  final Function(String value)? suggestionsCallback;
+  final Function(dynamic value)? onSuggestionSelected;
 
   const _ItemsSearchBar({
-    Key key,
+    Key? key,
     this.autoCompleteController,
     this.suggestionsCallback,
     this.onSuggestionSelected,
@@ -26,18 +26,19 @@ class _ItemsSearchBar extends StatelessWidget {
             icon: Icon(
               Icons.close,
             ),
-            onPressed: () => autoCompleteController.text = '',
+            onPressed: () => autoCompleteController!.text = '',
           ),
         ),
       ),
-      suggestionsCallback: suggestionsCallback,
-      itemBuilder: (context, itemData) => ListTile(
+      suggestionsCallback:
+          suggestionsCallback as Future<List<Item>> Function(String),
+      itemBuilder: (context, dynamic itemData) => ListTile(
         title: Text(itemData.name),
         subtitle: Text(
           'PKR: ${itemData.price}/=\nCode: ${itemData.id}',
         ),
       ),
-      onSuggestionSelected: onSuggestionSelected,
+      onSuggestionSelected: onSuggestionSelected!,
       noItemsFoundBuilder: (context) => ListTile(
         title: Text('No Item Found!'),
       ),

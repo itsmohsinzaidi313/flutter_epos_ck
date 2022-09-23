@@ -8,7 +8,10 @@ class SplashPage extends StatelessWidget {
 
   void _loadPage(BuildContext context) =>
       Future<void>.delayed(const Duration(seconds: 2))
-          .then((value) => Navigator.of(context).pushNamed(LoginPage.path));
+          .then((value) => Navigator.of(context).pushNamedAndRemoveUntil(
+                LoginPage.path,
+                (route) => false,
+              ));
 
   @override
   Widget build(BuildContext context) {

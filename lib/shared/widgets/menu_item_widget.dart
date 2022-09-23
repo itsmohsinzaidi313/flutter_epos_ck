@@ -1,5 +1,3 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:pos_app/models/item.dart';
@@ -20,9 +18,9 @@ Widget itemButton1(BuildContext context, Item item) => Stack(
                 topRight: Radius.circular(10),
               ),
               image: DecorationImage(
-                image: item.image != null
+                image: (item.image != null
                     ? NetworkImage(item.image)
-                    : AssetImage('assets/no_image1.jpg'),
+                    : AssetImage('assets/no_image1.jpg')) as ImageProvider<Object>,
                 fit: BoxFit.cover,
               ),
             ),
@@ -95,13 +93,13 @@ Widget itemButton1(BuildContext context, Item item) => Stack(
     );
 
 Widget itemButton2(
-    {BuildContext context,
-    Item item,
+    {BuildContext? context,
+    required Item item,
     bool showSubtitle = false,
-    String subtitle,
+    String? subtitle,
     bool isSelectable = false,
-    bool selected = false,
-    void Function() onTap}) {
+    bool? selected = false,
+    void Function()? onTap}) {
   return Card(
     shape: RoundedRectangleBorder(
       borderRadius: BorderRadius.circular(10),
@@ -118,7 +116,7 @@ Widget itemButton2(
               right: 10,
               child: isSelectable
                   ? Center(
-                      child: selected
+                      child: selected!
                           ? Icon(Icons.check_circle_rounded)
                           : Icon(Icons.check_circle_outline_outlined),
                     )
@@ -145,7 +143,7 @@ Widget itemButton2(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              subtitle,
+                              subtitle!,
                               style: GoogleFonts.ubuntuCondensed(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -175,5 +173,3 @@ Widget itemButton2(
     ),
   );
 }
-
-

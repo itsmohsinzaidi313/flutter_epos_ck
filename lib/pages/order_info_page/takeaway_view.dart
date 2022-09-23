@@ -3,7 +3,7 @@ part of 'order_info_page.dart';
 class TakeAwayLayout extends StatelessWidget {
   final nameController = TextEditingController();
   final contactController = TextEditingController();
-  final orderType = ORDERTYPE.TAKE_AWAY;
+  final orderType = OrderType.takeAway;
   static Key nameKey = GlobalKey();
   static Key contactKey = GlobalKey();
   @override
@@ -11,10 +11,9 @@ class TakeAwayLayout extends StatelessWidget {
     return BlocListener<OrderInfoBloc, OrderInfoState>(
       listener: (context, state) {
         if (state is LoadedState) {
-          if (state.orderType == orderType) {
-            nameController.text = state.customer.name;
-            contactController.text = state.customer.contact;
-            AppTheme.snackbar(context, state.message);
+          if (state.order.orderType == orderType) {
+            nameController.text = state.order.customer.name;
+            contactController.text = state.order.customer.contact;
           }
         }
       },
@@ -29,8 +28,8 @@ class TakeAwayLayout extends StatelessWidget {
                       child: TextField(
                         key: nameKey,
                         controller: contactController,
-                        onChanged: (value) => passEvent(context,
-                            ContactChanged(type: orderType, contact: value)),
+                        onChanged: (value) =>
+                            passEvent(context, ContactChanged(contact: value)),
                         keyboardType: TextInputType.number,
                         decoration: InputDecoration(
                             icon: Icon(
@@ -66,9 +65,7 @@ class TakeAwayLayout extends StatelessWidget {
                         key: contactKey,
                         controller: nameController,
                         onChanged: (value) => passEvent(
-                            context,
-                            CustomerChanged(
-                                type: orderType, customerName: value)),
+                            context, CustomerChanged(customerName: value)),
                         decoration: InputDecoration(
                             icon: Icon(
                               Icons.person,

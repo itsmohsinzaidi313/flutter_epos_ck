@@ -8,10 +8,10 @@ class CustomAppBar extends StatelessWidget {
   final Function onBackPressed;
 
   CustomAppBar(
-      {@required this.searchBar,
-      @required this.radioButtons,
-      @required this.appBarTitle,
-      @required this.onBackPressed});
+      {required this.searchBar,
+      required this.radioButtons,
+      required this.appBarTitle,
+      required this.onBackPressed});
 
   @override
   Widget build(BuildContext context) {
@@ -24,7 +24,7 @@ class CustomAppBar extends StatelessWidget {
               Icons.arrow_back_outlined,
               size: 20,
             ),
-            onPressed: onBackPressed,
+            onPressed: onBackPressed as void Function()?,
           ),
           Text(
             appBarTitle,

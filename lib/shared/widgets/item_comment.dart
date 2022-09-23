@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:pos_app/shared/config.dart';
 
 const double _WIDTH_FACTOR = 0.6;
-Future<String> openItemCommentDialog(
+Future<String?> openItemCommentDialog(
     BuildContext context, String itemName) async {
   final commentCntrlr = TextEditingController(text: '');
   return showDialog<String>(

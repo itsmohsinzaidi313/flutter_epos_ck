@@ -1,7 +1,5 @@
 import 'dart:async';
-import 'package:badges/badges.dart';
 import 'package:flutter/material.dart';
-import 'package:progress_dialog/progress_dialog.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class AppTheme {
@@ -15,11 +13,11 @@ class AppTheme {
           SizedBox(height: 40, width: 40, child: CircularProgressIndicator()));
 
   static Widget appBarNormal(
-      {BuildContext context,
-      String appBarTitle,
-      Color appBarBgColor,
-      double appBarElevation,
-      PreferredSizeWidget bottom,
+      {BuildContext? context,
+      required String appBarTitle,
+      Color? appBarBgColor,
+      double? appBarElevation,
+      PreferredSizeWidget? bottom,
       List<Widget> actions = const []}) {
     final appBar = AppBar(
       backgroundColor: appBarBgColor,
@@ -32,45 +30,13 @@ class AppTheme {
     return appBar;
   }
 
-  static Widget appBarWithBadge(
-      {BuildContext context,
-      String appBarTitle,
-      String badgeText,
-      Color appBarBgColor,
-      double appBarElevation,
-      Function appBarOnTap}) {
-    final appBar = AppBar(
-      backgroundColor: appBarBgColor,
-      elevation: appBarElevation == null ? 0.0 : appBarElevation,
-      title: Text(appBarTitle),
-      centerTitle: true,
-      actions: <Widget>[
-        InkWell(
-          onTap: appBarOnTap,
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Badge(
-              child: Icon(Icons.shopping_cart, size: 40),
-              badgeContent: Text(
-                badgeText,
-              ),
-              toAnimate: true,
-              animationType: BadgeAnimationType.fade,
-            ),
-          ),
-        ),
-      ],
-    );
-    return appBar;
-  }
-
   static Widget textWidget(
-      {String tText,
-      double tFontSize,
-      String tFontFamily,
-      FontWeight tFontWeight,
-      double tLetterSpacing,
-      Color tTextColor}) {
+      {required String tText,
+      double? tFontSize,
+      String? tFontFamily,
+      FontWeight? tFontWeight,
+      double? tLetterSpacing,
+      Color? tTextColor}) {
     final myText = Text(
       tText,
       style: TextStyle(
@@ -84,15 +50,15 @@ class AppTheme {
     return myText;
   }
 
-  static Future<Widget> showAlertDialog(BuildContext context,
-          {String title,
-          FontWeight fontWeight,
-          double fontSize,
-          Color color,
+  static Future<Widget?> showAlertDialog(BuildContext context,
+          {String? title,
+          FontWeight? fontWeight,
+          double? fontSize,
+          Color? color,
           bool barrier = true,
-          Widget content,
-          Widget widget,
-          List<TextButton> buttons}) =>
+          Widget? content,
+          Widget? widget,
+          List<TextButton>? buttons}) =>
       showDialog(
           context: context,
           barrierDismissible: barrier,
@@ -145,29 +111,29 @@ class AppTheme {
     );
   }
 
-  static Future<bool> showAlertDialogYN(BuildContext context,
-      {String title, String message, Function onYes, Function onNo}) async {
+  static Future<bool?> showAlertDialogYN(BuildContext context,
+      {String? title, String? message, Function? onYes, Function? onNo}) async {
     return await showDialog(
         context: context,
         builder: (value) => AlertDialog(
-            title: text(text: title, fontWeight: FontWeight.bold, fontSize: 20),
-            content: text(text: message),
+            title: text(text: title!, fontWeight: FontWeight.bold, fontSize: 20),
+            content: text(text: message!),
             actions: [
-              TextButton(child: text(text: 'Yes'), onPressed: onYes),
-              TextButton(child: text(text: 'No'), onPressed: onNo)
+              TextButton(child: text(text: 'Yes'), onPressed: onYes as void Function()?),
+              TextButton(child: text(text: 'No'), onPressed: onNo as void Function()?)
             ],
             shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8))));
   }
 
-  static Future<bool> showAlertDialogYNFutureReturn(BuildContext context,
-      {String title, String message}) async {
+  static Future<bool?> showAlertDialogYNFutureReturn(BuildContext context,
+      {String? title, String? message}) async {
     return await showDialog<bool>(
         context: context,
         barrierDismissible: false,
         builder: (value) => AlertDialog(
-            title: text(text: title, fontWeight: FontWeight.bold, fontSize: 20),
-            content: text(text: message),
+            title: text(text: title!, fontWeight: FontWeight.bold, fontSize: 20),
+            content: text(text: message!),
             actions: [
               TextButton(
                   child: text(text: 'Yes'),
@@ -181,7 +147,7 @@ class AppTheme {
   }
 
   static Text text(
-      {String text,
+      {required String text,
       double fontSize = 15,
       FontWeight fontWeight = FontWeight.normal,
       Color color = Colors.black}) {
@@ -200,18 +166,32 @@ class AppTheme {
   }
 
   static Future<dynamic> showAlertDialogOK(BuildContext context,
-      {String title, String message, Function onOK}) {
+      {String? title, String? message, Function? onOK}) {
     return showDialog(
         context: context,
         barrierDismissible: false,
         builder: (value) => AlertDialog(
               title:
-                  text(text: title, fontWeight: FontWeight.bold, fontSize: 20),
-              content: text(text: message),
+                  text(text: title!, fontWeight: FontWeight.bold, fontSize: 20),
+              content: text(text: message!),
               actions: [
                 TextButton(
-                    child: text(text: 'OK', color: Colors.blue),
-                    onPressed: onOK),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text(
+                          'Ok',
+                          style: TextStyle(
+                            color: Theme.of(context).iconTheme.color,
+                          ),
+                        ),
+                        Icon(
+                          Icons.arrow_forward,
+                          color: Theme.of(context).iconTheme.color,
+                        )
+                      ],
+                    ),
+                    onPressed: onOK as void Function()?),
               ],
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8)),
@@ -220,7 +200,7 @@ class AppTheme {
 
   static void snackbar(
     BuildContext context,
-    String text, {
+    String? text, {
     int level = 0,
     int duration = 2,
   }) {
@@ -240,7 +220,7 @@ class AppTheme {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         backgroundColor: Theme.of(context).colorScheme.background,
         content: Text(
-          text,
+          text!,
           style: TextStyle(color: color),
         ),
         duration: Duration(seconds: duration)));

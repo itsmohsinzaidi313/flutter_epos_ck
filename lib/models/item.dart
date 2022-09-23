@@ -1,69 +1,62 @@
 class Item {
   static const int OPENFOOD_CODE = 151605140604;
 
-  static const String IdKey = 'Id',
-      CodeKey = 'Code',
-      CatIdKey = 'CategoryId',
-      NameKey = 'Name',
-      PriceKey = 'Price',
-      TaxAmountKey = 'TaxAmount',
-      QuantityKey = 'Quantity',
-      CommentKey = 'Comment',
-      ImageKey = 'image',
-      SelectedKey = 'Selected';
+  static const String rowIdKey = 'RowId',
+      idKey = 'Id',
+      codeKey = 'Code',
+      categoryIdKey = 'CategoryId',
+      nameKey = 'Name',
+      priceKey = 'Price',
+      taxAmountKey = 'TaxAmount',
+      quantityKey = 'Quantity',
+      commentKey = 'Comment',
+      imageKey = 'image',
+      selectedKey = 'Selected',
+      isAdditionalKey = 'isAdditional';
 
-  final String id, code, categoryId, name, image;
-  double price, taxAmount, quantity;
-  bool selected = false;
-  String comment = '';
+  final String rowId, id, code, categoryId, name, image, comment;
+  final double price, taxAmount, quantity;
+  final bool selected, isAdditional;
 
-  Item(
-      {this.id,
-      this.code,
-      this.categoryId,
-      this.name,
-      this.price,
-      this.taxAmount,
-      this.quantity,
-      this.image,
-      String comment,
-      this.selected}) {
-    this.comment = comment;
-  }
+  const Item({
+    this.rowId = '',
+    this.id = '',
+    this.code = '',
+    this.categoryId = '',
+    this.name = '',
+    this.price = 0,
+    this.taxAmount = 0,
+    this.quantity = 0,
+    this.image = '',
+    this.comment = '',
+    this.selected = false,
+    this.isAdditional = false,
+  });
 
   Item.fromMap(Map<String, dynamic> map)
-      : id = map[IdKey],
-        code = map[CodeKey],
-        categoryId = map[CatIdKey],
-        name = map[NameKey],
-        price = map[PriceKey],
-        taxAmount = map[TaxAmountKey],
-        quantity = map[QuantityKey],
-        image = map[ImageKey],
-        comment = map[CommentKey],
-        selected = map[SelectedKey];
-
-  Item.fromItem(Item item)
-      : id = item.id,
-        code = item.code,
-        categoryId = item.categoryId,
-        name = item.name,
-        price = item.price,
-        taxAmount = item.taxAmount,
-        quantity = item.quantity ?? 1,
-        image = item.image,
-        comment = item.comment,
-        selected = item.selected;
+      : rowId = map[rowIdKey],
+        id = map[idKey],
+        code = map[codeKey],
+        categoryId = map[categoryIdKey],
+        name = map[nameKey],
+        price = map[priceKey],
+        taxAmount = map[taxAmountKey],
+        quantity = map[quantityKey],
+        image = map[imageKey],
+        comment = map[commentKey],
+        selected = map[selectedKey],
+        isAdditional = map[isAdditionalKey];
 
   Map<String, dynamic> toMap() => {
-        IdKey: id,
-        CodeKey: code,
-        CatIdKey: categoryId,
-        NameKey: name,
-        PriceKey: price,
-        TaxAmountKey: taxAmount,
-        QuantityKey: quantity,
-        CommentKey: comment ?? '',
-        SelectedKey: selected,
+        idKey: id,
+        codeKey: code,
+        categoryIdKey: categoryId,
+        nameKey: name,
+        priceKey: price,
+        taxAmountKey: taxAmount,
+        quantityKey: quantity,
+        commentKey: comment,
+        selectedKey: selected,
+        isAdditionalKey: isAdditional
       };
 }

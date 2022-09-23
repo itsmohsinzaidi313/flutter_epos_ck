@@ -12,23 +12,24 @@ import 'package:pos_app/repositories/feedback_repository.dart';
 
 class FeedbackScreen extends StatelessWidget {
   final Order order;
-  final List<String> ratingAnswer = [
+  static const List<String> ratingAnswer = [
     'BAD',
     'NEEDS IMPROVEMENT',
     'SATISFIED',
     'GOOD',
     'EXCELLENT'
   ];
-  FeedbackScreen({this.order});
+  FeedbackScreen({required this.order});
 
-  List<Container> feedbackItemsWidgets;
-  List<Container> feedbackQuestionsWidgets;
-  TextEditingController remarksController = TextEditingController(text: '');
+  List<Container>? feedbackItemsWidgets;
+  List<Container>? feedbackQuestionsWidgets;
+  TextEditingController? remarksController;
 
   @override
   Widget build(BuildContext context) {
+    remarksController = TextEditingController(text: '');
     if (feedbackItemsWidgets == null)
-      feedbackItemsWidgets = order.items
+      feedbackItemsWidgets = order.cart.items
           .map(
             (e) => Container(
               width: Config.getDeviceWidth(context) * 0.3,
@@ -72,30 +73,30 @@ class FeedbackScreen extends StatelessWidget {
                 feedback.orderKey = order.id;
                 feedback.name = order.customer.name;
                 feedback.contact = order.customer.contact;
-                feedback.remarks = remarksController.text;
+                feedback.remarks = remarksController!.text;
                 feedback.questions = [];
                 feedback.items = [];
 
-                feedbackQuestionsWidgets.forEach((e) {
+                feedbackQuestionsWidgets!.forEach((e) {
                   int rating = 0;
                   (e.child as FeedbackTile)
                       .selectedButton
                       .forEach((element) => element ? rating++ : rating);
 
-                  feedback.questions.add(FeedbackQuestions(
+                  feedback.questions!.add(FeedbackQuestions(
                     question: (e.child as FeedbackTile).text,
                     answer: ratingAnswer[rating - 1],
                   ));
                 });
 
-                feedbackItemsWidgets.forEach((e) {
+                feedbackItemsWidgets!.forEach((e) {
                   int rating = 0;
                   (e.child as FeedbackTile)
                       .selectedButton
                       .forEach((element) => element ? rating++ : rating);
 
-                  feedback.items.add(FeedbackItems(
-                    itemName: order.items
+                  feedback.items!.add(FeedbackItems(
+                    itemName: order.cart.items
                         .where((element) =>
                             element.name == (e.child as FeedbackTile).text)
                         .first
@@ -137,7 +138,7 @@ class FeedbackScreen extends StatelessWidget {
                 height: Config.getDeviceHeight(context) * 0.2,
                 child: ListView(
                   scrollDirection: Axis.horizontal,
-                  children: feedbackItemsWidgets,
+                  children: feedbackItemsWidgets!,
                 ),
               ),
               feedbackTitle('Remarks'),
@@ -161,7 +162,7 @@ class FeedbackScreen extends StatelessWidget {
               ),
               feedbackTitle('Questions'),
               Column(
-                children: feedbackQuestionsWidgets,
+                children: feedbackQuestionsWidgets!,
               ),
             ],
           ),
@@ -184,9 +185,9 @@ class FeedbackScreen extends StatelessWidget {
 }
 
 class FeedbackTile extends StatefulWidget {
-  final String text;
-  final double fontSize;
-  final MainAxisAlignment alignment;
+  final String? text;
+  final double? fontSize;
+  final MainAxisAlignment? alignment;
   final List<bool> selectedButton = [true, false, false, false, false];
   FeedbackTile({this.text, this.fontSize, this.alignment});
   @override
@@ -216,7 +217,7 @@ class _FeedbackTileState extends State<FeedbackTile> {
               children: [
                 Expanded(
                   child: Text(
-                    widget.text,
+                    widget.text!,
                     style: TextStyle(fontSize: widget.fontSize),
                   ),
                 ),
@@ -225,7 +226,7 @@ class _FeedbackTileState extends State<FeedbackTile> {
           ),
           Expanded(
             child: Row(
-              mainAxisAlignment: widget.alignment,
+              mainAxisAlignment: widget.alignment!,
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 IconButton(

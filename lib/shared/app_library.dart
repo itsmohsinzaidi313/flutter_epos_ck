@@ -24,7 +24,7 @@ class Lib {
       HttpStatus.requestTimeout);
 
   static Response httpErrorResponseHandler(
-      {Exception error, String caller = ''}) {
+      {Exception? error, String caller = ''}) {
     final message = {'Status': false, 'Message': error.toString(), 'Data': 0};
     final int httpStatusCode = HttpStatus.connectionClosedWithoutResponse;
     if (error is SocketException) {
@@ -38,7 +38,7 @@ class Lib {
     return Response(jsonEncode(message), httpStatusCode);
   }
 
-  static String getMessage(Response response) =>
+  static String? getMessage(Response response) =>
       jsonDecode(response.body)['Message'];
 
   static String getDateTime24HR() {
@@ -64,6 +64,6 @@ class Lib {
   static bool validateIpAddress(String ipAddress) =>
       RegExp(r'^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+:[0-9]+$').hasMatch(ipAddress);
 
-  static T getArguments<T>(BuildContext context) =>
-      ModalRoute.of(context).settings.arguments as T;
+  static T? getArguments<T>(BuildContext context) =>
+      ModalRoute.of(context)!.settings.arguments as T?;
 }

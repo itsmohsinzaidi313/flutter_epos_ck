@@ -10,11 +10,11 @@ class MenuPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    MenuPageArgs args = Lib.getArguments<MenuPageArgs>(context);
+    MenuPageArgs args = Lib.getArguments<MenuPageArgs>(context)!;
     return WillPopScope(
       onWillPop: () async {
-        bool value = await AppTheme.showAlertDialogYNFutureReturn(context,
-            message: 'Exit application?', title: 'Attention');
+        bool value = await (AppTheme.showAlertDialogYNFutureReturn(context,
+            message: 'Exit application?', title: 'Attention') as Future<bool>);
         return value;
       },
       child: Scaffold(
@@ -23,7 +23,7 @@ class MenuPage extends StatelessWidget {
           title: Row(
             children: [
               Text(
-                'User: ${args.user.name}'.toUpperCase(),
+                'User: ${args.user!.name}'.toUpperCase(),
               ),
               Expanded(
                 child: SizedBox(),

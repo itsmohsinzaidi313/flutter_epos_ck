@@ -7,6 +7,7 @@ import 'package:pos_app/models/waiter.dart';
 import 'package:pos_app/pages/items_menu_page/items_menu_page.dart';
 import 'package:pos_app/shared/app_theme.dart';
 import 'package:pos_app/shared/config.dart';
+import 'package:pos_app/shared/enums.dart';
 
 part 'order_info_page_widgets.dart';
 part 'dine_in_view.dart';
@@ -23,16 +24,20 @@ class OrderInfoPage extends StatelessWidget {
       takeAway = AssetImage('assets/takeaway.jpg'),
       delivery = AssetImage('assets/delivery.jpg');
 
-  final dineInOrdertype = ORDERTYPE.DINE_IN;
-  final takeAwayOrderType = ORDERTYPE.TAKE_AWAY;
-  final deliveryOrderType = ORDERTYPE.DELIVERY;
+  final dineInOrdertype = OrderType.dineIn;
+  final takeAwayOrderType = OrderType.takeAway;
+  final deliveryOrderType = OrderType.delivery;
 
   final Widget takeAwayLayout = TakeAwayLayout();
   final Widget deliveryLayout = DeliveryLayout();
 
+  List<Tables> tables = <Tables>[];
+  List<Waiter> waiters = <Waiter>[];
+
   @override
   Widget build(BuildContext context) {
-    _passEvent(context, OrderInfoBuild());
+    OrderType orderType = OrderType.dineIn;
+    _passEvent(context, OrderInfoBuild(orderType: dineInOrdertype));
     return Scaffold(
       appBar: AppTheme.appBarNormal(
         appBarTitle: 'Order Type',
@@ -42,34 +47,47 @@ class OrderInfoPage extends StatelessWidget {
           BlocBuilder<OrderInfoBloc, OrderInfoState>(
             builder: (context, state) => Container(
               width: Config.getDeviceWidth(context) * 0.2,
-              child: ElevatedButton(
+              child: TextButton(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
-                  children: [Text('Next'), Icon(Icons.arrow_forward)],
+                  children: [
+                    Text(
+                      'Next',
+                      style: TextStyle(
+                        color: Theme.of(context).iconTheme.color,
+                      ),
+                    ),
+                    Icon(
+                      Icons.arrow_forward,
+                      color: Theme.of(context).iconTheme.color,
+                    )
+                  ],
                 ),
                 onPressed: () =>
-                    _passEvent(context, Submit(type: state.orderType)),
+                    _passEvent(context, NextPressed(orderType: orderType)),
               ),
             ),
           ),
         ],
-      ),
+      ) as PreferredSizeWidget?,
       bottomNavigationBar: BlocBuilder<OrderInfoBloc, OrderInfoState>(
         builder: (context, state) {
+          if (state is LoadedState) orderType = state.order.orderType;
           return BottomNavigationBar(
-            currentIndex: (state.orderType ?? ORDERTYPE.DINE_IN).index,
+            currentIndex: (orderType).index,
             onTap: (int value) {
               switch (value) {
                 case 0:
-                  _passEvent(context, OrderTypeChanged(type: dineInOrdertype));
+                  _passEvent(
+                      context, OrderTypeChanged(orderType: dineInOrdertype));
                   break;
                 case 1:
                   _passEvent(
-                      context, OrderTypeChanged(type: takeAwayOrderType));
+                      context, OrderTypeChanged(orderType: takeAwayOrderType));
                   break;
                 case 2:
                   _passEvent(
-                      context, OrderTypeChanged(type: deliveryOrderType));
+                      context, OrderTypeChanged(orderType: deliveryOrderType));
                   break;
                 default:
               }
@@ -106,45 +124,41 @@ class OrderInfoPage extends StatelessWidget {
             if (state.validSubmission) {
               Navigator.of(context).pushNamed(
                 ItemsMenuPage.path,
-                arguments: state.customerOrder,
+                arguments: state.order,
               );
             }
           } else if (state is ErrorState) {
-            AppTheme.snackbar(
-              context,
-              state.message,
-            );
+            AppTheme.snackbar(context, state.message);
           }
         },
         builder: (context, state) {
-          List<Tables> tables = <Tables>[];
-          List<Waiter> waiters = <Waiter>[];
           if (state is LoadedState) {
-            tables = state.tables ?? <Tables>[];
-            waiters = state.waiters ?? <Waiter>[];
+            tables.clear();
+            waiters.clear();
+            tables.addAll(state.tables);
+            waiters.addAll(state.waiters);
+          } else if (state is LoadingState) {
+            return Center(child: CircularProgressIndicator());
           }
+
           return Container(
             padding: const EdgeInsets.all(8.0),
             child: Row(
               children: [
                 <Widget>() {
-                  switch (state.orderType) {
-                    case ORDERTYPE.DINE_IN:
+                  switch (orderType) {
+                    case OrderType.dineIn:
                       return Expanded(
                           child: DineInLayout(
                         tables: tables,
                         waiters: waiters,
                       ));
-                      break;
-                    case ORDERTYPE.TAKE_AWAY:
+                    case OrderType.takeAway:
                       return Expanded(child: takeAwayLayout);
-                      break;
-                    case ORDERTYPE.DELIVERY:
+                    case OrderType.delivery:
                       return Expanded(child: deliveryLayout);
-                      break;
                     default:
                       return Container();
-                      break;
                   }
                 }.call<Widget>(),
               ],

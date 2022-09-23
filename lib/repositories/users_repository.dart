@@ -7,8 +7,8 @@ class UsersRepo {
   UsersRepo._internal();
 
   Future<Response> users() async =>
-      await get(await Config.getUsersApi).timeout(Duration(seconds: Config.SERVER_TIMEOUT),
+      await get(Uri.parse(Config.getUsersApi)).timeout(Duration(seconds: Config.SERVER_TIMEOUT),
           onTimeout: () => Lib.timeout)
       .onError(
-          (error, stackTrace) => Lib.httpErrorResponseHandler(error: error));
+          (dynamic error, stackTrace) => Lib.httpErrorResponseHandler(error: error));
 }

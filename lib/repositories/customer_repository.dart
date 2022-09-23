@@ -11,19 +11,19 @@ class CustomerRepo {
 
   CustomerRepo._internal();
 
-  Future<Response> customer({@required String contact}) async =>
-      await get('${await Config.getCustomerApi}&contact=$contact')
+  Future<Response> customer({required String? contact}) async =>
+      await get(Uri.parse('${Config.getCustomerApi}&contact=$contact'))
           .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
               onTimeout: () => Lib.timeout)
-          .onError((error, stackTrace) =>
+          .onError((dynamic error, stackTrace) =>
               Lib.httpErrorResponseHandler(error: error));
 
-  Future<Response> postCustomer({@required Customer customer}) async =>
-      await post(await Config.getCustomerApi,
+  Future<Response> postCustomer({required Customer customer}) async =>
+      await post(Uri.parse(Config.getCustomerApi),
               headers: {'Content-type': 'application/json'},
               body: jsonEncode(customer.map))
           .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
               onTimeout: () => Lib.timeout)
-          .onError((error, stackTrace) =>
+          .onError((dynamic error, stackTrace) =>
               Lib.httpErrorResponseHandler(error: error));
 }

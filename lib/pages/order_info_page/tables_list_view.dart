@@ -2,8 +2,9 @@ part of 'order_info_page.dart';
 
 class _TablesList extends StatelessWidget {
   final List<Tables> listTables;
-  final void Function(BuildContext context, Tables table) onTap;
-  const _TablesList({Key key, this.listTables, this.onTap}) : super(key: key);
+  final void Function(BuildContext context, Tables table)? onTap;
+  const _TablesList({Key? key, required this.listTables, this.onTap})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -12,7 +13,7 @@ class _TablesList extends StatelessWidget {
         title: Text(listTables[index].name.toUpperCase()),
         trailing: Checkbox(
           value: listTables[index].selected,
-          onChanged: (value) => onTap(context, listTables[index]),
+          onChanged: (value) => onTap!(context, listTables[index]),
         ),
         subtitle: Text(
           listTables[index].reserved ? 'Table is reserved' : 'Table is open',

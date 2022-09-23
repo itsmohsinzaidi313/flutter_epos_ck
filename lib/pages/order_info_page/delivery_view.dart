@@ -4,7 +4,7 @@ class DeliveryLayout extends StatelessWidget {
   final nameController = TextEditingController();
   final contactController = TextEditingController();
   final addressController = TextEditingController();
-  final orderType = ORDERTYPE.DELIVERY;
+  final orderType = OrderType.delivery;
   static Key nameKey = GlobalKey();
   static Key contactKey = GlobalKey();
   static Key addressKey = GlobalKey();
@@ -14,11 +14,10 @@ class DeliveryLayout extends StatelessWidget {
     return BlocListener<OrderInfoBloc, OrderInfoState>(
       listener: (context, state) {
         if (state is LoadedState) {
-          if (state.orderType == orderType) {
-            nameController.text = state.customer.name;
-            contactController.text = state.customer.contact;
-            addressController.text = state.customer.address;
-            AppTheme.snackbar(context, state.message);
+          if (state.order.orderType == orderType) {
+            nameController.text = state.order.customer.name;
+            contactController.text = state.order.customer.contact;
+            addressController.text = state.order.customer.address;
           }
         }
       },
@@ -33,8 +32,8 @@ class DeliveryLayout extends StatelessWidget {
                       child: TextField(
                         key: nameKey,
                         controller: contactController,
-                        onChanged: (value) => passEvent(context,
-                            ContactChanged(type: orderType, contact: value)),
+                        onChanged: (value) =>
+                            passEvent(context, ContactChanged(contact: value)),
                         keyboardType: TextInputType.number,
                         decoration: InputDecoration(
                             icon: Icon(
@@ -70,9 +69,7 @@ class DeliveryLayout extends StatelessWidget {
                         key: contactKey,
                         controller: nameController,
                         onChanged: (value) => passEvent(
-                            context,
-                            CustomerChanged(
-                                type: orderType, customerName: value)),
+                            context, CustomerChanged(customerName: value)),
                         decoration: InputDecoration(
                             icon: Icon(
                               Icons.person,
@@ -93,8 +90,8 @@ class DeliveryLayout extends StatelessWidget {
                       child: TextField(
                         key: addressKey,
                         controller: addressController,
-                        onChanged: (value) => passEvent(context,
-                            AddressChanged(type: orderType, address: value)),
+                        onChanged: (value) =>
+                            passEvent(context, AddressChanged(address: value)),
                         decoration: InputDecoration(
                             icon: Icon(
                               Icons.home,

@@ -4,10 +4,10 @@ import 'package:pos_app/models/items_category.dart';
 import 'package:pos_app/shared/config.dart';
 
 Widget categoryButton(
-        {BuildContext context,
-        Category category,
+        {required BuildContext context,
+        required Category category,
         String text = '',
-        void Function() onTap}) =>
+        void Function()? onTap}) =>
     InkWell(
       onTap: onTap,
       child: Card(
@@ -41,7 +41,7 @@ Widget categoryButton(
                 width: Config.getDeviceWidth(context) * 0.1,
                 child: Center(
                   child: Text(
-                    '${category.name.toUpperCase()} $text',
+                    '${category.name!.toUpperCase()} $text',
                     textAlign: TextAlign.center,
                     style: GoogleFonts.ubuntuCondensed(
                       color: category.selected

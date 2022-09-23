@@ -15,7 +15,7 @@ class ReportsPage extends StatelessWidget {
             onPressed: () {},
           ),
         ],
-      ),
+      ) as PreferredSizeWidget?,
       bottomNavigationBar: BottomNavigationBar(
         onTap: (value) {},
         items: [

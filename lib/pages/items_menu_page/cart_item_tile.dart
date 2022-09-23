@@ -2,27 +2,22 @@ part of 'items_menu_page.dart';
 
 class _CartItemTile extends StatelessWidget {
   final Item item;
-  // final void Function() onAddItem;
-  // final void Function() onReduceItem;
-  // final void Function() onRemoveItem;
-  // final void Function(String value) onQuantityChanged;
-  // final void Function(String value) onItemCommentChanged;
-  final void Function(BuildContext context, Item item) onTap;
-  final void Function(BuildContext context, Item item) onAddItem;
+  final void Function(BuildContext context, Item? item) onTap;
+  final void Function(BuildContext context, Item item) onIncreaseItem;
   final void Function(BuildContext context, Item item) onReduceItem;
   final void Function(BuildContext context, Item item) onRemoveItem;
   final void Function(BuildContext context, Item, String) onQuantityChanged;
-  final void Function(BuildContext context, String value, Item item)
+  final void Function(BuildContext context, String value, Item? item)?
       onItemCommentChanged;
 
   const _CartItemTile({
-    Key key,
-    this.item,
-    this.onTap,
-    this.onAddItem,
-    this.onReduceItem,
-    this.onRemoveItem,
-    this.onQuantityChanged,
+    Key? key,
+    required this.item,
+    required this.onTap,
+    required this.onIncreaseItem,
+    required this.onReduceItem,
+    required this.onRemoveItem,
+    required this.onQuantityChanged,
     this.onItemCommentChanged,
   }) : super(key: key);
 
@@ -34,7 +29,7 @@ class _CartItemTile extends StatelessWidget {
         margin: const EdgeInsets.symmetric(vertical: 8.0),
         padding: const EdgeInsets.all(8.0),
         decoration: BoxDecoration(
-            color: Colors.grey[100],
+            // color: Colors.grey[100],
             borderRadius: BorderRadius.circular(8.0),
             border: Border.all(color: Colors.grey)),
         child: Slidable(
@@ -87,7 +82,7 @@ class _CartItemTile extends StatelessWidget {
                             ),
                             child: Icon(Icons.add),
                           ),
-                          onTap: () => onAddItem(context, item),
+                          onTap: () => onIncreaseItem(context, item),
                         ),
                         SizedBox(width: 8.0),
                         Container(
@@ -131,14 +126,13 @@ class _CartItemTile extends StatelessWidget {
                         padding: const EdgeInsets.symmetric(horizontal: 8.0),
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(18.0),
-                          color: Colors.grey[300],
+                          color: Colors.grey[300]!.withOpacity(0.2),
                         ),
                         child: TextField(
                           onChanged: (value) =>
-                              onItemCommentChanged(context, value, item),
+                              onItemCommentChanged!(context, value, item),
                           decoration: InputDecoration(
                             border: InputBorder.none,
-                            // label: Text('Note'),
                             hintText: 'e.g. No mayo please',
                           ),
                         ),

@@ -24,7 +24,7 @@ class Config {
       SharedPreferences.getInstance().then((pref) =>
           fServerIp.then((serverIp) => pref.setString('ipAddress', serverIp)));
 
-  static User user;
+  static User? user;
 
   static String ipAddress = '';
   static String get _apiCommon => 'http://$ipAddress/api/pos';
@@ -41,8 +41,8 @@ class Config {
   static String get getMenuApi => '$_apiCommon/Menu?key=$_key';
   static String get serverStatusApi => '$_apiCommon/Status?key=$_key';
 
-  static AndroidDeviceInfo _deviceData;
-  static Future<AndroidDeviceInfo> get deviceData async {
+  static AndroidDeviceInfo? _deviceData;
+  static Future<AndroidDeviceInfo?> get deviceData async {
     if (_deviceData == null) {
       _deviceData = await DeviceInfoPlugin().androidInfo;
     }

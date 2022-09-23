@@ -15,78 +15,85 @@ part 'login_bloc_event.dart';
 part 'login_bloc_state.dart';
 
 class LoginBloc extends Bloc<LoginEvent, LoginState> {
-  LoginBloc() : super(LoginBlocInitial());
+  LoginBloc()
+      : super(LoginBlocInitial(ipAddress: '', password: '', username: '')) {
+    on<LoginInit>((event, emit) async {
+      try {
+        // TODO: Disable for production
+        // await (await SharedPreferences.getInstance()).clear();
+        Config.ipAddress = await Config.serverIp;
+
+        emit(LoginBlocInitial(
+          ipAddress: Config.ipAddress,
+          username: await _username,
+          password: await _password,
+        ));
+        if (await _loginStatus) {
+          emit(LoadingState(message: 'Logging in please wait...'));
+          await attemptLogin(
+              emit: emit, username: await _username, password: await _password);
+        }
+      } catch (e) {
+        emit(ErrorState(message: e.toString()));
+      }
+    });
+    on<IpAddressChanged>((event, emit) async {
+      try {
+        if (event.ipaddress == '') {
+          emit(ErrorState(message: 'Ipaddress is required.'));
+        } else {
+          emit(LoadingState(message: 'Please wait...'));
+          await checkServerStatus(emit, event.ipaddress);
+        }
+      } catch (e) {
+        emit(ErrorState(message: e.toString()));
+      }
+    });
+    on<LoginPressed>((event, emit) async {
+      if (event.username == '' ||
+          event.password == '' ||
+          event.ipaddress == '') {
+        emit(ErrorState(message: 'Please check all fields.'));
+      } else {
+        emit(LoadingState(message: 'Please wait...'));
+        await attemptLogin(
+          emit: emit,
+          username: event.username,
+          password: event.password,
+        );
+      }
+    });
+    on<LogoutPressed>((event, emit) {
+      _loginStatus = Future.value(false);
+      _username = Future.value('');
+      _password = Future.value('');
+    });
+  }
 
   // REMEMBER LOGIN
   Future<bool> get _loginStatus async =>
-      (await SharedPreferences.getInstance()).getBool('loginStatus') ??
-      Future.value(false);
+      ((await SharedPreferences.getInstance()).getBool('loginStatus') ??
+          Future.value(false)) as FutureOr<bool>;
   set _loginStatus(Future<bool> fLoginStatus) =>
       SharedPreferences.getInstance().then((pref) => fLoginStatus
           .then((loginStatus) => pref.setBool('loginStatus', loginStatus)));
 
   Future<String> get _username async =>
-      (await SharedPreferences.getInstance()).getString('username');
-  set _username(Future<String> fUsername) =>
+      (await SharedPreferences.getInstance()).getString('username') ?? '';
+  set _username(Future<String?> fUsername) =>
       SharedPreferences.getInstance().then((pref) =>
-          fUsername.then((username) => pref.setString('username', username)));
+          fUsername.then((username) => pref.setString('username', username!)));
 
   Future<String> get _password async =>
-      (await SharedPreferences.getInstance()).getString('password');
-  set _password(Future<String> fPassword) =>
+      (await SharedPreferences.getInstance()).getString('password') ?? '';
+  set _password(Future<String?> fPassword) =>
       SharedPreferences.getInstance().then((pref) =>
-          fPassword.then((password) => pref.setString('password', password)));
+          fPassword.then((password) => pref.setString('password', password!)));
 
-  @override
-  Stream<LoginState> mapEventToState(
-    LoginEvent event,
-  ) async* {
-    try {
-      if (event is LoginInit) {
-        // TODO: Disable for production
-        // await (await SharedPreferences.getInstance()).clear();
-        Config.ipAddress = await Config.serverIp;
-
-        yield LoginBlocInitial(
-          ipAddress: Config.ipAddress,
-          username: await _username,
-          password: await _password,
-        );
-        if (await _loginStatus) {
-          yield* attemptLogin(
-              username: await _username, password: await _password);
-        }
-      } else if (event is IpAddressChanged) {
-        if (event.ipaddress == '') {
-          yield ErrorState(message: 'Ipaddress is required.');
-        } else {
-          yield LoadingState(message: 'Please wait...');
-          yield* checkServerStatus(event.ipaddress);
-        }
-      } else if (event is LoginPressed) {
-        if (event.username == '' ||
-            event.password == '' ||
-            event.ipaddress == '') {
-          yield ErrorState(message: 'Please check all fields.');
-        } else {
-          yield LoadingState(message: 'Please wait...');
-          yield* attemptLogin(
-              username: event.username, password: event.password);
-        }
-      } else if (event is LogoutPressed) {
-        _loginStatus = Future.value(false);
-        _username = Future.value('');
-        _password = Future.value('');
-      } else if (event is SwitchChanged) {
-        if (event.online) {
-        } else {}
-      }
-    } catch (e) {
-      yield ErrorState(message: e.toString());
-    }
-  }
-
-  Stream<LoginState> attemptLogin({String username, String password}) async* {
+  Future<void> attemptLogin(
+      {required Emitter<LoginState> emit,
+      String? username,
+      String? password}) async {
     try {
       final response =
           await LoginRepo.repo.login(username: username, password: password);
@@ -96,35 +103,38 @@ class LoginBloc extends Bloc<LoginEvent, LoginState> {
         _loginStatus = Future.value(true);
         this._username = Future.value(username);
         this._password = Future.value(password);
-        yield LoadedState(
-            message: 'Login successful.', allowLogin: true, user: user);
+        emit(LoadedState(
+            message: 'Login successful.', allowLogin: true, user: user));
+      } else if (response.statusCode == HttpStatus.unauthorized) {
+        emit(ErrorState(message: 'Invalid username/password'));
       } else {
-        yield ErrorState(message: Lib.getMessage(response));
+        emit(ErrorState(message: Lib.getMessage(response)));
       }
     } catch (e) {
-      yield ErrorState(message: e.toString());
+      emit(ErrorState(message: e.toString()));
     }
   }
 
-  Stream<LoginState> checkServerStatus(String ipAddress) async* {
+  Future<void> checkServerStatus(
+      Emitter<LoginState> emit, String ipAddress) async {
     Config.ipAddress = ipAddress;
-    final response = await get(Config.serverStatusApi)
+    final Response response = await get(Uri.parse(Config.serverStatusApi))
         .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
             onTimeout: () => Lib.timeout)
-        .onError(
-            (error, stackTrace) => Lib.httpErrorResponseHandler(error: error));
+        .onError((dynamic error, stackTrace) =>
+            Lib.httpErrorResponseHandler(error: error));
     if (response.statusCode == HttpStatus.ok) {
       Config.serverIp = Future<String>.value(ipAddress);
-      yield LoadedState(message: 'Server ip address saved');
+      emit(LoadedState(message: 'Server ip address saved'));
     } else if (response.statusCode == HttpStatus.requestTimeout) {
-      yield ErrorState(
+      emit(ErrorState(
         message: (jsonDecode(response.body) as Map<String, dynamic>)['Message'],
-      );
+      ));
     } else {
-      yield ErrorState(
+      emit(ErrorState(
         message:
             'Server did not respond to request.\nPlease check the ip address or server configurations',
-      );
+      ));
     }
   }
 }

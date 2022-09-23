@@ -9,16 +9,16 @@ class InitialState extends OrdersBlocState {
 }
 
 class LoadedState extends OrdersBlocState {
-  final List<Order> ordersList;
+  final List<Order>? ordersList;
   const LoadedState({this.ordersList});
 }
 
 class LoadingState extends OrdersBlocState {
-  final String message;
+  final String? message;
   const LoadingState({this.message});
 }
 
 class ErrorState extends OrdersBlocState {
-  final String message;
+  final String? message;
   const ErrorState({this.message});
 }

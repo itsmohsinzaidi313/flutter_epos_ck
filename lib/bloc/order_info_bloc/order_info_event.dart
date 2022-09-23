@@ -1,63 +1,58 @@
 part of 'order_info_bloc.dart';
 
-enum ORDERTYPE { DINE_IN, TAKE_AWAY, DELIVERY }
+abstract class OrderInfoEvent {}
 
-abstract class OrderInfoEvent {
-  const OrderInfoEvent({this.orderType});
-  final ORDERTYPE orderType;
+class OrderInfoBuild extends OrderInfoEvent {
+  OrderInfoBuild({required OrderType orderType});
 }
 
-class OrderInfoBuild extends OrderInfoEvent {}
-
 class OrderTypeChanged extends OrderInfoEvent {
-  OrderTypeChanged({@required ORDERTYPE type}) : super(orderType: type);
+  final OrderType orderType;
+  OrderTypeChanged({required this.orderType});
 }
 
 class WaiterChanged extends OrderInfoEvent {
   final Waiter waiter;
-  WaiterChanged({this.waiter, @required ORDERTYPE type})
-      : super(orderType: type);
+  WaiterChanged({required this.waiter});
 }
 
 class TableChanged extends OrderInfoEvent {
   final Tables table;
-  TableChanged({this.table, @required ORDERTYPE type}) : super(orderType: type);
+  TableChanged({required this.table});
 }
 
 class ChangeTable extends OrderInfoEvent {
-  ChangeTable({@required ORDERTYPE type}) : super(orderType: type);
+  ChangeTable({required OrderType type});
 }
 
 class CoversChanged extends OrderInfoEvent {
   final String covers;
-  CoversChanged({this.covers, @required ORDERTYPE type})
-      : super(orderType: type);
+  CoversChanged({required this.covers});
 }
 
 class CustomerChanged extends OrderInfoEvent {
   final String customerName;
-  CustomerChanged({this.customerName, @required ORDERTYPE type})
-      : super(orderType: type);
+  CustomerChanged({required this.customerName});
 }
 
 class ContactChanged extends OrderInfoEvent {
   final String contact;
-  ContactChanged({this.contact, @required ORDERTYPE type})
-      : super(orderType: type);
+  ContactChanged({required this.contact});
 }
 
 class AddressChanged extends OrderInfoEvent {
   final String address;
-  AddressChanged({this.address, @required ORDERTYPE type})
-      : super(orderType: type);
+  AddressChanged({required this.address});
 }
 
-class Submit extends OrderInfoEvent {
-  Submit({@required ORDERTYPE type}) : super(orderType: type);
+class NextPressed extends OrderInfoEvent {
+  NextPressed({required OrderType orderType});
 }
 
 class SearchCustomer extends OrderInfoEvent {
-  SearchCustomer({@required ORDERTYPE type}) : super(orderType: type);
+  SearchCustomer({required OrderType type});
 }
 
-class ResetOrderInfoOrder extends OrderInfoEvent {}
+class ResetOrderInfoOrder extends OrderInfoEvent {
+  ResetOrderInfoOrder({required OrderType orderType});
+}

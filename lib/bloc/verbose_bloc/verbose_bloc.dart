@@ -13,6 +13,5 @@ class VerboseBloc extends Bloc<VerboseEvent, VerboseState> {
   Stream<VerboseState> mapEventToState(
     VerboseEvent event,
   ) async* {
-    // TODO: implement mapEventToState
   }
 }

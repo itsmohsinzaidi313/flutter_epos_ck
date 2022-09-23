@@ -8,39 +8,24 @@ import 'package:pos_app/bloc/login_bloc/login_bloc.dart';
 
 part 'login_page_widgets.dart';
 
-class LoginPage extends StatefulWidget {
+class LoginPage extends StatelessWidget {
   static const String path = 'login_page';
-  @override
-  _LoginPageState createState() => _LoginPageState();
-}
+  late TextEditingController ipAddress;
+  late TextEditingController username;
+  late TextEditingController password;
 
-class _LoginPageState extends State<LoginPage> {
-  TextEditingController ipAddress;
-  TextEditingController username;
-  TextEditingController password;
-
-  @override
-  void initState() {
-    super.initState();
-    context.read<LoginBloc>().add(LoginInit());
-    ipAddress = TextEditingController(text: '');
-    username = TextEditingController(text: '');
-    password = TextEditingController(text: '');
-  }
-
-  Color get _textFieldsBg => Theme.of(context).colorScheme.background;
 
   bool _validateCredentials(
       String ipAddress, String username, String password) {
-    if ((Lib.validateIpAddress(ipAddress ?? '')) &&
-        (username ?? '').isNotEmpty &&
-        (password ?? '').isNotEmpty)
+    if ((Lib.validateIpAddress(ipAddress)) &&
+        (username).isNotEmpty &&
+        (password).isNotEmpty)
       return true;
     else
       return false;
   }
 
-  void _submitCredentials() {
+  void _submitCredentials(BuildContext context) {
     if (_validateCredentials(
       ipAddress.text,
       username.text,
@@ -48,9 +33,9 @@ class _LoginPageState extends State<LoginPage> {
     )) {
       context.read<LoginBloc>().add(
             LoginPressed(
-              ipaddress: ipAddress.text ?? '',
-              username: username.text ?? '',
-              password: password.text ?? '',
+              ipaddress: ipAddress.text,
+              username: username.text,
+              password: password.text,
             ),
           );
     }
@@ -58,29 +43,35 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<LoginBloc, LoginState>(
-      listener: (context, state) async {
-        if (state is LoginBlocInitial) {
-          ipAddress.text = state.ipAddress;
-        } else if (state is LoadedState) {
-          AppTheme.snackbar(context, state.message);
-          if (state.allowLogin) {
-            Navigator.of(context).pushNamedAndRemoveUntil(
-              MenuPage.path,
-              (route) => false,
-              arguments: MenuPageArgs(
-                user: state.user,
-              ),
-            );
-          }
-        } else if (state is LoadingState) {
-          AppTheme.snackbar(context, state.message);
-        } else if (state is ErrorState) {
-          AppTheme.snackbar(context, state.message);
-        }
-      },
-      child: Scaffold(
-        body: BlocBuilder<LoginBloc, LoginState>(
+    context.read<LoginBloc>().add(LoginInit());
+    ipAddress = TextEditingController(text: '');
+    username = TextEditingController(text: '');
+    password = TextEditingController(text: '');
+    return Scaffold(
+      body: SingleChildScrollView(
+        child: BlocConsumer<LoginBloc, LoginState>(
+          listener: (context, state) async {
+            if (state is LoginBlocInitial) {
+              ipAddress.text = state.ipAddress;
+              username.text = state.username;
+              password.text = state.password;
+            } else if (state is LoadedState) {
+              AppTheme.snackbar(context, state.message);
+              if (state.allowLogin) {
+                Navigator.of(context).pushNamedAndRemoveUntil(
+                  MenuPage.path,
+                  (route) => false,
+                  arguments: MenuPageArgs(
+                    user: state.user,
+                  ),
+                );
+              }
+            } else if (state is LoadingState) {
+              AppTheme.snackbar(context, state.message);
+            } else if (state is ErrorState) {
+              AppTheme.snackbar(context, state.message);
+            }
+          },
           builder: (context, state) {
             return Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -101,7 +92,7 @@ class _LoginPageState extends State<LoginPage> {
                   padding: const EdgeInsets.all(8.0),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(8.0),
-                    color: _textFieldsBg,
+                    color: Theme.of(context).colorScheme.background,
                   ),
                   child: FractionallySizedBox(
                     widthFactor: 0.5,

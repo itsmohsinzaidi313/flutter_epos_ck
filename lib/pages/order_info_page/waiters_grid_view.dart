@@ -3,7 +3,11 @@ part of 'order_info_page.dart';
 class _WaitersGrid extends StatelessWidget {
   final List<Waiter> listWaiters;
   final void Function(BuildContext context, Waiter waiter) onTap;
-  const _WaitersGrid({Key key, this.listWaiters, this.onTap}) : super(key: key);
+  const _WaitersGrid({
+    Key? key,
+    required this.listWaiters,
+    required this.onTap,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

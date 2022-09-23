@@ -1,21 +1,21 @@
-import 'dart:developer';
-
 import 'package:equatable/equatable.dart';
 import 'package:pos_app/models/item.dart';
 
-class MenuItem extends Item with EquatableMixin {
-  MenuItem({
-    String id,
-    String code,
-    String categoryId,
-    String name,
-    double price,
-    double taxAmount,
-    double quantity,
-    String image,
-    String comment,
-    bool selected,
+class FoodItem extends Item with EquatableMixin {
+  FoodItem({
+    String rowId = '',
+    String id = '',
+    String code = '',
+    String categoryId = '',
+    String name = '',
+    double price = 0,
+    double taxAmount = 0,
+    double quantity = 0,
+    String image = '',
+    String comment = '',
+    bool selected = false,
   }) : super(
+            rowId: rowId,
             id: id,
             code: code,
             categoryId: categoryId,
@@ -27,133 +27,72 @@ class MenuItem extends Item with EquatableMixin {
             comment: comment,
             selected: selected);
 
-  MenuItem.fromMap(Map<String, dynamic> map)
+  FoodItem.modify(Item item,
+      {String? rowId,
+      String? id,
+      String? code,
+      String? categoryId,
+      String? name,
+      double? price,
+      double? taxAmount,
+      double? quantity,
+      String? image,
+      String? comment,
+      bool? selected,
+      bool? isAdditional})
       : super(
-            id: map[Item.IdKey],
-            code: map[Item.CodeKey],
-            categoryId: map[Item.CatIdKey],
-            name: map[Item.NameKey],
-            price: map[Item.PriceKey],
-            taxAmount: map[Item.TaxAmountKey],
-            quantity: map[Item.QuantityKey],
-            image: map[Item.ImageKey],
-            selected: map[Item.SelectedKey],
-            comment: map[Item.CommentKey]);
+            rowId: rowId ?? item.rowId,
+            id: id ?? item.id,
+            code: code ?? item.code,
+            categoryId: categoryId ?? item.categoryId,
+            name: name ?? item.name,
+            price: price ?? item.price,
+            taxAmount: taxAmount ?? item.taxAmount,
+            quantity: quantity ?? item.quantity,
+            image: image ?? item.image,
+            comment: comment ?? item.comment,
+            selected: selected ?? item.selected,
+            isAdditional: isAdditional ?? item.isAdditional);
 
-  MenuItem.fromMenuItem(MenuItem item)
+  FoodItem.fromMap(Map<String, dynamic> map)
       : super(
-            id: item.id,
-            categoryId: item.categoryId,
-            code: item.code,
-            name: item.name,
-            price: item.price,
-            quantity: item.quantity,
-            comment: item.comment,
-            image: item.image,
-            selected: item.selected,
-            taxAmount: item.taxAmount);
+          rowId: map[Item.rowIdKey],
+          id: map[Item.idKey],
+          code: map[Item.codeKey],
+          categoryId: map[Item.categoryIdKey],
+          name: map[Item.nameKey],
+          price: map[Item.priceKey],
+          taxAmount: map[Item.taxAmountKey],
+          quantity: map[Item.quantityKey],
+          image: '',
+          selected: map[Item.selectedKey],
+          comment: map[Item.commentKey],
+        );
 
   Map<String, dynamic> toMap() => {
-        Item.IdKey: id,
-        Item.CodeKey: code,
-        Item.CatIdKey: categoryId,
-        Item.NameKey: name,
-        Item.PriceKey: price,
-        Item.TaxAmountKey: taxAmount,
-        Item.QuantityKey: quantity,
-        Item.ImageKey: image,
-        Item.SelectedKey: selected,
-        Item.CommentKey: comment,
+        Item.rowIdKey: rowId,
+        Item.idKey: id,
+        Item.codeKey: code,
+        Item.categoryIdKey: categoryId,
+        Item.nameKey: name,
+        Item.priceKey: price,
+        Item.taxAmountKey: taxAmount,
+        Item.quantityKey: quantity,
+        Item.imageKey: image,
+        Item.selectedKey: selected,
+        Item.commentKey: comment,
       };
 
   @override
-  List<Object> get props => [id];
+  List<Object?> get props => [id];
 }
 
 class FixedDeal extends Item with EquatableMixin {
-  static String _ItemsKey = 'Items';
-  final List<Item> dealItems;
+  static String itemsKey = 'Items';
+  final List<Item>? dealItems;
 
-  FixedDeal(
-      {String id,
-      String code,
-      String categoryId,
-      String name,
-      double price,
-      double taxAmount,
-      double quantity,
-      String image,
-      String comment,
-      bool selected,
-      this.dealItems})
-      : super(
-            id: id,
-            code: code,
-            categoryId: categoryId,
-            name: name,
-            price: price,
-            taxAmount: taxAmount,
-            quantity: quantity,
-            image: image,
-            comment: comment,
-            selected: selected);
-
-  FixedDeal.fromMap(Map<String, dynamic> map)
-      : this.dealItems = (map[_ItemsKey] as List<dynamic>)
-            .map((e) => MenuItem.fromMap(e))
-            .toList(),
-        super(
-            id: map[Item.IdKey],
-            code: map[Item.CodeKey],
-            categoryId: map[Item.CatIdKey],
-            name: map[Item.NameKey],
-            price: map[Item.PriceKey],
-            taxAmount: map[Item.TaxAmountKey],
-            quantity: map[Item.QuantityKey],
-            image: map[Item.ImageKey],
-            selected: map[Item.SelectedKey],
-            comment: map[Item.CommentKey]);
-
-  FixedDeal.fromDeal(FixedDeal deal)
-      : dealItems = deal.dealItems,
-        super(
-            id: deal.id,
-            categoryId: deal.categoryId,
-            code: deal.code,
-            name: deal.name,
-            price: deal.price,
-            quantity: deal.quantity,
-            comment: deal.comment,
-            image: deal.image,
-            selected: deal.selected,
-            taxAmount: deal.taxAmount);
-
-  @override
-  Map<String, dynamic> toMap() => {
-        Item.IdKey: id,
-        Item.CodeKey: code,
-        Item.CatIdKey: categoryId,
-        Item.NameKey: name,
-        Item.TaxAmountKey: taxAmount,
-        Item.PriceKey: price,
-        Item.QuantityKey: quantity,
-        Item.CommentKey: comment ?? '',
-        Item.SelectedKey: selected,
-        _ItemsKey: dealItems.map((e) => e.toMap()).toList(),
-      };
-
-  @override
-  List<Object> get props => [id];
-}
-
-class OnSpotDeal extends Item with EquatableMixin {
-  static const String _DealItemsKey = 'DealItems',
-      _UniqueDealId = 'UniqueDealId';
-  final String uniqueDealId;
-  final List<OnSpotDealItem> dealItems;
-  bool changeable = true;
-  OnSpotDeal(
-      {this.uniqueDealId = '',
+  const FixedDeal(
+      {String rowId = '',
       String id = '',
       String code = '',
       String categoryId = '',
@@ -162,58 +101,76 @@ class OnSpotDeal extends Item with EquatableMixin {
       double taxAmount = 0,
       double quantity = 0,
       String image = '',
-      bool selected,
+      String comment = '',
+      bool selected = false,
       this.dealItems})
       : super(
-            id: id,
-            code: code,
-            categoryId: categoryId,
-            name: name,
-            price: price,
-            taxAmount: taxAmount,
-            quantity: quantity,
-            image: image,
-            selected: selected);
+          rowId: rowId,
+          id: id,
+          code: code,
+          categoryId: categoryId,
+          name: name,
+          price: price,
+          taxAmount: taxAmount,
+          quantity: quantity,
+          image: image,
+          comment: comment,
+          selected: selected,
+        );
 
-  OnSpotDeal.fromMap(Map<String, dynamic> map)
-      : this.uniqueDealId = map[_UniqueDealId],
-        this.dealItems = (map[_DealItemsKey] as List<dynamic>)
-            .map((e) => OnSpotDealItem.fromMap(e))
+  FixedDeal.modify(FixedDeal deal,
+      {String? rowId,
+      String? id,
+      String? code,
+      String? categoryId,
+      String? name,
+      double? price,
+      double? taxAmount,
+      double? quantity,
+      String? image,
+      String? comment,
+      bool? selected,
+      bool? isAdditional})
+      : dealItems = deal.dealItems ?? <FixedDeal>[],
+        super(
+          rowId: rowId ?? deal.rowId,
+          id: id ?? deal.id,
+          code: code ?? deal.code,
+          categoryId: categoryId ?? deal.categoryId,
+          name: name ?? deal.name,
+          price: price ?? deal.price,
+          taxAmount: taxAmount ?? deal.taxAmount,
+          quantity: quantity ?? deal.quantity,
+          image: image ?? deal.image,
+          comment: comment ?? deal.comment,
+          selected: selected ?? deal.selected,
+          isAdditional: isAdditional ?? deal.isAdditional,
+        );
+
+  FixedDeal.fromMap(Map<String, dynamic> map)
+      : this.dealItems = (map[itemsKey] as List<dynamic>)
+            .map((e) => FoodItem.fromMap(e))
             .toList(),
         super(
-            id: map[Item.IdKey],
-            code: map[Item.CodeKey],
-            categoryId: map[Item.CatIdKey],
-            name: map[Item.NameKey],
-            price: map[Item.PriceKey],
-            taxAmount: map[Item.TaxAmountKey],
-            quantity: map[Item.QuantityKey],
-            selected: map[Item.SelectedKey],
-            comment: '',
-            image: map[Item.ImageKey]);
+            rowId: map[Item.rowIdKey],
+            id: map[Item.idKey],
+            code: map[Item.codeKey],
+            categoryId: map[Item.categoryIdKey],
+            name: map[Item.nameKey],
+            price: map[Item.priceKey],
+            taxAmount: map[Item.taxAmountKey],
+            quantity: map[Item.quantityKey],
+            image: '',
+            selected: map[Item.selectedKey],
+            comment: map[Item.commentKey]);
 
-  OnSpotDeal.fromOnSpotDeal(OnSpotDeal deal)
-      : this.uniqueDealId = deal.uniqueDealId,
-        this.dealItems = deal.dealItems,
+  FixedDeal.fromDeal(FixedDeal deal)
+      : dealItems = deal.dealItems,
         super(
+            rowId: deal.rowId,
             id: deal.id,
-            code: deal.code,
             categoryId: deal.categoryId,
-            name: deal.name,
-            price: deal.price,
-            quantity: deal.quantity,
-            comment: deal.comment,
-            image: deal.image,
-            selected: deal.selected,
-            taxAmount: deal.taxAmount);
-
-  OnSpotDeal.newDeal(OnSpotDeal deal, List<OnSpotDealItem> items)
-      : this.uniqueDealId = deal.uniqueDealId,
-        this.dealItems = items,
-        super(
-            id: deal.id,
             code: deal.code,
-            categoryId: deal.categoryId,
             name: deal.name,
             price: deal.price,
             quantity: deal.quantity,
@@ -224,17 +181,139 @@ class OnSpotDeal extends Item with EquatableMixin {
 
   @override
   Map<String, dynamic> toMap() => {
-        _UniqueDealId: uniqueDealId == '' ? _signature : uniqueDealId,
-        Item.IdKey: id,
-        Item.CodeKey: code,
-        Item.CatIdKey: categoryId,
-        Item.NameKey: name,
-        Item.TaxAmountKey: taxAmount,
-        Item.PriceKey: price,
-        Item.QuantityKey: quantity,
-        Item.CommentKey: comment ?? '',
-        Item.SelectedKey: selected,
-        _DealItemsKey: dealItems.map((e) => e.toMap()).toList(),
+        Item.rowIdKey: rowId,
+        Item.idKey: id,
+        Item.codeKey: code,
+        Item.categoryIdKey: categoryId,
+        Item.nameKey: name,
+        Item.taxAmountKey: taxAmount,
+        Item.priceKey: price,
+        Item.quantityKey: quantity,
+        Item.commentKey: comment,
+        Item.selectedKey: selected,
+        itemsKey: dealItems!.map((e) => e.toMap()).toList(),
+      };
+
+  @override
+  List<Object?> get props => [id];
+}
+
+class OnSpotDeal extends Item with EquatableMixin {
+  static const String dealItemsKey = 'DealItems', dealStepsKey = 'DealSteps';
+  final List<OnSpotDealItem> dealItems;
+  final List<DealStep> dealSteps;
+  const OnSpotDeal({
+    String rowId = '',
+    String id = '',
+    String code = '',
+    String categoryId = '',
+    String name = '',
+    double price = 0,
+    double taxAmount = 0,
+    double quantity = 0,
+    String image = '',
+    bool selected = false,
+    String comment = '',
+    bool isAdditional = false,
+    this.dealItems = const [],
+    this.dealSteps = const [],
+  }) : super(
+          rowId: rowId,
+          id: id,
+          code: code,
+          categoryId: categoryId,
+          name: name,
+          price: price,
+          taxAmount: taxAmount,
+          quantity: quantity,
+          image: image,
+          selected: selected,
+          comment: comment,
+          isAdditional: isAdditional,
+        );
+
+  OnSpotDeal.fromMap(Map<String, dynamic> map)
+      : this.dealItems = (map[dealItemsKey] as List<dynamic>)
+            .map((e) => OnSpotDealItem.fromMap(e))
+            .toList(),
+        this.dealSteps = (map[dealStepsKey] as List<dynamic>)
+            .map((e) => DealStep.fromMap(e))
+            .toList(),
+        super(
+          rowId: map[Item.rowIdKey],
+          id: map[Item.idKey],
+          code: map[Item.codeKey],
+          categoryId: map[Item.categoryIdKey],
+          name: map[Item.nameKey],
+          price: map[Item.priceKey],
+          taxAmount: map[Item.taxAmountKey],
+          quantity: map[Item.quantityKey],
+          selected: map[Item.selectedKey],
+          comment: '',
+          image: '',
+        );
+
+  OnSpotDeal.fromOnSpotDeal(OnSpotDeal deal)
+      : this.dealItems = deal.dealItems,
+        this.dealSteps = deal.dealSteps,
+        super(
+            rowId: deal.rowId,
+            id: deal.id,
+            code: deal.code,
+            categoryId: deal.categoryId,
+            name: deal.name,
+            price: deal.price,
+            quantity: deal.quantity,
+            comment: deal.comment,
+            image: deal.image,
+            selected: deal.selected,
+            taxAmount: deal.taxAmount);
+
+  OnSpotDeal.modify(OnSpotDeal deal,
+      {String? rowId,
+      String? id,
+      String? code,
+      String? categoryId,
+      String? name,
+      double? price,
+      double? taxAmount,
+      double? quantity,
+      String? image,
+      String? comment,
+      bool? selected,
+      bool? isAdditional,
+      List<OnSpotDealItem>? items,
+      List<DealStep>? steps})
+      : this.dealItems = items ?? deal.dealItems,
+        this.dealSteps = steps ?? deal.dealSteps,
+        super(
+          rowId: rowId ?? deal.rowId,
+          id: id ?? deal.id,
+          code: code ?? deal.code,
+          categoryId: categoryId ?? deal.categoryId,
+          name: name ?? deal.name,
+          price: price ?? deal.price,
+          quantity: quantity ?? deal.quantity,
+          comment: comment ?? deal.comment,
+          image: image ?? deal.image,
+          selected: selected ?? deal.selected,
+          taxAmount: taxAmount ?? deal.taxAmount,
+          isAdditional: isAdditional ?? deal.isAdditional,
+        );
+
+  @override
+  Map<String, dynamic> toMap() => {
+        Item.rowIdKey: rowId,
+        Item.idKey: id,
+        Item.codeKey: code,
+        Item.categoryIdKey: categoryId,
+        Item.nameKey: name,
+        Item.taxAmountKey: taxAmount,
+        Item.priceKey: price,
+        Item.quantityKey: quantity,
+        Item.commentKey: comment,
+        Item.selectedKey: selected,
+        dealItemsKey: dealItems.map((e) => e.toMap()).toList(),
       };
   String get _signature {
     String _ = '';
@@ -247,24 +326,27 @@ class OnSpotDeal extends Item with EquatableMixin {
   }
 
   @override
-  List<Object> get props {
+  List<Object?> get props {
     String _ = '';
     _ += id;
     _ += dealItems.length.toString();
     for (var item in dealItems) {
       _ += item.id;
     }
-    return uniqueDealId == '' ? [_] : [uniqueDealId];
+    return rowId == '' ? [_] : [rowId];
   }
 }
 
 class OnSpotDealItem extends Item with EquatableMixin {
   static const String _ChoiceKey = 'Choice';
+  static const String _DealStepIdKey = 'DealStepId';
 
-  final double choice;
+  final double? choice;
+  final String? dealStepId;
 
   OnSpotDealItem(
-      {String id = '0',
+      {String rowId = '0',
+      String id = '0',
       String code = '0',
       String categoryId = '0',
       String name = '',
@@ -272,9 +354,11 @@ class OnSpotDealItem extends Item with EquatableMixin {
       double taxAmount = 0,
       double quantity = 0,
       this.choice = 0,
-      String image,
+      this.dealStepId = '0',
+      String image = '',
       bool selected = false})
       : super(
+            rowId: rowId,
             id: id,
             code: code,
             categoryId: categoryId,
@@ -287,44 +371,81 @@ class OnSpotDealItem extends Item with EquatableMixin {
 
   OnSpotDealItem.fromMap(Map<String, dynamic> map)
       : choice = map[_ChoiceKey],
+        dealStepId = map[_DealStepIdKey],
         super(
-          id: map[Item.IdKey],
-          code: map[Item.CodeKey],
-          categoryId: map[Item.CatIdKey],
-          name: map[Item.NameKey],
-          price: map[Item.PriceKey],
-          taxAmount: map[Item.TaxAmountKey],
-          quantity: map[Item.QuantityKey],
-          selected: map[Item.SelectedKey],
-          image: map[Item.ImageKey],
+          rowId: map[Item.rowIdKey],
+          id: map[Item.idKey],
+          code: map[Item.codeKey],
+          categoryId: map[Item.categoryIdKey],
+          name: map[Item.nameKey],
+          price: map[Item.priceKey],
+          taxAmount: map[Item.taxAmountKey],
+          quantity: map[Item.quantityKey],
+          selected: map[Item.selectedKey],
+          image: '',
         );
 
-  OnSpotDealItem.fromItem(OnSpotDealItem item)
-      : this.choice = item.choice,
+  OnSpotDealItem.modify(OnSpotDealItem item,
+      {String? rowId,
+      String? id,
+      String? code,
+      String? categoryId,
+      String? name,
+      double? price,
+      double? taxAmount,
+      double? quantity,
+      String? image,
+      String? comment,
+      double? choice,
+      String? dealStepId,
+      bool? selected,
+      bool? isAdditional})
+      : this.choice = choice ?? item.choice,
+        this.dealStepId = dealStepId ?? item.dealStepId,
         super(
-            id: item.id,
-            code: item.code,
-            categoryId: item.categoryId,
-            name: item.name,
-            price: item.price,
-            taxAmount: item.taxAmount,
-            quantity: 0,
-            image: item.image,
-            selected: item.selected);
+            rowId: rowId ?? item.rowId,
+            id: id ?? item.id,
+            code: code ?? item.code,
+            categoryId: categoryId ?? item.categoryId,
+            name: name ?? item.name,
+            price: price ?? item.price,
+            taxAmount: taxAmount ?? item.taxAmount,
+            quantity: quantity ?? item.quantity,
+            image: image ?? item.image,
+            comment: comment ?? item.comment,
+            selected: selected ?? item.selected,
+            isAdditional: isAdditional ?? item.isAdditional);
 
   @override
   Map<String, dynamic> toMap() => {
-        Item.IdKey: id,
-        Item.CodeKey: code,
-        Item.CatIdKey: categoryId,
-        Item.NameKey: name,
-        Item.PriceKey: price,
-        Item.QuantityKey: quantity,
-        Item.CommentKey: comment ?? '',
+        Item.rowIdKey: rowId,
+        Item.idKey: id,
+        Item.codeKey: code,
+        Item.categoryIdKey: categoryId,
+        Item.nameKey: name,
+        Item.priceKey: price,
+        Item.quantityKey: quantity,
+        Item.commentKey: comment,
         _ChoiceKey: choice,
-        Item.SelectedKey: selected,
+        Item.selectedKey: selected,
       };
 
   @override
-  List<Object> get props => [id, code, quantity];
+  List<Object?> get props => [id, code, quantity];
+}
+
+class DealStep {
+  static const String _IdKey = 'Id', _NameKey = 'Name', _LimitKey = 'Limit';
+  final String? id;
+  final String? name;
+  final String? limit;
+  DealStep({
+    this.id,
+    this.name,
+    this.limit,
+  });
+  DealStep.fromMap(Map<String, dynamic> map)
+      : id = map[_IdKey],
+        name = map[_NameKey],
+        limit = map[_LimitKey];
 }

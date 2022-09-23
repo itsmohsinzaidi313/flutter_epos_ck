@@ -8,9 +8,9 @@ class _WaitersList extends StatelessWidget {
   ) onTap;
 
   const _WaitersList({
-    Key key,
-    this.waitersList,
-    this.onTap,
+    Key? key,
+    required this.waitersList,
+    required this.onTap,
   }) : super(key: key);
 
   @override

@@ -11,5 +11,5 @@ abstract class NetworkEvent extends Equatable {
 
 class ConnectionChanged extends NetworkEvent {
   final ConnectionState connectionState;
-  ConnectionChanged({@required this.connectionState});
+  ConnectionChanged({required this.connectionState});
 }

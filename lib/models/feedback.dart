@@ -1,10 +1,10 @@
 class CustomerFeedback {
-  String name;
-  String contact;
-  String orderKey;
-  String remarks;
-  List<FeedbackQuestions> questions = [];
-  List<FeedbackItems> items = [];
+  String? name;
+  String? contact;
+  String? orderKey;
+  String? remarks;
+  List<FeedbackQuestions>? questions = [];
+  List<FeedbackItems>? items = [];
 
   CustomerFeedback(
       {this.name,
@@ -19,10 +19,10 @@ class CustomerFeedback {
         'Contact': contact,
         'OrderKey': orderKey,
         'Remarks': remarks,
-        'Questions': questions
+        'Questions': questions!
             .map((e) => {'Question': e.question, 'Answer': e.answer})
             .toList(),
-        'Items': items
+        'Items': items!
             .map((e) => {
                   'ItemName': e.itemName,
                   'Rating': e.rating,
@@ -32,13 +32,13 @@ class CustomerFeedback {
 }
 
 class FeedbackQuestions {
-  String question;
-  String answer;
+  String? question;
+  String? answer;
   FeedbackQuestions({this.question, this.answer});
 }
 
 class FeedbackItems {
-  String itemName;
-  int rating;
+  String? itemName;
+  int? rating;
   FeedbackItems({this.itemName, this.rating});
 }

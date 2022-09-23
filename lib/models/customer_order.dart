@@ -1,90 +1,154 @@
-import 'dart:developer';
-
 import 'package:equatable/equatable.dart';
-import 'package:pos_app/bloc/payment_bloc/payment_bloc.dart';
 import 'package:pos_app/models/customer.dart';
+import 'package:pos_app/models/customer_order_context.dart';
+import 'package:pos_app/models/customer_table.dart';
 import 'package:pos_app/models/deals.dart';
-import 'package:pos_app/models/item.dart';
+import 'package:pos_app/models/items_cart.dart';
+import 'package:pos_app/models/waiter.dart';
 import 'package:pos_app/shared/app_library.dart';
+import 'package:pos_app/shared/enums.dart';
 
-class Order {
-  static const String _OrderIdKey = 'Id',
-      _MenuKey = 'Menu',
-      _ItemsKey = 'Items',
-      _FixedDealKey = 'FixedDeals',
-      _OnSpotDealKey = 'OnSpotDeals',
-      _WaiterKey = 'Waiter',
-      _TableKey = 'Table',
-      _OrderTypeKey = 'OrderType',
-      _CoversKey = 'Covers',
-      _CustomerKey = 'Customer',
-      _UserIdKey = 'UserId',
-      _OrderNoKey = 'OrderNo',
-      _OrderTimeKey = 'Time',
-      _OrderDateKey = 'Date',
-      _TiltIdKey = 'TiltId';
+class Order extends OrderContext with EquatableMixin {
+  static const String _orderIdKey = 'Id',
+      // _MenuKey = 'Menu',
+      _itemsKey = 'Items',
+      _fixedDealKey = 'FixedDeals',
+      _onSpotDealKey = 'OnSpotDeals',
+      _waiterKey = 'Waiter',
+      _tableKey = 'Table',
+      _orderTypeKey = 'OrderType',
+      _coversKey = 'Covers',
+      _customerKey = 'Customer',
+      _orderNoKey = 'OrderNo',
+      _orderTimeKey = 'Time',
+      _orderDateKey = 'Date',
+      _deviceIdKey = 'DeviceId',
+      _paidAmountKey = 'PaidAmount',
+      _discountAmountKey = 'DiscountAmount',
+      _discountPercentageKey = 'DiscountPercentage';
 
-  List<Item> items = [];
-  String id,
-      waiterId,
-      tableId,
-      userId,
-      orderType,
-      orderNo,
-      covers,
-      time,
-      date,
-      tax,
-      tiltId,
-      discountedAmount,
-      payment,
-      cardNumber;
-  Customer customer;
-  PAYMENTMODE paymentmode;
-  bool editOrder = false;
+  final ItemsCart cart;
 
-  Order({
-    this.id,
-    this.waiterId,
-    this.tableId,
-    this.covers,
-    this.customer,
-    this.orderType,
-    this.orderNo,
-  }) {
-    customer = Customer();
-  }
+  const Order({
+    String id = '',
+    String cardNumber = '',
+    String covers = '',
+    Customer customer = const Customer(),
+    OrderStatus orderStatus = OrderStatus.incomplete,
+    String date = '',
+    String deviceId = '',
+    String orderNumber = '',
+    OrderType orderType = OrderType.dineIn,
+    PaymentMode paymentMode = PaymentMode.cash,
+    Waiter waiter = const Waiter(),
+    Tables tables = const Tables(),
+    String time = '',
+    double paidAmount = 0.0,
+    double discountAmount = 0.0,
+    double discountPercentage = 0.0,
+    required this.cart,
+  }) : super(
+          id: id,
+          cardNumber: cardNumber,
+          covers: covers,
+          customer: customer,
+          date: date,
+          deviceId: deviceId,
+          orderNumber: orderNumber,
+          orderStatus: orderStatus,
+          orderType: orderType,
+          paymentMode: paymentMode,
+          table: tables,
+          time: time,
+          waiter: waiter,
+          paidAmount: paidAmount,
+          discountAmount: discountAmount,
+          discountPercentage: discountPercentage,
+        );
+
+  Order.modify(Order order,
+      {String? id,
+      String? cardNumber,
+      String? covers,
+      Customer? customer,
+      OrderStatus? orderStatus,
+      String? date,
+      String? deviceId,
+      String? orderNumber,
+      OrderType? orderType,
+      PaymentMode? paymentmode,
+      Waiter? waiter,
+      Tables? table,
+      String? time,
+      double? paidAmount,
+      double? discountAmount,
+      double? discountPercentage,
+      ItemsCart? cart})
+      : cart = cart ?? order.cart,
+        super(
+          id: id ?? order.id,
+          cardNumber: cardNumber ?? order.cardNumber,
+          covers: covers ?? order.covers,
+          customer: customer ?? order.customer,
+          date: date ?? order.date,
+          deviceId: deviceId ?? order.deviceId,
+          orderStatus: orderStatus ?? order.orderStatus,
+          orderNumber: orderNumber ?? order.orderNumber,
+          orderType: orderType ?? order.orderType,
+          paymentMode: paymentmode ?? order.paymentMode,
+          table: table ?? order.table,
+          time: time ?? order.time,
+          waiter: waiter ?? order.waiter,
+          paidAmount: paidAmount ?? order.paidAmount,
+          discountAmount: discountAmount ?? order.discountAmount,
+          discountPercentage: discountPercentage ?? order.discountPercentage,
+        );
 
   Order.fromMap(Map<String, dynamic> map)
-      : id = map[_OrderIdKey].toString(),
-        waiterId = map[_WaiterKey],
-        tableId = map[_TableKey],
-        covers = map[_CoversKey].toString(),
-        customer = Customer.fromMap(map[_CustomerKey]),
-        orderType = map[_OrderTypeKey],
-        userId = map[_UserIdKey],
-        orderNo = map[_OrderNoKey].toString(),
-        time = map[_OrderTimeKey],
-        date = map[_OrderDateKey],
-        tiltId = map[_TiltIdKey] {
-    items.addAll((map[_ItemsKey] as List<dynamic>)
-        .map((e) => MenuItem.fromMap(e))
-        .toList());
-    items.addAll((map[_FixedDealKey] as List<dynamic>)
-        .map((e) => FixedDeal.fromMap(e))
-        .toList());
-    items.addAll((map[_OnSpotDealKey] as List<dynamic>)
-        .map((e) => OnSpotDeal.fromMap(e))
-        .toList());
-  }
+      : cart = ItemsCart(items: [
+          ...(map[_itemsKey] as List<dynamic>)
+              .map((e) => FoodItem.fromMap(e))
+              .toList(),
+          ...(map[_fixedDealKey] as List<dynamic>)
+              .map((e) => FixedDeal.fromMap(e))
+              .toList(),
+          ...(map[_onSpotDealKey] as List<dynamic>)
+              .map((e) => OnSpotDeal.fromMap(e))
+              .toList()
+        ]),
+        super(
+          id: map[_orderIdKey].toString(),
+          waiter: Waiter.fromMap(map[_waiterKey]),
+          table: Tables.fromMap(map[_tableKey]),
+          covers: map[_coversKey].toString(),
+          customer: Customer.fromMap(map[_customerKey]),
+          time: map[_orderTimeKey],
+          date: map[_orderDateKey],
+          deviceId: map[_deviceIdKey],
+          orderStatus: OrderStatus.complete,
+          paymentMode: PaymentMode.cash,
+          cardNumber: '',
+          orderNumber: map[_orderNoKey].toString(),
+          orderType: map[_orderTypeKey] == '1'
+              ? OrderType.dineIn
+              : (map[_orderTypeKey] == '2'
+                  ? OrderType.takeAway
+                  : OrderType.delivery),
+          paidAmount: double.tryParse(map[_paidAmountKey] as String? ?? '0') ?? 0,
+          discountAmount:
+              double.tryParse(map[_discountAmountKey] as String? ?? '0') ?? 0.0,
+          discountPercentage:
+              double.tryParse(map[_discountPercentageKey] as String? ?? '0') ??
+                  0.0,
+        );
 
   Map<String, dynamic> get map {
     List<dynamic> itemsList = [];
     List<dynamic> fixedDealList = [];
     List<dynamic> onSpotDealsList = [];
 
-    for (var item in items) {
-      if (item is MenuItem) {
+    for (var item in cart.items) {
+      if (item is FoodItem) {
         itemsList.add(item.toMap());
       } else if (item is FixedDeal) {
         fixedDealList.add(item.toMap());
@@ -93,70 +157,24 @@ class Order {
       } else {}
     }
     return {
-      _ItemsKey: itemsList,
-      _FixedDealKey: fixedDealList,
-      _OnSpotDealKey: onSpotDealsList,
-      _CustomerKey: customer?.map,
-      _OrderIdKey: id ?? '0',
-      _WaiterKey: waiterId ?? '0',
-      _TableKey: tableId ?? '0',
-      _CoversKey: covers ?? '0',
-      _OrderTypeKey: orderType ?? '0',
-      _UserIdKey: userId ?? '0',
-      _TiltIdKey: tiltId ?? '0',
-      _OrderDateKey: Lib.getDate(),
-      _OrderTimeKey: Lib.getTime12HR(),
+      _itemsKey: itemsList,
+      _fixedDealKey: fixedDealList,
+      _onSpotDealKey: onSpotDealsList,
+      _customerKey: customer.map,
+      _orderIdKey: id,
+      _waiterKey: waiter.id,
+      _tableKey: table.id,
+      _coversKey: covers,
+      _orderTypeKey: (orderType.index + 1).toString(),
+      _deviceIdKey: deviceId,
+      _orderDateKey: Lib.getDate(),
+      _orderTimeKey: Lib.getTime12HR(),
     };
   }
 
-  void addCartItem(Item item) {
-    if (items == null) items = [];
-    bool itemExists = false;
-    for (var i = 0; i < items.length; i++) {
-      if (items[i].id == item.id) {
-        items[i].quantity++;
-        itemExists = true;
-        break;
-      }
-    }
-    if (!itemExists) {
-      if (item is MenuItem) {
-        items.add(MenuItem.fromMenuItem(item));
-      } else if (item is FixedDeal) {
-        items.add(FixedDeal.fromDeal(item));
-      }
-    }
-  }
-
-  void reduceCartItem(int itemId, {bool removeZeroQuantity = true}) {
-    if (items == null) items = [];
-    for (var i = 0; i < items.length; i++) {
-      if (items[i].id == '$itemId') {
-        if (items[i].quantity > 0) {
-          items[i].quantity--;
-        }
-        if (items[i].quantity < 1 && removeZeroQuantity) {
-          removeCartItem(itemId);
-        }
-        break;
-      }
-    }
-  }
-
-  void removeCartItem(int itemId) =>
-      items.removeAt(items.indexWhere((element) => element.id == '$itemId'));
-
-  void addItemComment(int itemId, String comment) =>
-      items.where((element) => element.id == itemId.toString()).first.comment =
-          comment;
-
-  void setItemQuantity(int itemId, double quantity) =>
-      items.where((element) => element.id == itemId.toString()).first.quantity =
-          quantity;
-
   String get subTotal {
     double amount = 0;
-    for (var item in items) {
+    for (var item in cart.items) {
       amount += item.price * item.quantity;
     }
     return amount.toStringAsFixed(2);
@@ -164,7 +182,7 @@ class Order {
 
   String get totalTaxedAmount {
     double amount = 0;
-    for (var item in items) {
+    for (var item in cart.items) {
       amount += item.taxAmount * item.quantity;
     }
     return amount.toStringAsFixed(2);
@@ -174,75 +192,8 @@ class Order {
           (double.tryParse(subTotal) ?? 0))
       .toStringAsFixed(2);
 
-  void reset() {
-    items = [];
-    id = '';
-    waiterId = '';
-    tableId = '';
-    covers = '';
-    cardNumber = '';
-    orderType = '';
-    userId = '';
-    orderNo = '';
-    time = '';
-    date = '';
-    discountedAmount = '';
-  }
+  void reset() => cart.clear();
 
-  // void copyOrder(Order order) {
-  //   reset();
-  //   for (var item in order.items) {
-  //     if (item is FixedDeal) {
-  //       items.add(FixedDeal(
-  //           categoryId: item.categoryId,
-  //           code: item.code,
-  //           comment: item.comment,
-  //           dealItems: item.dealItems,
-  //           id: item.id,
-  //           image: item.image,
-  //           name: item.name,
-  //           price: item.price,
-  //           quantity: item.quantity,
-  //           selected: item.selected,
-  //           taxAmount: item.taxAmount));
-  //     } else if (item is OnSpotDeal) {
-  //       items.add(OnSpotDeal(
-  //           id: item.id,
-  //           categoryId: item.categoryId,
-  //           code: item.code,
-  //           dealItems: item.dealItems,
-  //           image: item.image,
-  //           name: item.name,
-  //           price: item.price,
-  //           quantity: item.quantity,
-  //           selected: item.selected,
-  //           taxAmount: item.taxAmount,
-  //           uniqueDealId: item.uniqueDealId));
-  //     } else if (item is Item) {
-  //       items.add(MenuItem(
-  //           id: item.id,
-  //           code: item.code,
-  //           categoryId: item.categoryId,
-  //           comment: item.comment,
-  //           image: item.image,
-  //           name: item.name,
-  //           price: item.price,
-  //           quantity: item.quantity,
-  //           selected: item.selected,
-  //           taxAmount: item.taxAmount));
-  //     }
-  //   }
-  //   id = order.id;
-  //   waiterId = order.waiterId;
-  //   tableId = order.tableId;
-  //   covers = order.covers;
-  //   cardNumber = order.cardNumber;
-  //   customer = order.customer;
-  //   orderType = order.orderType;
-  //   userId = order.userId;
-  //   orderNo = order.orderNo;
-  //   time = order.time;
-  //   date = order.date;
-  //   discountedAmount = order.discountedAmount;
-  // }
+  @override
+  List<Object> get props => [id, orderNumber, cart.items.length];
 }

@@ -1,12 +1,9 @@
 part of 'order_info_bloc.dart';
 
-abstract class OrderInfoState {
-  const OrderInfoState({@required this.orderType});
-  final ORDERTYPE orderType;
-}
+abstract class OrderInfoState {}
 
 class OrderInfoInitial extends OrderInfoState {
-  OrderInfoInitial({@required ORDERTYPE type}) : super(orderType: type);
+  OrderInfoInitial();
 }
 
 // class ValidSubmission extends OrderInfoState {
@@ -16,30 +13,24 @@ class OrderInfoInitial extends OrderInfoState {
 // }
 
 class LoadedState extends OrderInfoState {
-  final String message;
-  final Customer customer;
   final List<Tables> tables;
   final List<Waiter> waiters;
   final bool validSubmission;
-  final Order customerOrder;
+  final Order order;
 
   LoadedState({
     this.tables = const [],
     this.waiters = const [],
-    this.customer,
-    this.message,
+    required this.order,
     this.validSubmission = false,
-    this.customerOrder,
-    @required ORDERTYPE type,
-  }) : super(orderType: type);
+  });
 }
 
 class LoadingState extends OrderInfoState {
   final String message;
   LoadingState({
     this.message = '',
-    @required ORDERTYPE type,
-  }) : super(orderType: type);
+  });
 }
 
 class ErrorState extends OrderInfoState {
@@ -48,6 +39,5 @@ class ErrorState extends OrderInfoState {
   ErrorState({
     this.message = '',
     this.level = 0,
-    @required ORDERTYPE type,
-  }) : super(orderType: type);
+  });
 }

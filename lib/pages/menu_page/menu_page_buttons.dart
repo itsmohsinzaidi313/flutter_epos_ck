@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:pos_app/bloc/login_bloc/login_bloc.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:pos_app/models/customer.dart';
 import 'package:pos_app/models/customer_order.dart';
 import 'package:pos_app/pages/login_page/login_page.dart';
 import 'package:pos_app/pages/order_info_page/order_info_page.dart';
@@ -14,7 +15,7 @@ import 'package:pos_app/shared/config.dart';
 import 'package:pos_app/shared/widgets/menu_card.dart';
 
 class MenuPageButtons {
-  final BuildContext context;
+  final BuildContext? context;
   MenuPageButtons({this.context});
 
   List<MainMenuCard> get buttons => [
@@ -22,22 +23,23 @@ class MenuPageButtons {
             title: 'New Order',
             subtitle: 'place new customer order',
             asset: 'cutlery.png',
-            onTap: () => Navigator.of(context).pushNamed(OrderInfoPage.path)),
+            onTap: () => Navigator.of(context!).pushNamed(OrderInfoPage.path)),
         MainMenuCard(
           title: 'Pending Orders',
           subtitle: 'all pending customer orders',
           asset: 'order.png',
-          onTap: () => Navigator.of(context).pushNamed(OrdersPage.path),
+          onTap: () => Navigator.of(context!).pushNamed(OrdersPage.path),
         ),
         MainMenuCard(
             title: 'Logout',
             subtitle: 'logout of you account',
             onTap: () async {
-              bool x = await AppTheme.showAlertDialogYNFutureReturn(context,
-                  title: 'Attention', message: 'Are you sure?');
+              bool x = await (AppTheme.showAlertDialogYNFutureReturn(context!,
+                  title: 'Attention',
+                  message: 'Are you sure?') as Future<bool>);
               if (x) {
-                context.read<LoginBloc>().add(LogoutPressed());
-                Navigator.of(context)
+                context!.read<LoginBloc>().add(LogoutPressed());
+                Navigator.of(context!)
                     .pushNamedAndRemoveUntil(LoginPage.path, (route) => false);
               }
             },
@@ -51,7 +53,7 @@ class MenuPageButtons {
               final orderNoController = TextEditingController();
               final dateController = TextEditingController();
               showDialog(
-                context: context,
+                context: context!,
                 builder: (context) {
                   return Dialog(
                     child: SingleChildScrollView(
@@ -187,20 +189,20 @@ class MenuPageButtons {
       ];
 
   Future<void> _onFeedbackPressed(BuildContext context,
-      {@required String name,
-      @required String contact,
-      @required String orderNo}) async {
+      {required String name,
+      required String contact,
+      required String orderNo}) async {
     if (orderNo != '' && name != '' && contact != '') {
-      Order order = await _getOrder(context, orderNo);
+      Order? order = await _getOrder(context, orderNo);
       if (order != null) {
-        order.customer.name = name;
-        order.customer.contact = contact;
+        order = Order.modify(order,
+            customer: Customer(name: name, contact: contact));
         Navigator.of(context).pushNamed('/feedback', arguments: order);
       }
     }
   }
 
-  Future<Order> _getOrder(BuildContext context, String orderNo) async {
+  Future<Order?> _getOrder(BuildContext context, String orderNo) async {
     final response = await OrderRepo.repo.getOrders(
       orderNo: orderNo,
     );

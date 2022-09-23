@@ -8,7 +8,7 @@ Widget orderTypeButton(
         color: Color(0xff7c94b6),
         elevation: 5,
         child: InkWell(
-          onTap: onTap,
+          onTap: onTap as void Function()?,
           child: Container(
             decoration: BoxDecoration(
               image: DecorationImage(

@@ -3,13 +3,13 @@ import 'package:pos_app/shared/config.dart';
 
 class MainMenuCard extends StatelessWidget {
   MainMenuCard(
-      {@required this.title,
+      {required this.title,
       this.subtitle,
-      @required this.onTap,
-      @required this.asset});
+      required this.onTap,
+      required this.asset});
   final String asset;
   final String title;
-  final String subtitle;
+  final String? subtitle;
   final Function onTap;
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,7 @@ class MainMenuCard extends StatelessWidget {
         ),
         elevation: 10.0,
         child: InkWell(
-          onTap: onTap,
+          onTap: onTap as void Function()?,
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -51,7 +51,7 @@ class MainMenuCard extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.all(3.0),
                   child: Text(
-                    subtitle,
+                    subtitle!,
                     maxLines: 2,
                     textAlign: TextAlign.center,
                     overflow: TextOverflow.ellipsis,

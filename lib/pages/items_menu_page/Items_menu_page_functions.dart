@@ -1,87 +1,73 @@
 part of 'items_menu_page.dart';
 
-void _onAddItem(BuildContext context, Item item) {
+void _updateLayout(BuildContext context) =>
+    _passEvent(context, UpdateItemsMenu());
+
+void _onNextPressed(BuildContext context) => _passEvent(context, PostOrder());
+
+void _onSuggestionSelected(
+  BuildContext context,
+  Item item,
+) {
   if (item is OnSpotDeal) {
-    passEvent(context, AddOnSpotDeal(deal: item));
-  } else {
-    passEvent(
-      context,
-      AddItem(
-        code: item.code,
-        itemId: int.parse(item.id),
-      ),
-    );
-  }
+  } else if (item is FixedDeal) {
+  } else if (item is FoodItem) {}
 }
 
-void _onReduceItem(BuildContext context, Item item) {
-  if (item is OnSpotDeal) {
-    ReduceOnSpotDeal(deal: item);
-  } else {
-    passEvent(
-      context,
-      ReduceItem(
-        code: item.code,
-        itemId: int.parse(item.id),
-      ),
-    );
-  }
+void _onIncreaseItem(BuildContext context, int index) {
+  _passEvent(context, IncreaseItem(index: index));
 }
 
-void _onQuantityChanged(BuildContext context, Item item, String value) {
-  if (item is OnSpotDeal) {
-    passEvent(
-        context,
-        OnSpotDealQuantityChanged(
-            deal: item, quantity: int.tryParse(value) ?? 0.0));
-  } else {
-    passEvent(
-      context,
-      ItemQuantityChanged(
-        code: item.code,
-        itemId: int.parse(item.id),
-        quantity: double.tryParse(value) ?? 0.0,
-      ),
-    );
-  }
+void _onReduceItem(BuildContext context, int index) {
+  _passEvent(context, DecreaseItem(index: index));
 }
 
-void _onRemoveItem(BuildContext context, Item item) {
-  if (item is OnSpotDeal) {
-    passEvent(context, RemoveOnSpotDeal(deal: item));
-  } else {
-    passEvent(
-      context,
-      RemoveItem(
-        code: item.code,
-        itemId: int.parse(item.id),
-      ),
-    );
-  }
+void _onRemoveItem(BuildContext context, int index) {
+  _passEvent(context, RemoveItem(index: index));
 }
 
 Future<void> _onItemCommentChanged(
-    BuildContext context, String value, Item item) async {
-  passEvent(
-    context,
-    AddComment(
-      code: item.code,
-      itemId: int.parse(item.id),
-      comment: value ?? '',
-    ),
-  );
+    BuildContext context, String value, int index) async {
+  _passEvent(context, AddComment(index: index, value: value));
 }
 
-void _onCartItemTap(BuildContext context, Item e) {
-  if (e is OnSpotDeal) {
-    _showDealDetail(context, e.name, e.dealItems);
-  } else if (e is FixedDeal) {
-    _showDealDetail(context, e.name, e.dealItems);
+void _onCartItemTap(BuildContext context, int index) {}
+
+Future<void> _onMenuItemPressed(
+  BuildContext context,
+  List<Category>? listCategories,
+  Item item,
+) async {
+  if (item.code == Item.OPENFOOD_CODE.toString()) {
+    openFoodDialog(context, item.categoryId).then((openItem) {
+      if (openItem != null) {
+        // _passEvent(context, AddOpenItem(openItem: openItem));
+      }
+    });
+  } else if (item is OnSpotDeal) {
+    try {
+      final x = OnSpotDeal.modify(item);
+      final deal = await showOnSpotDealDialog(
+        context: context,
+        onSpotDeal: x,
+      );
+      if (deal != null && deal.quantity <= 0) {
+        _passEvent(context, AddMenuItem(item: deal));
+      } else {
+        AppTheme.snackbar(context, 'Deal cancelled');
+      }
+    } catch (e) {
+      print(e);
+    }
+  } else if (item is FixedDeal) {
+  } else if (item is FoodItem) {
+    _passEvent(context, AddMenuItem(item: item));
   }
+  _updateLayout(context);
 }
 
 Future<void> _showDealDetail(
-    BuildContext context, String dealName, List<Item> dealItems) async {
+    BuildContext context, String? dealName, List<Item> dealItems) async {
   String itemNames = '';
   for (var item in dealItems) {
     itemNames += '${item.name} ${(item.quantity.toInt() + 1).toString()}\n';
@@ -116,5 +102,5 @@ Future<void> _showDealDetail(
   );
 }
 
-void passEvent(BuildContext context, ItemsMenuEvents event) =>
+void _passEvent(BuildContext context, ItemsMenuEvents event) =>
     context.read<ItemsMenuBloc>().add(event);

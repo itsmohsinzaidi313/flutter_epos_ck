@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:http/http.dart';
 import 'package:pos_app/models/feedback.dart';
@@ -16,11 +15,11 @@ class FeedbackRepo {
         'Cleanliness?',
       ];
   Future<Response> uploadFeedback(CustomerFeedback feedback) async =>
-      await post(Uri.parse(await Config.postFeedbackApi),
+      await post(Uri.parse(Config.postFeedbackApi),
               headers: {'Content-type': 'application/json'},
               body: jsonEncode(feedback.toMap()))
           .timeout(Duration(seconds: Config.SERVER_TIMEOUT),
               onTimeout: () => Lib.timeout)
-          .onError((error, stackTrace) =>
+          .onError((dynamic error, stackTrace) =>
               Lib.httpErrorResponseHandler(error: error));
 }

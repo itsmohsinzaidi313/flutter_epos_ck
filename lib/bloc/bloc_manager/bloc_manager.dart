@@ -4,6 +4,7 @@ import 'package:pos_app/bloc/order_info_bloc/order_info_bloc.dart';
 import 'package:pos_app/bloc/orders_bloc/orders_bloc.dart';
 import 'package:pos_app/bloc/payment_bloc/payment_bloc.dart';
 import 'package:pos_app/bloc/report_bloc/report_bloc.dart';
+import 'package:pos_app/models/customer_order.dart';
 
 class BlocManager {
   final LoginBloc loginBloc;
@@ -13,12 +14,12 @@ class BlocManager {
   final OrdersBloc ordersBloc;
   final ReportBloc reportBloc;
 
-  BlocManager()
+  BlocManager(Order order)
       : loginBloc = LoginBloc(),
-        orderInfoBloc = OrderInfoBloc(),
-        posBloc = ItemsMenuBloc(),
-        paymentBloc = PaymentBloc(),
+        orderInfoBloc = OrderInfoBloc(order: order),
+        posBloc = ItemsMenuBloc(order: order),
         ordersBloc = OrdersBloc(),
+        paymentBloc = PaymentBloc(),
         reportBloc = ReportBloc();
 
   void dispose() {

@@ -1,19 +1,19 @@
 part of 'order_info_page.dart';
 
 class _TablesGrid extends StatelessWidget {
-  final List<Tables> listTables;
-  final void Function(BuildContext context, Tables table) onTap;
-  const _TablesGrid({Key key, this.listTables, this.onTap}) : super(key: key);
+  final List<Tables>? listTables;
+  final void Function(BuildContext context, Tables table)? onTap;
+  const _TablesGrid({Key? key, this.listTables, this.onTap}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
-      itemCount: listTables.length,
+      itemCount: listTables!.length,
       gridDelegate:
           SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 4),
       itemBuilder: (context, index) => Card(
         elevation: 10,
-        color: listTables[index].selected
+        color: listTables![index].selected
             ? Colors.redAccent[200]
             : Colors.grey.shade100,
         child: InkWell(
@@ -23,7 +23,7 @@ class _TablesGrid extends StatelessWidget {
                 top: 2,
                 left: 2,
                 child: Text(
-                  listTables[index].name,
+                  listTables![index].name,
                   style: GoogleFonts.ubuntuCondensed(
                     color: Colors.grey.shade900,
                     fontSize: 16,
@@ -69,10 +69,10 @@ class _TablesGrid extends StatelessWidget {
                       ),
                     ],
                   ),
-                  child: listTables[index].reserved
+                  child: listTables![index].reserved
                       ? Icon(Icons.lock, color: Colors.black)
                       : Icon(Icons.check,
-                          color: listTables[index].selected
+                          color: listTables![index].selected
                               ? Colors.green
                               : Colors.white),
                 ),
@@ -80,7 +80,7 @@ class _TablesGrid extends StatelessWidget {
             ],
           ),
           onTap: () {
-            onTap(context, listTables[index]);
+            onTap!(context, listTables![index]);
           },
         ),
       ),

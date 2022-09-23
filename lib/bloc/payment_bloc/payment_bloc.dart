@@ -1,14 +1,14 @@
 import 'dart:async';
-import 'package:meta/meta.dart';
 import 'package:bloc/bloc.dart';
 import 'package:pos_app/models/customer_order.dart';
 import 'package:pos_app/models/item.dart';
+import 'package:pos_app/shared/enums.dart';
 
 part 'payment_event.dart';
 part 'payment_state.dart';
 
 class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
-  Order customerOrder;
+  late Order order;
   PaymentBloc() : super(PaymentInitial(totalAmount: '0', totalTaxAmount: '0'));
 
   final String invalidDiscountMessage = 'Please check the discount amount';
@@ -22,130 +22,132 @@ class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {
     PaymentEvent event,
   ) async* {
     if (event is LoadPaymentOrder) {
-      customerOrder = event.customerOrder;
+      order = event.customerOrder;
     } else if (event is PaymentBuild) {
       yield CartItems(
-          list: customerOrder.items,
-          totalAmount: customerOrder.subTotal,
-          totalTaxAmount: customerOrder.totalTaxedAmount);
+          list: order.cart.items,
+          totalAmount: order.subTotal,
+          totalTaxAmount: order.totalTaxedAmount);
       yield PaymentType(
-          mode: PAYMENTMODE.CASH,
-          totalAmount: customerOrder.subTotal,
-          totalTaxAmount: customerOrder.totalTaxedAmount);
+          mode: PaymentMode.cash,
+          totalAmount: order.subTotal,
+          totalTaxAmount: order.totalTaxedAmount);
     } else if (event is PaymentModeChanged) {
-      customerOrder.paymentmode = event.mode;
+      order = Order.modify(order, paymentmode: event.mode);
       yield PaymentType(
           mode: event.mode,
-          totalAmount: customerOrder.subTotal,
-          totalTaxAmount: customerOrder.totalTaxedAmount);
+          totalAmount: order.subTotal,
+          totalTaxAmount: order.totalTaxedAmount);
     } else if (event is AddItem) {
-      customerOrder.addCartItem(customerOrder.items
+      order.cart.addItem(order.cart.items
           .where((element) => element.id == '${event.itemId}')
           .first);
       yield CartItems(
-          list: customerOrder.items,
-          totalAmount: customerOrder.subTotal,
-          totalTaxAmount: customerOrder.totalTaxedAmount);
+          list: order.cart.items,
+          totalAmount: order.subTotal,
+          totalTaxAmount: order.totalTaxedAmount);
     } else if (event is ReduceItem) {
-      customerOrder.reduceCartItem(event.itemId, removeZeroQuantity: false);
+      order.cart.reduceCartItem(event.item.id, removeZeroQuantity: false);
       yield CartItems(
-          list: customerOrder.items,
-          totalAmount: customerOrder.subTotal,
-          totalTaxAmount: customerOrder.totalTaxedAmount);
+          list: order.cart.items,
+          totalAmount: order.subTotal,
+          totalTaxAmount: order.totalTaxedAmount);
     } else if (event is RemoveItem) {
-      customerOrder.removeCartItem(event.itemId);
+      order.cart.removeCartItem(event.item.id);
       yield CartItems(
-          list: customerOrder.items,
-          totalAmount: customerOrder.subTotal,
-          totalTaxAmount: customerOrder.totalTaxedAmount);
+          list: order.cart.items,
+          totalAmount: order.subTotal,
+          totalTaxAmount: order.totalTaxedAmount);
     } else if (event is AddComment) {
-      customerOrder.addItemComment(event.itemId, event.comment);
+      order.cart.addItemComment(event.itemId, event.comment ?? '');
       yield CartItems(
-          list: customerOrder.items,
-          totalAmount: customerOrder.subTotal,
-          totalTaxAmount: customerOrder.totalTaxedAmount);
+          list: order.cart.items,
+          totalAmount: order.subTotal,
+          totalTaxAmount: order.totalTaxedAmount);
     } else if (event is PaymentChanged) {
-      double payment = double.tryParse(event.payment);
-      if (payment != null) {
-        if (payment > double.parse(customerOrder.subTotal) || payment <= 0) {
+      double? payment = event.payment;
+      if (payment <= 0) {
+        if (payment > double.parse(order.subTotal) || payment <= 0) {
           yield InvalidPayment(
               message: invalidPaymentMessage,
-              totalAmount: customerOrder.subTotal,
-              totalTaxAmount: customerOrder.totalTaxedAmount);
+              totalAmount: order.subTotal,
+              totalTaxAmount: order.totalTaxedAmount);
         } else {
-          customerOrder.payment = event.payment;
+          order = Order.modify(order, paidAmount: event.payment);
         }
       } else {
         yield InvalidPayment(
             message: invalidPaymentMessage,
-            totalAmount: customerOrder.subTotal,
-            totalTaxAmount: customerOrder.totalTaxedAmount);
+            totalAmount: order.subTotal,
+            totalTaxAmount: order.totalTaxedAmount);
       }
       yield AdjustPayment(
-          totalAmount: customerOrder.subTotal,
-          totalTaxAmount: customerOrder.totalTaxedAmount);
+          totalAmount: order.subTotal, totalTaxAmount: order.totalTaxedAmount);
     } else if (event is CardNumberChanged) {
-      if (int.tryParse(event.cardNumber) == null) {
+      if (int.tryParse(event.cardNumber!) == null) {
         yield InvalidCardNumber(
             message: invalidCardNumberMessage,
-            totalAmount: customerOrder.subTotal,
-            totalTaxAmount: customerOrder.totalTaxedAmount);
+            totalAmount: order.subTotal,
+            totalTaxAmount: order.totalTaxedAmount);
       }
     } else if (event is DiscountChanged) {
-      double discount = double.tryParse(event.discount);
+      double? discount = double.tryParse(event.discount!);
       if (discount != null) {
-        if (double.parse(customerOrder.subTotal) - discount < 0) {
+        if (double.parse(order.subTotal) - discount < 0) {
           yield InvalidDiscount(
               message: invalidDiscountMessage,
-              totalAmount: customerOrder.subTotal,
-              totalTaxAmount: customerOrder.totalTaxedAmount);
+              totalAmount: order.subTotal,
+              totalTaxAmount: order.totalTaxedAmount);
         } else {
-          customerOrder.discountedAmount = event.discount;
+          order = Order.modify(order, discountAmount: discount);
         }
       } else {
         yield InvalidDiscount(
             message: invalidDiscountMessage,
-            totalAmount: customerOrder.subTotal,
-            totalTaxAmount: customerOrder.totalTaxedAmount);
+            totalAmount: order.subTotal,
+            totalTaxAmount: order.totalTaxedAmount);
       }
-    } else if (event is Submit) {
-      double discount = double.tryParse(customerOrder.discountedAmount);
-      double payment = double.tryParse(customerOrder.payment);
-      if (discount == null) {
+    } else if (event is SubmitPressed) {
+      double discount = order.discountAmount;
+      double payment = order.paidAmount;
+      if (discount <= 0) {
         yield InvalidDiscount(
             message: invalidDiscountMessage,
-            totalAmount: customerOrder.subTotal,
-            totalTaxAmount: customerOrder.totalTaxedAmount);
+            totalAmount: order.subTotal,
+            totalTaxAmount: order.totalTaxedAmount);
       }
-      if (customerOrder.paymentmode == PAYMENTMODE.CASH) {
-        if (payment == null) {
+      if (order.paymentMode == PaymentMode.cash) {
+        if (payment <= 0) {
           yield InvalidPayment(
-              message: invalidPaymentMessage,
-              totalAmount: customerOrder.subTotal,
-              totalTaxAmount: customerOrder.totalTaxedAmount);
+            message: invalidPaymentMessage,
+            totalAmount: order.subTotal,
+            totalTaxAmount: order.totalTaxedAmount,
+          );
         }
-        if (payment != null && discount != null) {
+        if (discount <= 0) {
           if (payment - discount < 0) {
             yield InvalidDiscount(
-                message: invalidDiscountMessage,
-                totalAmount: customerOrder.subTotal,
-                totalTaxAmount: customerOrder.totalTaxedAmount);
+              message: invalidDiscountMessage,
+              totalAmount: order.subTotal,
+              totalTaxAmount: order.totalTaxedAmount,
+            );
           } else {
             yield ValidSubmission();
           }
-        } else if (customerOrder.paymentmode == PAYMENTMODE.CREDIT) {
-          if (int.tryParse(customerOrder.cardNumber) == null) {
+        } else if (order.paymentMode == PaymentMode.credit) {
+          if (int.tryParse(order.cardNumber) == null) {
             yield InvalidCardNumber(
-                message: invalidCardNumberMessage,
-                totalAmount: customerOrder.subTotal,
-                totalTaxAmount: customerOrder.totalTaxedAmount);
+              message: invalidCardNumberMessage,
+              totalAmount: order.subTotal,
+              totalTaxAmount: order.totalTaxedAmount,
+            );
           } else {
             yield ValidSubmission();
           }
         }
       }
     } else if (event is ResetPaymentOrder) {
-      customerOrder.reset();
+      order.reset();
     }
   }
 }

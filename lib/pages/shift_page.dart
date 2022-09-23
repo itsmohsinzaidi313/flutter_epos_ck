@@ -9,7 +9,7 @@ class ShiftScreen extends StatefulWidget {
 }
 
 class _ShiftScreen extends State<ShiftScreen> {
-  String _dropdown = 'Morning';
+  String? _dropdown = 'Morning';
   TextEditingController closingAmount = TextEditingController();
   TextEditingController openingAmount = TextEditingController();
   bool checkField = false;
@@ -66,7 +66,7 @@ class _ShiftScreen extends State<ShiftScreen> {
                 borderRadius: BorderRadius.circular(10),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.grey[300],
+                    color: Colors.grey[300]!,
                     blurRadius: 20,
                   ),
                 ],
@@ -134,7 +134,7 @@ class _ShiftScreen extends State<ShiftScreen> {
                           FocusScope.of(context).unfocus();
                         },
                         validator: (value) {
-                          if (value.isEmpty ||
+                          if (value!.isEmpty ||
                               value.length < 0 ||
                               int.parse(value) <= 0) {
                             return 'Invalid Amount';
@@ -203,8 +203,8 @@ class _ShiftScreen extends State<ShiftScreen> {
         return FloatingActionButton(
           onPressed: () {
             setState(() {
-              if (_formKey.currentState.validate()) {
-                _formKey.currentState.save();
+              if (_formKey.currentState!.validate()) {
+                _formKey.currentState!.save();
               } else {
                 // _autoValidate = true;
               }
@@ -218,7 +218,7 @@ class _ShiftScreen extends State<ShiftScreen> {
         return FloatingActionButton(
           onPressed: () async {
             try {} catch (e) {
-              log(e);
+              log('Error', error: e);
             }
           },
           child: Icon(Icons.close),

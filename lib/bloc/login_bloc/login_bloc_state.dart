@@ -8,9 +8,9 @@ class LoginBlocInitial extends LoginState {
   final String username;
   final String password;
   LoginBlocInitial({
-    this.ipAddress,
-    this.username,
-    this.password,
+    required this.ipAddress,
+    required this.username,
+    required this.password,
   });
 }
 
@@ -25,7 +25,7 @@ class LoadedState extends LoginState {
   final String password;
   final bool allowLogin;
   final String message;
-  final User user;
+  final User? user;
 
   LoadedState({
     this.ipAddress = '',
@@ -38,8 +38,8 @@ class LoadedState extends LoginState {
 }
 
 class ErrorState extends LoginState {
-  final String message;
-  ErrorState({@required this.message});
+  final String? message;
+  ErrorState({required this.message});
 }
 
 // class ValidIpAddress extends LoginState {

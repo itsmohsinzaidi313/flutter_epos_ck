@@ -4,15 +4,15 @@ class _TextFields extends StatelessWidget {
   final TextEditingController ipAddress;
   final TextEditingController username;
   final TextEditingController password;
-  final void Function() onTap;
-  final void Function() onSubmitted;
+  final void Function(BuildContext context) onTap;
+  final void Function(BuildContext context) onSubmitted;
   const _TextFields({
-    Key key,
-    this.ipAddress,
-    this.username,
-    this.password,
-    this.onTap,
-    this.onSubmitted,
+    Key? key,
+    required this.ipAddress,
+    required this.username,
+    required this.password,
+    required this.onTap,
+    required this.onSubmitted,
   }) : super(key: key);
 
   @override
@@ -50,21 +50,20 @@ class _TextFields extends StatelessWidget {
         ),
         Row(
           children: [
-            Flexible(
-              child: StatefulBuilder(builder: (context, setState) {
-                return TextField(
+            StatefulBuilder(builder: (context, setState) {
+              return Flexible(
+                child: TextField(
                   controller: username,
                   decoration: InputDecoration(
                       icon: Icon(Icons.person),
                       labelText: 'Username',
-                      errorText:
-                          (username.text ?? '').isEmpty ? 'Required' : null),
+                      errorText: (username.text).isEmpty ? 'Required' : null),
                   textInputAction: TextInputAction.next,
                   keyboardType: TextInputType.emailAddress,
                   onChanged: (value) => setState(() => null),
-                );
-              }),
-            ),
+                ),
+              );
+            }),
           ],
         ),
         Row(
@@ -76,12 +75,11 @@ class _TextFields extends StatelessWidget {
                   decoration: InputDecoration(
                     icon: Icon(Icons.vpn_key),
                     labelText: 'Password',
-                    errorText:
-                        (password.text ?? '').isEmpty ? 'Required' : null,
+                    errorText: (password.text).isEmpty ? 'Required' : null,
                   ),
                   textInputAction: TextInputAction.done,
                   keyboardType: TextInputType.visiblePassword,
-                  onSubmitted: (value) => onSubmitted(),
+                  onSubmitted: (value) => onSubmitted(context),
                   onChanged: (value) => setState(() => null),
                 );
               }),
@@ -93,7 +91,7 @@ class _TextFields extends StatelessWidget {
           children: [
             Expanded(
               child: OutlinedButton(
-                onPressed: onTap,
+                onPressed: () => onTap(context),
                 child: Center(
                   child: Text(
                     'Login',
