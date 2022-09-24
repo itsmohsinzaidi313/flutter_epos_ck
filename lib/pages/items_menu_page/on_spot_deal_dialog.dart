@@ -42,10 +42,12 @@ class _OnSpotDealPageState extends State<OnSpotDealPage>
   }
 
   double _limit(OnSpotDealItem item) =>
-      double.tryParse(widget.deal!.dealSteps.where((element) => element.id == item.dealStepId)
+      double.tryParse(widget.deal!.dealSteps
+          .where((element) => element.id == item.dealStepId)
           .first
           .limit!) ??
       0;
+      
   double _seletedQuantity(String? categoryId) {
     double total = 0;
     for (OnSpotDealItem dealItem in widget.deal!.dealItems) {
@@ -57,7 +59,8 @@ class _OnSpotDealPageState extends State<OnSpotDealPage>
   }
 
   void _buildLayout() {
-    _tabs = widget.deal!.dealSteps.map((e) => Tab(
+    _tabs = widget.deal!.dealSteps
+        .map((e) => Tab(
               text: e.name!.toUpperCase(),
             ))
         .toList();
@@ -180,7 +183,7 @@ class _OnSpotDealPageState extends State<OnSpotDealPage>
       setState(() {
         widget.deal!.dealItems[itemIndex] = OnSpotDealItem.modify(
           item,
-          quantity: item.quantity+ 1,
+          quantity: item.quantity + 1,
           selected: true,
         );
       });
@@ -196,6 +199,6 @@ class _OnSpotDealPageState extends State<OnSpotDealPage>
   }
 
   void createDeal() {
-    Navigator.of(context).pop();
+    Navigator.of(context).pop(widget.deal);
   }
 }

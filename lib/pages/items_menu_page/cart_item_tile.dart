@@ -51,21 +51,23 @@ class _CartItemTile extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    RichText(
-                      text: TextSpan(
-                        text: '${item.name.toUpperCase()}\n',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                          color: Colors.black,
+                    Flexible(
+                      child: RichText(
+                        text: TextSpan(
+                          text: '${item.name.toUpperCase()}\n',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black,
+                          ),
+                          children: [
+                            TextSpan(
+                                style: TextStyle(
+                                    fontSize: 12, color: Colors.black),
+                                text:
+                                    '${item.quantity}x${item.price}=${item.quantity * item.price}')
+                          ],
                         ),
-                        children: [
-                          TextSpan(
-                              style:
-                                  TextStyle(fontSize: 12, color: Colors.black),
-                              text:
-                                  '${item.quantity}x${item.price}=${item.quantity * item.price}')
-                        ],
                       ),
                     ),
                     Spacer(),
